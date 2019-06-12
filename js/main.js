@@ -93,7 +93,7 @@ var generateCoordinate = function (minCoordinate, maxCoordinate) {
 var generateAd = function (minNumberImg, maxNumberImg, offersArray, minCoordinateX, maxCoordinateX, minCoordinateY, maxCoordinateY) {
   return {
     'author': {
-      avatar: generateAvatarImg(minNumberImg, maxNumberImg)
+      'avatar': generateAvatarImg(minNumberImg, maxNumberImg)
     },
     'offer': {
       'type': getElementFormArray(offersArray)
@@ -105,9 +105,35 @@ var generateAd = function (minNumberImg, maxNumberImg, offersArray, minCoordinat
   };
 };
 
-//генерация массива объявлений(объектов)
+//генерация массива объектов
 var ads = [];
 while (randomNumbers.length !== AD.numbers.max) {
   ads.push(generateAd(AD.numbers.min, AD.numbers.max, AD.offers, COORDINATE_MAP_PINS.x.MIN_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.x.MAX_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.y.MIN_HEIGTH_MAP_PINS, COORDINATE_MAP_PINS.y.MAX_HEIGTH_MAP_PINS));
-  console.log(ads);
 }
+console.log(ads);
+
+var map = document.querySelector('.map');
+map.classList.remove('map--faded');
+
+var pinList = document.querySelector('.map__pins');
+var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pin');
+console.log(pinTamplate);
+
+var renderPin = function (pinProperties) {
+  var pinElement = pinTamplate.cloneNode(true);
+  console.log(pinElement);
+  // pinElement.querySelector('.map__pin').style.cssText = "left: " + ads[i].location.x + "px; top: " + ads[i].location.y + "px;";
+  pinElement.querySelector('img').src = ads[i].author.avatar;
+  pinElement.querySelector('img').alt = ads[i].offer.type;
+  pinElement.querySelector('img').style['left'] = '10px';
+  pinElement.querySelector('img').style['top'] = '10px';
+
+  return pinElement;
+}
+
+var fragment = document.createDocumentFragment();
+for (var i = 0; i < ads.length; i++) {
+  fragment.appendChild(renderPin(ads[i]));
+}
+
+pinList.appendChild(fragment);
