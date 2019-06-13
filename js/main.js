@@ -79,29 +79,15 @@ var getElementFormArray = function (someArray) {
 };
 
 /**
- * Генерирует случайную координату X.
+ * Генерирует случайную координату.
  *
- * @param {number} minCoordinate - минимальная координата X.
- * @param {number} maxCoordinate - максимальная координата X.
- * @param {number} widthPin - ширина метки.
- * @return {number} coordinateX - случайная координата X.
+ * @param {number} minCoordinate - минимальная координата.
+ * @param {number} maxCoordinate - максимальная координата.
+ * @return {number} coordinate - случайная координата.
  */
-var generateCoordinateX = function (minCoordinate, maxCoordinate, widthPin) {
-  var coordinateX = Math.floor(minCoordinate + (Math.random() * (maxCoordinate - minCoordinate)) - widthPin / 2);
-  return coordinateX;
-};
-
-/**
- * Генерирует случайную координату Y.
- *
- * @param {number} minCoordinate - минимальная координата Y.
- * @param {number} maxCoordinate - максимальная координата Y.
- * @param {number} heightPin - высота метки.
- * @return {number} coordinateY - случайная координата Y.
- */
-var generateCoordinateY = function (minCoordinate, maxCoordinate, heightPin) {
-  var coordinateY = Math.floor(minCoordinate + (Math.random() * (maxCoordinate - minCoordinate)) - heightPin);
-  return coordinateY;
+var generateCoordinate = function (minCoordinate, maxCoordinate) {
+  var coordinate = Math.floor(minCoordinate + (Math.random() * (maxCoordinate - minCoordinate)));
+  return coordinate;
 };
 
 /**
@@ -118,7 +104,7 @@ var generateCoordinateY = function (minCoordinate, maxCoordinate, heightPin) {
  * @param {number} heightPin - высота метки.
  * @return {Object} - объект данных  для метки: строка адреса для автара, строка тип предлложения, координаты метки.
  */
-var generateAd = function (minNumberImg, maxNumberImg, offersArray, minCoordinateX, maxCoordinateX, widthPin, minCoordinateY, maxCoordinateY, heightPin) {
+var generateAd = function (minNumberImg, maxNumberImg, offersArray, minCoordinateX, maxCoordinateX, minCoordinateY, maxCoordinateY) {
   return {
     'author': {
       'avatar': generateAvatarImg(minNumberImg, maxNumberImg)
@@ -127,8 +113,8 @@ var generateAd = function (minNumberImg, maxNumberImg, offersArray, minCoordinat
       'type': getElementFormArray(offersArray)
     },
     'location': {
-      'x': generateCoordinateX(minCoordinateX, maxCoordinateX, widthPin),
-      'y': generateCoordinateY(minCoordinateY, maxCoordinateY, heightPin)
+      'x': generateCoordinate(minCoordinateX, maxCoordinateX),
+      'y': generateCoordinate(minCoordinateY, maxCoordinateY)
     }
   };
 };
@@ -148,15 +134,15 @@ var generateAd = function (minNumberImg, maxNumberImg, offersArray, minCoordinat
  * @param {Array} maxPins - максимальное количество меток .
  * @return {Array} adsArray - массив объектов с данными для меток.
  */
-var getAds = function (minNumberImg, maxNumberImg, offersArray, minCoordinateX, maxCoordinateX, widthPin, minCoordinateY, maxCoordinateY, heightPin, maxPins) {
+var getAds = function (minNumberImg, maxNumberImg, offersArray, minCoordinateX, maxCoordinateX, minCoordinateY, maxCoordinateY, maxPins) {
   var adsArray = [];
   for (var i = 0; i < maxPins; i++) {
-    adsArray.push(generateAd(AD.NUMBERS.MIN, AD.NUMBERS.MAX, AD.OFFERS, COORDINATE_MAP_PINS.X.MIN_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.X.MAX_WIDTH_MAP_PINS, WIDTH_PIN, COORDINATE_MAP_PINS.Y.MIN_HEIGTH_MAP_PINS, COORDINATE_MAP_PINS.Y.MAX_HEIGTH_MAP_PINS, HEIGHT_PIN));
+    adsArray.push(generateAd(AD.NUMBERS.MIN, AD.NUMBERS.MAX, AD.OFFERS, COORDINATE_MAP_PINS.X.MIN_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.X.MAX_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.Y.MIN_HEIGTH_MAP_PINS, COORDINATE_MAP_PINS.Y.MAX_HEIGTH_MAP_PINS));
   }
   return adsArray;
 };
 
-var ads = getAds(AD.NUMBERS.MIN, AD.NUMBERS.MAX, AD.OFFERS, COORDINATE_MAP_PINS.X.MIN_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.X.MAX_WIDTH_MAP_PINS, WIDTH_PIN, COORDINATE_MAP_PINS.Y.MIN_HEIGTH_MAP_PINS, COORDINATE_MAP_PINS.Y.MAX_HEIGTH_MAP_PINS, HEIGHT_PIN, MAX_PINS);
+var ads = getAds(AD.NUMBERS.MIN, AD.NUMBERS.MAX, AD.OFFERS, COORDINATE_MAP_PINS.X.MIN_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.X.MAX_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.Y.MIN_HEIGTH_MAP_PINS, COORDINATE_MAP_PINS.Y.MAX_HEIGTH_MAP_PINS, MAX_PINS);
 
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
@@ -168,11 +154,13 @@ var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pi
  * Генерирует массив объектов с данными для метки.
  *
  * @param {Object} pinProperties - объект с данными для генерации новой метки.
+ * @param {number} widthPin - ширина метки.
+ * @param {number} heightPin - высота метки.
  * @return {Object} pinElement - измененный склонированный элемент.
  */
-var generatePin = function (pinProperties) {
+var generatePin = function (pinProperties, widthPin, heightPin) {
   var pinElement = pinTamplate.cloneNode(true);
-  pinElement.style.cssText = 'left: ' + pinProperties.location.x + 'px; top: ' + pinProperties.location.y + 'px;';
+  pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
   pinElement.querySelector('img').src = pinProperties.author.avatar;
   pinElement.querySelector('img').alt = pinProperties.offer.type;
   return pinElement;
@@ -185,11 +173,11 @@ var fragment = document.createDocumentFragment();
  *
  * @param {Array} dataArray - массив с данными для рендера меток.
  */
-var renderPin = function (dataArray) {
+var renderPin = function (dataArray, widthPin, heightPin) {
   for (var i = 0; i < dataArray.length; i++) {
-    fragment.appendChild(generatePin(dataArray[i]));
+    fragment.appendChild(generatePin(dataArray[i], widthPin, heightPin));
   }
   pinList.appendChild(fragment);
 };
 
-renderPin(ads);
+renderPin(ads, WIDTH_PIN, HEIGHT_PIN);
