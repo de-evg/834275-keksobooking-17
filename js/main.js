@@ -98,10 +98,8 @@ var generateCoordinate = function (minCoordinate, maxCoordinate) {
  * @param {Array} offersArray - массив рекламных предложений.
  * @param {number} minCoordinateX - минимальная координата X.
  * @param {number} maxCoordinateX - максимальная координата X.
- * @param {number} widthPin - ширина метки.
  * @param {number} minCoordinateY - минимальная координата Y.
  * @param {number} maxCoordinateY - максимальная координата Y.
- * @param {number} heightPin - высота метки.
  * @return {Object} - объект данных  для метки: строка адреса для автара, строка тип предлложения, координаты метки.
  */
 var generateAd = function (minNumberImg, maxNumberImg, offersArray, minCoordinateX, maxCoordinateX, minCoordinateY, maxCoordinateY) {
@@ -127,10 +125,8 @@ var generateAd = function (minNumberImg, maxNumberImg, offersArray, minCoordinat
  * @param {Array} offersArray - массив рекламных предложений.
  * @param {number} minCoordinateX - минимальная координата X.
  * @param {number} maxCoordinateX - максимальная координата X.
- * @param {number} widthPin - ширина метки.
  * @param {number} minCoordinateY - минимальная координата Y.
  * @param {number} maxCoordinateY - максимальная координата Y.
- * @param {number} heightPin - высота метки.
  * @param {Array} maxPins - максимальное количество меток .
  * @return {Array} adsArray - массив объектов с данными для меток.
  */
@@ -172,6 +168,8 @@ var fragment = document.createDocumentFragment();
  * Добавляет в DOM склонированные элементы.
  *
  * @param {Array} dataArray - массив с данными для рендера меток.
+ * @param {number} widthPin - ширина метки.
+ * @param {number} heightPin - высота метки.
  */
 var renderPin = function (dataArray, widthPin, heightPin) {
   for (var i = 0; i < dataArray.length; i++) {
