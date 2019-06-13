@@ -30,7 +30,6 @@ var AD = {
 // обявление массива для проверки на уникальность случайного числа
 var randomNumbers = [];
 
-
 /**
  * Генерирует адреса изображения для автара.
  *
@@ -59,17 +58,16 @@ var generateAvatarImg = function (minNumberImg, maxNumberImg) {
  * @return {boolean} - возвращает логическое true или false.
  */
 var checkRandomNumber = function (randomNumber, maxNumberImg) {
-  // проверяю на количество выбранных уникальных номеров
-  if (randomNumbers.length < maxNumberImg) {
-    // проверяю на наличие в массиве случайного числа
-    if (randomNumbers.indexOf(randomNumber) === -1) {
-      // добавляю в массив новое случайное число
-      randomNumbers.push(randomNumber);
-      return true;
-    }
+  // проверяю на наличие в массиве случайного числа
+  if (randomNumbers.indexOf(randomNumber) === -1) {
+    // добавляю в массив новое случайное число
+    randomNumbers.push(randomNumber);
+    return true;
   }
   return false;
 };
+
+console.log(randomNumbers);
 
 /**
  * Получает случайный элемент массива.
@@ -101,7 +99,7 @@ var generateCoordinateX = function (minCoordinate, maxCoordinate, widthPin) {
  * @param {number} minCoordinate - минимальная координата Y.
  * @param {number} maxCoordinate - максимальная координата Y.
  * @param {number} heightPin - высота метки.
- * @return {number} coordinateX - случайная координата Y.
+ * @return {number} coordinateY - случайная координата Y.
  */
 var generateCoordinateY = function (minCoordinate, maxCoordinate, heightPin) {
   var coordinateY = Math.floor(minCoordinate + (Math.random() * (maxCoordinate - minCoordinate)) - heightPin);
@@ -161,6 +159,8 @@ var getAds = function (minNumberImg, maxNumberImg, offersArray, minCoordinateX, 
 };
 
 var ads = getAds(AD.NUMBERS.MIN, AD.NUMBERS.MAX, AD.OFFERS, COORDINATE_MAP_PINS.X.MIN_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.X.MAX_WIDTH_MAP_PINS, WIDTH_PIN, COORDINATE_MAP_PINS.Y.MIN_HEIGTH_MAP_PINS, COORDINATE_MAP_PINS.Y.MAX_HEIGTH_MAP_PINS, HEIGHT_PIN, MAX_PINS);
+
+console.log(ads);
 
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
