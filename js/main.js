@@ -57,7 +57,7 @@ var generateAvatarImg = function (minNumberImg, maxNumberImg) {
  * @param {number} maxNumberImg - максимальное число.
  * @return {boolean} - возвращает логическое true или false.
  */
-var checkRandomNumber = function (randomNumber, maxNumberImg) {
+var checkRandomNumber = function (randomNumber) {
   // проверяю на наличие в массиве случайного числа
   if (randomNumbers.indexOf(randomNumber) === -1) {
     // добавляю в массив новое случайное число
@@ -66,8 +66,6 @@ var checkRandomNumber = function (randomNumber, maxNumberImg) {
   }
   return false;
 };
-
-console.log(randomNumbers);
 
 /**
  * Получает случайный элемент массива.
@@ -159,8 +157,6 @@ var getAds = function (minNumberImg, maxNumberImg, offersArray, minCoordinateX, 
 };
 
 var ads = getAds(AD.NUMBERS.MIN, AD.NUMBERS.MAX, AD.OFFERS, COORDINATE_MAP_PINS.X.MIN_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.X.MAX_WIDTH_MAP_PINS, WIDTH_PIN, COORDINATE_MAP_PINS.Y.MIN_HEIGTH_MAP_PINS, COORDINATE_MAP_PINS.Y.MAX_HEIGTH_MAP_PINS, HEIGHT_PIN, MAX_PINS);
-
-console.log(ads);
 
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
