@@ -39,7 +39,7 @@ var randomNumbers = [];
  */
 var generateAvatarImg = function (minNumberImg, maxNumberImg) {
   // получаю случайное число
-  var n = Math.floor(minNumberImg + (Math.random() * maxNumberImg));
+  var n = Math.floor(minNumberImg + (Math.random() * maxNumberImg + 1 - minNumberImg));
   // выполняю проверку на уникальность
   if (checkRandomNumber(n, maxNumberImg)) {
     // создаю уникальную строку с адресом
@@ -86,7 +86,7 @@ var getElementFormArray = function (someArray) {
  * @return {number} coordinate - случайная координата.
  */
 var generateCoordinate = function (minCoordinate, maxCoordinate) {
-  var coordinate = Math.floor(minCoordinate + (Math.random() * (maxCoordinate - minCoordinate)));
+  var coordinate = Math.floor(minCoordinate + (Math.random() * (maxCoordinate + 1 - minCoordinate)));
   return coordinate;
 };
 
