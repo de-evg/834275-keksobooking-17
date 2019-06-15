@@ -147,7 +147,7 @@ var pinList = document.querySelector('.map__pins');
 var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pin');
 
 /**
- * Генерирует массив объектов с данными для метки.
+ * Генерирует объект с данными для метки.
  *
  * @param {Object} pinProperties - объект с данными для генерации новой метки.
  * @param {number} widthPin - ширина метки.
