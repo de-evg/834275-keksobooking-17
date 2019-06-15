@@ -133,7 +133,7 @@ var generateAd = function (minNumberImg, maxNumberImg, offersArray, minCoordinat
 var getAds = function (minNumberImg, maxNumberImg, offersArray, minCoordinateX, maxCoordinateX, minCoordinateY, maxCoordinateY, maxPins) {
   var adsArray = [];
   for (var i = 0; i < maxPins; i++) {
-    adsArray.push(generateAd(AD.NUMBERS.MIN, AD.NUMBERS.MAX, AD.OFFERS, COORDINATE_MAP_PINS.X.MIN_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.X.MAX_WIDTH_MAP_PINS, COORDINATE_MAP_PINS.Y.MIN_HEIGTH_MAP_PINS, COORDINATE_MAP_PINS.Y.MAX_HEIGTH_MAP_PINS));
+    adsArray.push(generateAd(minNumberImg, maxNumberImg, offersArray, minCoordinateX, maxCoordinateX, minCoordinateY, maxCoordinateY));
   }
   return adsArray;
 };
