@@ -42,16 +42,16 @@ var generateRandomNumber = function (minNumber, maxNumber) {
 /**
  * Генерирует объект данных для метки.
  *
- * @param {number} uniqueImgNumber - уникальный номер изображения для аватара.
- * @param {Array} offerType - тип предлагаемого жилья.
+ * @param {string} uniqueImgAdress - уникальный адрес изображения.
+ * @param {string} offerType - тип предлагаемого жилья.
  * @param {number} coordinateX - координата X.
  * @param {number} coordinateY - координата Y.
  * @return {Object} - объект данных для метки: строка адреса для автара, строка тип предлложения, координаты метки.
  */
-var generateAd = function (uniqueImgNumber, offerType, coordinateX, coordinateY) {
+var generateAd = function (uniqueImgAdress, offerType, coordinateX, coordinateY) {
   return {
     'author': {
-      'avatar': uniqueImgNumber
+      'avatar': uniqueImgAdress
     },
     'offer': {
       'type': offerType
@@ -74,14 +74,14 @@ var generateAd = function (uniqueImgNumber, offerType, coordinateX, coordinateY)
 var getAds = function (offers, coordinates, maxPins) {
   var adsArray = [];
   for (var i = 0; i < maxPins; i++) {
-    var uniqueImgNumber = 'img/avatars/user0' + (i + 1) + '.png';
+    var uniqueImgAdress = 'img/avatars/user0' + (i + 1) + '.png';
     var newCoordinate = [];
     coordinates.forEach(function (coordinate, j) {
       newCoordinate[j] = generateRandomNumber(coordinate[0], coordinate[1]);
     });
     var offersKeys = (Object.values(offers));
     var offerType = getElementFormArray(offersKeys);
-    adsArray.push(generateAd(uniqueImgNumber, offerType, newCoordinate[0], newCoordinate[1]));
+    adsArray.push(generateAd(uniqueImgAdress, offerType, newCoordinate[0], newCoordinate[1]));
   }
   return adsArray;
 };
