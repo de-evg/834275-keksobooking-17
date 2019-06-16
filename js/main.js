@@ -4,7 +4,7 @@ var WIDTH_PIN = 50;
 var HEIGHT_PIN = 70;
 var MAX_PINS = 8;
 
-var COORDINATE_MAP_PINS = [
+var CoordinateMapPins = [
   [0, 1200],
   [130, 630]
 ];
@@ -86,7 +86,7 @@ var getAds = function (offers, coordinates, maxPins) {
   return adsArray;
 };
 
-var ads = getAds(Offers, COORDINATE_MAP_PINS, MAX_PINS);
+var ads = getAds(Offers, CoordinateMapPins, MAX_PINS);
 
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
