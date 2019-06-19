@@ -4,16 +4,12 @@ var WIDTH_PIN = 50;
 var HEIGHT_PIN = 70;
 var MAX_PINS = 8;
 
-var CoordinateMaps = [
-  {MIN_X: 0},
-  {MAX_X: 1200},
-  {MIN_Y:130},
-  {MAX_Y: 630}
-];
-
-var b = Object.values(CoordinateMaps[1]);
-var c = b.slice(0, 1);
-console.log(c);
+var CoordinateMaps = {
+  MIN_X: 0,
+  MAX_X: 1200,
+  MIN_Y: 130,
+  MAX_Y: 630
+};
 
 var Offers = {
   'PALACE': 'Дворец',
@@ -82,11 +78,8 @@ var getAds = function (offers, coordinates, maxPins) {
   for (var i = 0; i < maxPins; i++) {
     var uniqueImgAdress = 'img/avatars/user0' + (i + 1) + '.png';
     var newCoordinates = [];
-    coordinates.forEach(function (coordinate, j) {
-      var newCoordinateX = generateRandomNumber(Object.values(coordinates[0])[0], Object.values(coordinates[1])[0]);
-      var newCoordinateY = generateRandomNumber(Object.values(coordinates[2])[0], Object.values(coordinates[3])[0]);
-      newCoordinates.push(newCoordinateX, newCoordinateY);
-    });
+    newCoordinates.push(generateRandomNumber(coordinates.MIN_X, coordinates.MAX_X));
+    newCoordinates.push(generateRandomNumber(coordinates.MIN_Y, coordinates.MAX_Y));
     var offersKeys = (Object.values(offers));
     var offerType = getElementFormArray(offersKeys);
     adsArray.push(generateAd(uniqueImgAdress, offerType, newCoordinates[0], newCoordinates[1]));
