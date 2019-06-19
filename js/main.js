@@ -4,10 +4,16 @@ var WIDTH_PIN = 50;
 var HEIGHT_PIN = 70;
 var MAX_PINS = 8;
 
-var CoordinateMapPins = [
-  [0, 1200],
-  [130, 630]
+var CoordinateMaps = [
+  {MIN_X: 0},
+  {MAX_X: 1200},
+  {MIN_Y:130},
+  {MAX_Y: 630}
 ];
+
+var b = Object.values(CoordinateMaps[1]);
+var c = b.slice(0, 1);
+console.log(c);
 
 var Offers = {
   'PALACE': 'Дворец',
@@ -75,18 +81,20 @@ var getAds = function (offers, coordinates, maxPins) {
   var adsArray = [];
   for (var i = 0; i < maxPins; i++) {
     var uniqueImgAdress = 'img/avatars/user0' + (i + 1) + '.png';
-    var newCoordinate = [];
+    var newCoordinates = [];
     coordinates.forEach(function (coordinate, j) {
-      newCoordinate[j] = generateRandomNumber(coordinate[0], coordinate[1]);
+      var newCoordinateX = generateRandomNumber(Object.values(coordinates[0])[0], Object.values(coordinates[1])[0]);
+      var newCoordinateY = generateRandomNumber(Object.values(coordinates[2])[0], Object.values(coordinates[3])[0]);
+      newCoordinates.push(newCoordinateX, newCoordinateY);
     });
     var offersKeys = (Object.values(offers));
     var offerType = getElementFormArray(offersKeys);
-    adsArray.push(generateAd(uniqueImgAdress, offerType, newCoordinate[0], newCoordinate[1]));
+    adsArray.push(generateAd(uniqueImgAdress, offerType, newCoordinates[0], newCoordinates[1]));
   }
   return adsArray;
 };
 
-var ads = getAds(Offers, CoordinateMapPins, MAX_PINS);
+var ads = getAds(Offers, CoordinateMaps, MAX_PINS);
 
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
