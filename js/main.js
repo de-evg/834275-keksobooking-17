@@ -2,6 +2,8 @@
 
 var WIDTH_PIN = 50;
 var HEIGHT_PIN = 70;
+var WIDTH_MAIN_PIN = 65;
+var HEIGHT_MAIN_PIN = 65;
 var MAX_PINS = 8;
 
 var CoordinateMaps = {
@@ -12,10 +14,15 @@ var CoordinateMaps = {
 };
 
 var Offers = {
-  'PALACE': 'Дворец',
-  'FLAT': 'Квартира',
-  'HOUSE': 'Дом',
-  'BUNGALO': 'Бунгало'
+  PALACE: 'Дворец',
+  FLAT: 'Квартира',
+  HOUSE: 'Дом',
+  BUNGALO: 'Бунгало'
+};
+
+var mainPinCoordinate = {
+  X: 570,
+  Y: 375
 };
 
 /**
@@ -89,10 +96,6 @@ var getAds = function (offers, coordinates, maxPins) {
 
 var ads = getAds(Offers, CoordinateMaps, MAX_PINS);
 
-var map = document.querySelector('.map');
-map.classList.remove('map--faded');
-
-var pinList = document.querySelector('.map__pins');
 var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pin');
 
 /**
@@ -112,6 +115,7 @@ var generatePin = function (pinProperties, widthPin, heightPin) {
 };
 
 var fragment = document.createDocumentFragment();
+var pinList = document.querySelector('.map__pins');
 
 /**
  * Добавляет в DOM склонированные элементы.
@@ -127,4 +131,80 @@ var renderPin = function (dataArray, widthPin, heightPin) {
   pinList.appendChild(fragment);
 };
 
-renderPin(ads, WIDTH_PIN, HEIGHT_PIN);
+var map = document.querySelector('.map');
+
+var formMapFilters = document.querySelector('.map__filters');
+var mapFilters = formMapFilters.querySelectorAll('.map__filter');
+var mapFiterFieldset = formMapFilters.querySelector('fieldset');
+
+
+/**
+ * Переключает состояние фильтра disable/active.
+ *
+ * @param {boolean} toggle - переключатель disable(true)/active(false).
+ */
+var toggleFilterActive = function (toggle) {
+  mapFilters.forEach(function (filter, i) {
+    mapFilters[i].disabled = toggle;
+  });
+  mapFiterFieldset.disabled = toggle;
+  if (toggle !== formMapFilters.classList.contains('map__filters--disabled')) {
+    formMapFilters.classList.toggle('map__filters--disabled');
+  }
+};
+
+var formAd = document.querySelector('.ad-form');
+var formAdFieldsets = formAd.querySelectorAll('fieldset');
+
+var address = formAd.querySelector('#address');
+address.value = (mainPinCoordinate.X + WIDTH_MAIN_PIN / 2) + ', ' + (mainPinCoordinate.Y + HEIGHT_MAIN_PIN / 2);
+
+
+/**
+ * Переключает состояние формы disable/active.
+ *
+ * @param {boolean} toggle - переключатель disable(true)/active(false).
+ */
+var toggleAdFormActive = function (toggle) {
+  formAdFieldsets.forEach(function (fieldset, i) {
+    formAdFieldsets[i].disabled = toggle;
+  });
+  if (toggle !== formAd.classList.contains('ad-form--disabled')) {
+    formAd.classList.toggle('ad-form--disabled');
+  }
+};
+
+var main = document.querySelector('main');
+
+/**
+ * Отслеживает нажатие кнопки мыши на .map__pin--main
+ * и запускает функцию активации карты
+ */
+main.addEventListener('mouseup', function (evt) {
+  if (evt.target.closest('.map__pin--main')) {
+    activateMap();
+  }
+}, false);
+
+/**
+ * Активирует фильтр, форму и показывает похожие объявления
+ */
+var activateMap = function () {
+  map.classList.remove('map--faded');
+  renderPin(ads, WIDTH_PIN, HEIGHT_PIN);
+  toggleFilterActive(false);
+  toggleAdFormActive(false);
+};
+
+/**
+ * Блокирует карту, фильтр и форму
+ */
+var disableMap = function () {
+  if (!map.classList.contains('map--faded')) {
+    map.classList.add('map--faded');
+  }
+  toggleFilterActive(true);
+  toggleAdFormActive(true);
+};
+
+disableMap();
