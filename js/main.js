@@ -148,7 +148,7 @@ var toggleFilterActive = function (toggle) {
     mapFilters[i].disabled = toggle;
   });
   mapFiterFieldset.disabled = toggle;
-  if (toggle !== !!formMapFilters.classList.contains('map__filters--disabled')) {
+  if (toggle !== formMapFilters.classList.contains('map__filters--disabled')) {
     formMapFilters.classList.toggle('map__filters--disabled');
   }
 };
@@ -169,7 +169,7 @@ var toggleAdFormActive = function (toggle) {
   formAdFieldsets.forEach(function (fieldset, i) {
     formAdFieldsets[i].disabled = toggle;
   });
-  if (toggle !== !!formAd.classList.contains('ad-form--disabled')) {
+  if (toggle !== formAd.classList.contains('ad-form--disabled')) {
     formAd.classList.toggle('ad-form--disabled');
   }
 };
@@ -200,7 +200,7 @@ var activateMap = function () {
  * Блокирует карту, фильтр и форму
  */
 var disableMap = function () {
-  if (!map.classList.contain('map--faded')) {
+  if (!map.classList.contains('map--faded')) {
     map.classList.add('map--faded');
   }
   toggleFilterActive(true);
