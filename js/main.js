@@ -200,7 +200,7 @@ var activateMap = function () {
  * Блокирует карту, фильтр и форму
  */
 var disableMap = function () {
-  if (!map.querySelector('map--faded')) {
+  if (!map.classList.contain('map--faded')) {
     map.classList.add('map--faded');
   }
   toggleFilterActive(true);
