@@ -20,7 +20,7 @@ var Offers = {
   BUNGALO: 'Бунгало'
 };
 
-var mainPinCenter = {
+var mainPinCoordinate = {
   X: 570,
   Y: 375
 };
@@ -157,7 +157,7 @@ var formAd = document.querySelector('.ad-form');
 var formFieldsets = formAd.querySelectorAll('fieldset');
 
 var address = formAd.querySelector('#address');
-address.value = (mainPinCenter.X + WIDTH_MAIN_PIN / 2) + ', ' + (mainPinCenter.Y + HEIGHT_MAIN_PIN / 2);
+address.value = (mainPinCoordinate.X + WIDTH_MAIN_PIN / 2) + ', ' + (mainPinCoordinate.Y + HEIGHT_MAIN_PIN / 2);
 
 
 /**
