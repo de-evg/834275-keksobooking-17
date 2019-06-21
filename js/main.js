@@ -135,6 +135,7 @@ var map = document.querySelector('.map');
 
 var formMapFilters = document.querySelector('.map__filters');
 var mapFilters = formMapFilters.querySelectorAll('.map__filter');
+var mapFiterFieldset = formMapFilters.querySelector('fieldset');
 
 
 /**
@@ -146,15 +147,14 @@ var toggleFilterActive = function (toggle) {
   mapFilters.forEach(function (filter, i) {
     mapFilters[i].disabled = toggle;
   });
-  if (toggle) {
-    formMapFilters.classList.add('map__filters--disabled');
-  } else {
-    formMapFilters.classList.remove('map__filters--disabled');
+  mapFiterFieldset.disabled = toggle;
+  if (toggle !== !!formMapFilters.classList.contains('map__filters--disabled')) {
+    formMapFilters.classList.toggle('map__filters--disabled');
   }
 };
 
 var formAd = document.querySelector('.ad-form');
-var formFieldsets = formAd.querySelectorAll('fieldset');
+var formAdFieldsets = formAd.querySelectorAll('fieldset');
 
 var address = formAd.querySelector('#address');
 address.value = (mainPinCoordinate.X + WIDTH_MAIN_PIN / 2) + ', ' + (mainPinCoordinate.Y + HEIGHT_MAIN_PIN / 2);
@@ -166,13 +166,11 @@ address.value = (mainPinCoordinate.X + WIDTH_MAIN_PIN / 2) + ', ' + (mainPinCoor
  * @param {boolean} toggle - переключатель disable(true)/active(false).
  */
 var toggleAdFormActive = function (toggle) {
-  formFieldsets.forEach(function (fieldset, i) {
-    formFieldsets[i].disabled = toggle;
+  formAdFieldsets.forEach(function (fieldset, i) {
+    formAdFieldsets[i].disabled = toggle;
   });
-  if (toggle) {
-    formAd.classList.add('ad-form--disabled');
-  } else {
-    formAd.classList.remove('ad-form--disabled');
+  if (toggle !== !!formAd.classList.contains('ad-form--disabled')) {
+    formAd.classList.toggle('ad-form--disabled');
   }
 };
 
