@@ -224,21 +224,6 @@ formAd.addEventListener('click', function (evt) {
 });
 
 /**
- * Устанавливает минимальную цену и плейсхолдер
- * для option выбранного по-умолчанию
- *
- */
-var setDefaultMinPrice = function () {
-  var types = formAd.querySelector('#type').querySelectorAll('option');
-  types.forEach(function (defaultSelectedType) {
-    if (defaultSelectedType.selected === true) {
-      setMinPrice(defaultSelectedType.value);
-    }
-  });
-};
-setDefaultMinPrice();
-
-/**
  * Устанавливает плейсхолдер и минимальное значение для цены
  * в зависимости от типа предолжения
  *
@@ -262,6 +247,21 @@ var setMinPrice = function (typeOffer) {
     price.placeholder = '10000';
   }
 };
+
+/**
+ * Устанавливает минимальную цену и плейсхолдер
+ * для option выбранного по-умолчанию
+ *
+ */
+var setDefaultMinPrice = function () {
+  var types = formAd.querySelector('#type').querySelectorAll('option');
+  types.forEach(function (defaultSelectedType) {
+    if (defaultSelectedType.selected === true) {
+      setMinPrice(defaultSelectedType.value);
+    }
+  });
+};
+setDefaultMinPrice();
 
 /**
  * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
