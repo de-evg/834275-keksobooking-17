@@ -20,10 +20,20 @@ var Offers = {
   BUNGALO: 'Бунгало'
 };
 
-var mainPinCoordinate = {
+var startUserPinCoordinate = {
   X: 570,
   Y: 375
 };
+
+var map = document.querySelector('.map');
+var formMapFilters = document.querySelector('.map__filters');
+var mapFilters = formMapFilters.querySelectorAll('.map__filter');
+var mapFiterFieldset = formMapFilters.querySelector('fieldset');
+var formAd = document.querySelector('.ad-form');
+var formAdFieldsets = formAd.querySelectorAll('fieldset');
+var main = document.querySelector('main');
+var price = formAd.querySelector('#price');
+var pinList = document.querySelector('.map__pins');
 
 /**
  * Получает случайный элемент массива.
@@ -114,9 +124,6 @@ var generatePin = function (pinProperties, widthPin, heightPin) {
   return pinElement;
 };
 
-var fragment = document.createDocumentFragment();
-var pinList = document.querySelector('.map__pins');
-
 /**
  * Добавляет в DOM склонированные элементы.
  *
@@ -125,18 +132,12 @@ var pinList = document.querySelector('.map__pins');
  * @param {number} heightPin - высота метки.
  */
 var renderPin = function (dataArray, widthPin, heightPin) {
+  var fragment = document.createDocumentFragment();
   for (var i = 0; i < dataArray.length; i++) {
     fragment.appendChild(generatePin(dataArray[i], widthPin, heightPin));
   }
   pinList.appendChild(fragment);
 };
-
-var map = document.querySelector('.map');
-
-var formMapFilters = document.querySelector('.map__filters');
-var mapFilters = formMapFilters.querySelectorAll('.map__filter');
-var mapFiterFieldset = formMapFilters.querySelector('fieldset');
-
 
 /**
  * Переключает состояние фильтра disable/active.
@@ -153,12 +154,11 @@ var isFilterDisabled = function (toggle) {
   }
 };
 
-var formAd = document.querySelector('.ad-form');
-var formAdFieldsets = formAd.querySelectorAll('fieldset');
-
-var address = formAd.querySelector('#address');
-address.value = (mainPinCoordinate.X + WIDTH_MAIN_PIN / 2) + ', ' + (mainPinCoordinate.Y + HEIGHT_MAIN_PIN / 2);
-
+var generateAddress = function (startPinCoordinate) {
+  var address = formAd.querySelector('#address');
+  address.value = (startPinCoordinate.X + WIDTH_MAIN_PIN / 2) + ', ' + (startPinCoordinate.Y + HEIGHT_MAIN_PIN / 2);
+};
+generateAddress(startUserPinCoordinate);
 
 /**
  * Переключает состояние формы disable/active.
@@ -173,8 +173,6 @@ var isAdFormDisabled = function (toggle) {
     formAd.classList.toggle('ad-form--disabled');
   }
 };
-
-var main = document.querySelector('main');
 
 /**
  * Отслеживает нажатие кнопки мыши на .map__pin--main
@@ -206,5 +204,76 @@ var disableMap = function () {
   isFilterDisabled(true);
   isAdFormDisabled(true);
 };
-
 disableMap();
+
+formAd.addEventListener('click', function (evt) {
+  if (evt.target.id === 'type') {
+    var selectedType = evt.target.value;
+    setMinPrice(selectedType);
+  }
+  if (evt.target.id === 'timein') {
+    var selectedTime = evt.target.value;
+    var syncTimes = formAd.querySelector('#timeout').querySelectorAll('option');
+    setTime(selectedTime, syncTimes);
+  }
+  if (evt.target.id === 'timeout') {
+    selectedTime = evt.target.value;
+    syncTimes = formAd.querySelector('#timein').querySelectorAll('option');
+    setTime(selectedTime, syncTimes);
+  }
+});
+
+/**
+ * Устанавливает минимальную цену и плейсхолдер
+ * для option выбранного по-умолчанию
+ *
+ */
+var setDefaultMinPrice = function () {
+  var types = formAd.querySelector('#type').querySelectorAll('option');
+  types.forEach(function (defaultSelectedType) {
+    if (defaultSelectedType.selected === true) {
+      setMinPrice(defaultSelectedType.value);
+    }
+  });
+};
+setDefaultMinPrice();
+
+/**
+ * Устанавливает плейсхолдер и минимальное значение для цены
+ * в зависимости от типа предолжения
+ *
+ * @param {string} typeOffer - наименование типа жилья
+ */
+var setMinPrice = function (typeOffer) {
+  if (typeOffer === 'bungalo') {
+    price.min = '0';
+    price.placeholder = '0';
+  }
+  if (typeOffer === 'flat') {
+    price.min = '1000';
+    price.placeholder = '1000';
+  }
+  if (typeOffer === 'house') {
+    price.min = '5000';
+    price.placeholder = '5000';
+  }
+  if (typeOffer === 'palace') {
+    price.min = '10000';
+    price.placeholder = '10000';
+  }
+};
+
+/**
+ * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
+ *
+ * @param {string} selectedTime - значение выбранного option
+ * @param {Collection} syncTimes - коллекция option, значение одного из них
+ * должно быть аналогично selectedTime и выбрано как selected
+ */
+var setTime = function (selectedTime, syncTimes) {
+  syncTimes.forEach(function (time) {
+    if (selectedTime === time.value) {
+      time.selected = true;
+    }
+  });
+};
