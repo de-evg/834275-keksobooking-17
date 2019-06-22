@@ -143,9 +143,9 @@ var mapFiterFieldset = formMapFilters.querySelector('fieldset');
  *
  * @param {boolean} toggle - переключатель disable(true)/active(false).
  */
-var toggleFilterActive = function (toggle) {
-  mapFilters.forEach(function (filter, i) {
-    mapFilters[i].disabled = toggle;
+var isFilterDisabled = function (toggle) {
+  mapFilters.forEach(function (filter) {
+    filter.disabled = toggle;
   });
   mapFiterFieldset.disabled = toggle;
   if (toggle !== formMapFilters.classList.contains('map__filters--disabled')) {
@@ -165,9 +165,9 @@ address.value = (mainPinCoordinate.X + WIDTH_MAIN_PIN / 2) + ', ' + (mainPinCoor
  *
  * @param {boolean} toggle - переключатель disable(true)/active(false).
  */
-var toggleAdFormActive = function (toggle) {
-  formAdFieldsets.forEach(function (fieldset, i) {
-    formAdFieldsets[i].disabled = toggle;
+var isAdFormDisabled = function (toggle) {
+  formAdFieldsets.forEach(function (fieldset) {
+    fieldset.disabled = toggle;
   });
   if (toggle !== formAd.classList.contains('ad-form--disabled')) {
     formAd.classList.toggle('ad-form--disabled');
@@ -192,8 +192,8 @@ main.addEventListener('mouseup', function (evt) {
 var activateMap = function () {
   map.classList.remove('map--faded');
   renderPin(ads, WIDTH_PIN, HEIGHT_PIN);
-  toggleFilterActive(false);
-  toggleAdFormActive(false);
+  isFilterDisabled(false);
+  isAdFormDisabled(false);
 };
 
 /**
@@ -203,8 +203,8 @@ var disableMap = function () {
   if (!map.classList.contains('map--faded')) {
     map.classList.add('map--faded');
   }
-  toggleFilterActive(true);
-  toggleAdFormActive(true);
+  isFilterDisabled(true);
+  isAdFormDisabled(true);
 };
 
 disableMap();
