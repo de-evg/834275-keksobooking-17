@@ -32,7 +32,6 @@ var mapFiterFieldset = formMapFilters.querySelector('fieldset');
 var formAd = document.querySelector('.ad-form');
 var formAdFieldsets = formAd.querySelectorAll('fieldset');
 var main = document.querySelector('main');
-var price = formAd.querySelector('#price');
 var pinList = document.querySelector('.map__pins');
 
 /**
@@ -206,23 +205,6 @@ var disableMap = function () {
 };
 disableMap();
 
-formAd.addEventListener('click', function (evt) {
-  if (evt.target.id === 'type') {
-    var selectedType = evt.target.value;
-    setMinPrice(selectedType);
-  }
-  if (evt.target.id === 'timein') {
-    var selectedTime = evt.target.value;
-    var syncTimes = formAd.querySelector('#timeout').querySelectorAll('option');
-    setTime(selectedTime, syncTimes);
-  }
-  if (evt.target.id === 'timeout') {
-    selectedTime = evt.target.value;
-    syncTimes = formAd.querySelector('#timein').querySelectorAll('option');
-    setTime(selectedTime, syncTimes);
-  }
-});
-
 /**
  * Устанавливает плейсхолдер и минимальное значение для цены
  * в зависимости от типа предолжения
@@ -230,38 +212,53 @@ formAd.addEventListener('click', function (evt) {
  * @param {string} typeOffer - наименование типа жилья
  */
 var setMinPrice = function (typeOffer) {
-  if (typeOffer === 'bungalo') {
-    price.min = '0';
-    price.placeholder = '0';
-  }
-  if (typeOffer === 'flat') {
-    price.min = '1000';
-    price.placeholder = '1000';
-  }
-  if (typeOffer === 'house') {
-    price.min = '5000';
-    price.placeholder = '5000';
-  }
-  if (typeOffer === 'palace') {
-    price.min = '10000';
-    price.placeholder = '10000';
+  var price = formAd.querySelector('#price');
+  switch (typeOffer) {
+    case 'bungalo':
+      price.min = '0';
+      price.placeholder = '0';
+      break;
+    case 'flat':
+      price.min = '1000';
+      price.placeholder = '1000';
+      break;
+    case 'house':
+      price.min = '5000';
+      price.placeholder = '5000';
+      break;
+    case 'palace':
+      price.min = '10000';
+      price.placeholder = '10000';
+      break;
   }
 };
 
 /**
- * Устанавливает минимальную цену и плейсхолдер
- * для option выбранного по-умолчанию
+ * Получает объект option в состоянии selected
  *
+ * @return {*} seletedOption - возвращает выбранный option
  */
-var setDefaultMinPrice = function () {
-  var types = formAd.querySelector('#type').querySelectorAll('option');
-  types.forEach(function (defaultSelectedType) {
-    if (defaultSelectedType.selected === true) {
-      setMinPrice(defaultSelectedType.value);
+var getSelectedOption = function () {
+  var seletedOption;
+  var options = formAd.querySelector('#type').querySelectorAll('option');
+  options.forEach(function (option) {
+    if (option.selected === true) {
+      seletedOption = option;
     }
   });
+  return seletedOption;
 };
-setDefaultMinPrice();
+
+/**
+ * Устанавливает плейсхолдер и минимальное значение цены
+ * для option в состоянии selected по-умолчанию
+ *
+ */
+var getDefaultMinPrice = function () {
+  var selectedOption = getSelectedOption();
+  setMinPrice(selectedOption.value);
+};
+getDefaultMinPrice();
 
 /**
  * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
@@ -277,3 +274,22 @@ var setTime = function (selectedTime, syncTimes) {
     }
   });
 };
+
+formAd.addEventListener('click', function (evt) {
+  switch (evt.target.id) {
+    case 'type':
+      var selectedOption = getSelectedOption();
+      setMinPrice(selectedOption.value);
+      break;
+    case 'timein':
+      var selectedTime = evt.target.value;
+      var syncTimes = formAd.querySelector('#timeout').querySelectorAll('option');
+      setTime(selectedTime, syncTimes);
+      break;
+    case 'timeout':
+      selectedTime = evt.target.value;
+      syncTimes = formAd.querySelector('#timein').querySelectorAll('option');
+      setTime(selectedTime, syncTimes);
+      break;
+  }
+});
