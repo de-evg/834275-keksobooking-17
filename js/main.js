@@ -153,11 +153,18 @@ var isFilterDisabled = function (toggle) {
   }
 };
 
-var generateAddress = function (startPinCoordinate, widthMainPin, heigthMainPin) {
+/**
+ * Генерирует и изменяет значение координат главного пина.
+ *
+ * @param {Object} startPinCoordinate - начальные координаты пина.
+ * @param {number} widthMainPin - ширина пина
+ * @param {number} heightMainPin - высота пина
+ */
+window.generateAddress = function (startPinCoordinate, widthMainPin, heightMainPin) {
   var address = formAd.querySelector('#address');
-  address.value = (startPinCoordinate.X + widthMainPin / 2) + ', ' + (startPinCoordinate.Y + heigthMainPin / 2);
+  address.value = (startPinCoordinate.X + widthMainPin / 2) + ', ' + (startPinCoordinate.Y + heightMainPin / 2);
 };
-generateAddress(startUserPinCoordinate, WIDTH_MAIN_PIN, HEIGHT_MAIN_PIN);
+window.generateAddress(startUserPinCoordinate, WIDTH_MAIN_PIN, HEIGHT_MAIN_PIN);
 
 /**
  * Переключает состояние формы disable/active.
@@ -179,14 +186,14 @@ var isAdFormDisabled = function (toggle) {
  */
 main.addEventListener('mouseup', function (evt) {
   if (evt.target.closest('.map__pin--main')) {
-    activateMap();
+    window.activateMap();
   }
 }, false);
 
 /**
  * Активирует фильтр, форму и показывает похожие объявления
  */
-var activateMap = function () {
+window.activateMap = function () {
   map.classList.remove('map--faded');
   renderPin(ads, WIDTH_PIN, HEIGHT_PIN);
   isFilterDisabled(false);
