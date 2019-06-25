@@ -153,11 +153,11 @@ var isFilterDisabled = function (toggle) {
   }
 };
 
-var generateAddress = function (startPinCoordinate) {
+var generateAddress = function (startPinCoordinate, widthMainPin, heigthMainPin) {
   var address = formAd.querySelector('#address');
-  address.value = (startPinCoordinate.X + WIDTH_MAIN_PIN / 2) + ', ' + (startPinCoordinate.Y + HEIGHT_MAIN_PIN / 2);
+  address.value = (startPinCoordinate.X + widthMainPin / 2) + ', ' + (startPinCoordinate.Y + heigthMainPin / 2);
 };
-generateAddress(startUserPinCoordinate);
+generateAddress(startUserPinCoordinate, WIDTH_MAIN_PIN, HEIGHT_MAIN_PIN);
 
 /**
  * Переключает состояние формы disable/active.
