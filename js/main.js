@@ -20,10 +20,19 @@ var Offers = {
   BUNGALO: 'Бунгало'
 };
 
-var mainPinCoordinate = {
+var startUserPinCoordinate = {
   X: 570,
   Y: 375
 };
+
+var map = document.querySelector('.map');
+var formMapFilters = document.querySelector('.map__filters');
+var mapFilters = formMapFilters.querySelectorAll('.map__filter');
+var mapFiterFieldset = formMapFilters.querySelector('fieldset');
+var formAd = document.querySelector('.ad-form');
+var formAdFieldsets = formAd.querySelectorAll('fieldset');
+var main = document.querySelector('main');
+var pinList = document.querySelector('.map__pins');
 
 /**
  * Получает случайный элемент массива.
@@ -114,9 +123,6 @@ var generatePin = function (pinProperties, widthPin, heightPin) {
   return pinElement;
 };
 
-var fragment = document.createDocumentFragment();
-var pinList = document.querySelector('.map__pins');
-
 /**
  * Добавляет в DOM склонированные элементы.
  *
@@ -125,27 +131,21 @@ var pinList = document.querySelector('.map__pins');
  * @param {number} heightPin - высота метки.
  */
 var renderPin = function (dataArray, widthPin, heightPin) {
+  var fragment = document.createDocumentFragment();
   for (var i = 0; i < dataArray.length; i++) {
     fragment.appendChild(generatePin(dataArray[i], widthPin, heightPin));
   }
   pinList.appendChild(fragment);
 };
 
-var map = document.querySelector('.map');
-
-var formMapFilters = document.querySelector('.map__filters');
-var mapFilters = formMapFilters.querySelectorAll('.map__filter');
-var mapFiterFieldset = formMapFilters.querySelector('fieldset');
-
-
 /**
  * Переключает состояние фильтра disable/active.
  *
  * @param {boolean} toggle - переключатель disable(true)/active(false).
  */
-var toggleFilterActive = function (toggle) {
-  mapFilters.forEach(function (filter, i) {
-    mapFilters[i].disabled = toggle;
+var isFilterDisabled = function (toggle) {
+  mapFilters.forEach(function (filter) {
+    filter.disabled = toggle;
   });
   mapFiterFieldset.disabled = toggle;
   if (toggle !== formMapFilters.classList.contains('map__filters--disabled')) {
@@ -153,28 +153,32 @@ var toggleFilterActive = function (toggle) {
   }
 };
 
-var formAd = document.querySelector('.ad-form');
-var formAdFieldsets = formAd.querySelectorAll('fieldset');
-
-var address = formAd.querySelector('#address');
-address.value = (mainPinCoordinate.X + WIDTH_MAIN_PIN / 2) + ', ' + (mainPinCoordinate.Y + HEIGHT_MAIN_PIN / 2);
-
+/**
+ * Генерирует и изменяет значение координат главного пина.
+ *
+ * @param {Object} startPinCoordinate - начальные координаты пина.
+ * @param {number} widthMainPin - ширина пина
+ * @param {number} heightMainPin - высота пина
+ */
+window.generateAddress = function (startPinCoordinate, widthMainPin, heightMainPin) {
+  var address = formAd.querySelector('#address');
+  address.value = (startPinCoordinate.X + widthMainPin / 2) + ', ' + (startPinCoordinate.Y + heightMainPin / 2);
+};
+window.generateAddress(startUserPinCoordinate, WIDTH_MAIN_PIN, HEIGHT_MAIN_PIN);
 
 /**
  * Переключает состояние формы disable/active.
  *
  * @param {boolean} toggle - переключатель disable(true)/active(false).
  */
-var toggleAdFormActive = function (toggle) {
-  formAdFieldsets.forEach(function (fieldset, i) {
-    formAdFieldsets[i].disabled = toggle;
+var isAdFormDisabled = function (toggle) {
+  formAdFieldsets.forEach(function (fieldset) {
+    fieldset.disabled = toggle;
   });
   if (toggle !== formAd.classList.contains('ad-form--disabled')) {
     formAd.classList.toggle('ad-form--disabled');
   }
 };
-
-var main = document.querySelector('main');
 
 /**
  * Отслеживает нажатие кнопки мыши на .map__pin--main
@@ -182,18 +186,18 @@ var main = document.querySelector('main');
  */
 main.addEventListener('mouseup', function (evt) {
   if (evt.target.closest('.map__pin--main')) {
-    activateMap();
+    window.activateMap();
   }
 }, false);
 
 /**
  * Активирует фильтр, форму и показывает похожие объявления
  */
-var activateMap = function () {
+window.activateMap = function () {
   map.classList.remove('map--faded');
   renderPin(ads, WIDTH_PIN, HEIGHT_PIN);
-  toggleFilterActive(false);
-  toggleAdFormActive(false);
+  isFilterDisabled(false);
+  isAdFormDisabled(false);
 };
 
 /**
@@ -203,8 +207,96 @@ var disableMap = function () {
   if (!map.classList.contains('map--faded')) {
     map.classList.add('map--faded');
   }
-  toggleFilterActive(true);
-  toggleAdFormActive(true);
+  isFilterDisabled(true);
+  isAdFormDisabled(true);
+};
+disableMap();
+
+/**
+ * Устанавливает плейсхолдер и минимальное значение для цены
+ * в зависимости от типа предолжения
+ *
+ * @param {string} typeOffer - наименование типа жилья
+ */
+var setMinPrice = function (typeOffer) {
+  var price = formAd.querySelector('#price');
+  switch (typeOffer) {
+    case 'bungalo':
+      price.min = '0';
+      price.placeholder = '0';
+      break;
+    case 'flat':
+      price.min = '1000';
+      price.placeholder = '1000';
+      break;
+    case 'house':
+      price.min = '5000';
+      price.placeholder = '5000';
+      break;
+    case 'palace':
+      price.min = '10000';
+      price.placeholder = '10000';
+      break;
+  }
 };
 
-disableMap();
+/**
+ * Получает объект option в состоянии selected
+ *
+ * @return {*} seletedOption - возвращает выбранный option
+ */
+var getSelectedOption = function () {
+  var seletedOption;
+  var options = formAd.querySelector('#type').querySelectorAll('option');
+  options.forEach(function (option) {
+    if (option.selected === true) {
+      seletedOption = option;
+    }
+  });
+  return seletedOption;
+};
+
+/**
+ * Устанавливает плейсхолдер и минимальное значение цены
+ * для option в состоянии selected по-умолчанию
+ *
+ */
+var getDefaultMinPrice = function () {
+  var selectedOption = getSelectedOption();
+  setMinPrice(selectedOption.value);
+};
+getDefaultMinPrice();
+
+/**
+ * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
+ *
+ * @param {string} selectedTime - значение выбранного option
+ * @param {Collection} syncTimes - коллекция option, значение одного из них
+ * должно быть аналогично selectedTime и выбрано как selected
+ */
+var setTime = function (selectedTime, syncTimes) {
+  syncTimes.forEach(function (time) {
+    if (selectedTime === time.value) {
+      time.selected = true;
+    }
+  });
+};
+
+formAd.addEventListener('click', function (evt) {
+  switch (evt.target.id) {
+    case 'type':
+      var selectedOption = getSelectedOption();
+      setMinPrice(selectedOption.value);
+      break;
+    case 'timein':
+      var selectedTime = evt.target.value;
+      var syncTimes = formAd.querySelector('#timeout').querySelectorAll('option');
+      setTime(selectedTime, syncTimes);
+      break;
+    case 'timeout':
+      selectedTime = evt.target.value;
+      syncTimes = formAd.querySelector('#timein').querySelectorAll('option');
+      setTime(selectedTime, syncTimes);
+      break;
+  }
+});
