@@ -47,7 +47,6 @@ var mapFilters = formMapFilters.querySelectorAll('.map__filter');
 var mapFiterFieldset = formMapFilters.querySelector('fieldset');
 var formAd = document.querySelector('.ad-form');
 var formAdFieldsets = formAd.querySelectorAll('fieldset');
-var main = document.querySelector('main');
 var pinList = document.querySelector('.map__pins');
 var selectTypeOffer = formAd.querySelector('#type');
 var selectTimeIn = formAd.querySelector('#timein');
@@ -206,16 +205,6 @@ var isAdFormDisabled = function (toggle) {
     formAd.classList.toggle('ad-form--disabled');
   }
 };
-
-/**
- * Отслеживает нажатие кнопки мыши на .map__pin--main
- * и запускает функцию активации карты
- */
-main.addEventListener('mouseup', function (evt) {
-  if (evt.target.closest('.map__pin--main')) {
-    window.activateMap();
-  }
-}, false);
 
 /**
  * Активирует фильтр, форму и показывает похожие объявления
