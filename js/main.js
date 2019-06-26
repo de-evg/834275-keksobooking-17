@@ -19,11 +19,11 @@ var CoordinateMaps = {
 
 var Offers = {
   PALACE: {
-    TYPE:'Дворец',
+    TYPE: 'Дворец',
     MIN_PRICE: 10000
   },
   FLAT: {
-    TYPE:'Квартира',
+    TYPE: 'Квартира',
     MIN_PRICE: 1000
   },
   HOUSE: {
@@ -176,19 +176,21 @@ var isFilterDisabled = function (toggle) {
 };
 
 /**
- * Генерирует и изменяет значение координат главного пина.
+ * Генерирует и изменяет значение координат главного метки.
  *
- * @param {Object} startPinCoordinate - начальные координаты пина.
- * @param {number} widthMainPin - ширина пина
- * @param {number} heightMainPin - высота пина
+ * @param {Object} startPinCoordinate - начальные координаты метки.
+ * @param {Object} sizeMainPin - перечисление размеров метки
+ * @param {boolean} flag - состояние активности карты
  */
-window.generateAddress = function (startPinCoordinate, sizeMainPin) {
+window.generateAddress = function (startPinCoordinate, sizeMainPin, flag) {
   var address = formAd.querySelector('#address');
-  isMapDisabled ?
-  address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2))) :
-  address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
+  if (flag) {
+    address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2)));
+  } else {
+    address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
+  }
 };
-window.generateAddress(StartUserPinCoordinate, SizeMainPin);
+window.generateAddress(StartUserPinCoordinate, SizeMainPin, isMapDisabled);
 
 
 /**
@@ -283,7 +285,7 @@ var getDefaultMinPrice = function (select, offers, inputFieldElement) {
   var offer = {
     selectedOption: getSelectedOption(select),
     offersObj: offers
-  }
+  };
   setMinPrice(offer, inputFieldElement);
 };
 getDefaultMinPrice(selectTypeOffer, Offers, price);
@@ -307,20 +309,20 @@ var setTime = function (selectedTime, syncTimes) {
 formAd.addEventListener('click', function (evt) {
   switch (evt.target.id) {
     case 'type':
-    var offer = {
-      selectedOption: getSelectedOption(selectTypeOffer),
-      offersObj: Offers
-    };
-    setMinPrice(offer, price);
-    break;
+      var offer = {
+        selectedOption: getSelectedOption(selectTypeOffer),
+        offersObj: Offers
+      };
+      setMinPrice(offer, price);
+      break;
     case 'timein':
-    var selectedOption = getSelectedOption(selectTimeIn);
-    setTime(selectedOption, selectTimeOut);
-    break;
+      var selectedOption = getSelectedOption(selectTimeIn);
+      setTime(selectedOption, selectTimeOut);
+      break;
     case 'timeout':
-    var selectedOption = getSelectedOption(selectTimeOut);
-    setTime(selectedOption, selectTimeIn);
-    break;
+      selectedOption = getSelectedOption(selectTimeOut);
+      setTime(selectedOption, selectTimeIn);
+      break;
   }
 });
 
@@ -335,78 +337,75 @@ mainPin.addEventListener('mousedown', function (evt) {
     y: evt.clientY
   };
 
-/**
- * Перемещенает метку и передает координаты в форму
- *
- * @param {Object} moveEvt - DOM объект события
- *
- */
-var onMouseMove = function (moveEvt) {
-  moveEvt.preventDefault();
+  /**
+   * Перемещенает метку и передает координаты в форму
+   *
+   * @param {Object} moveEvt - DOM объект события
+   *
+   */
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
 
-  var shift = {
-    x: startCoords.x - moveEvt.clientX,
-    y: startCoords.y - moveEvt.clientY
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    var PinCoords = {
+      X: parseInt(mainPin.style.left, 10),
+      Y: parseInt(mainPin.style.top, 10)
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    mainPin.style.top = mainPin.offsetTop - shift.y + 'px';
+    mainPin.style.left = mainPin.offsetLeft - shift.x + 'px';
+
+    var Limits = {
+      MIN_X: CoordinateMaps.MIN_X,
+      MAX_X: CoordinateMaps.MAX_X - SizeMainPin.WIDTH,
+      MIN_Y: CoordinateMaps.MIN_Y - SizeMainPin.HEIGHT / 2 - SizeMainPin.POINTER_HEIGHT,
+      MAX_Y: CoordinateMaps.MAX_Y - SizeMainPin.HEIGHT / 2 - SizeMainPin.POINTER_HEIGHT
+    };
+
+    if (parseInt(mainPin.style.top, 10) < Limits.MIN_Y) {
+      mainPin.style.top = Limits.MIN_Y + 'px';
+    }
+
+    if (parseInt(mainPin.style.top, 10) > Limits.MAX_Y) {
+      mainPin.style.top = Limits.MAX_Y + 'px';
+    }
+
+    if (parseInt(mainPin.style.left, 10) < Limits.MIN_X) {
+      mainPin.style.left = Limits.MIN_X + 'px';
+    }
+
+    if (parseInt(mainPin.style.left, 10) > Limits.MAX_X) {
+      mainPin.style.left = Limits.MAX_X + 'px';
+    }
+    window.generateAddress(PinCoords, SizeMainPin, isMapDisabled);
   };
 
-  var PinCoords = {
-    X: parseInt(mainPin.style.left, 10),
-    Y: parseInt(mainPin.style.top, 10)
+  /**
+   * Удаляет отслеживание событий и передает координаты в форму при отжатии кнопки мыши
+   *
+   * @param {Object} upEvt - DOM объект события
+   *
+   */
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    map.removeEventListener('mousemove', onMouseMove);
+    map.removeEventListener('mouseup', onMouseUp);
+    var PinCoords = {
+      X: parseInt(mainPin.style.left, 10),
+      Y: parseInt(mainPin.style.top, 10)
+    };
+    window.generateAddress(PinCoords, SizeMainPin, isMapDisabled);
   };
 
-  startCoords = {
-    x: moveEvt.clientX,
-    y: moveEvt.clientY
-  };
-
-  mainPin.style.top = mainPin.offsetTop - shift.y + 'px';
-  mainPin.style.left = mainPin.offsetLeft - shift.x + 'px';
-
-  var Limits = {
-    MIN_X: CoordinateMaps.MIN_X,
-    MAX_X: CoordinateMaps.MAX_X - SizeMainPin.WIDTH,
-    MIN_Y: CoordinateMaps.MIN_Y - SizeMainPin.HEIGHT / 2 - SizeMainPin.POINTER_HEIGHT,
-    MAX_Y: CoordinateMaps.MAX_Y - SizeMainPin.HEIGHT / 2 - SizeMainPin.POINTER_HEIGHT
-  };
-
-  if (parseInt(mainPin.style.top, 10) < Limits.MIN_Y) {
-    mainPin.style.top = Limits.MIN_Y + 'px';
-  };
-
-  if (parseInt(mainPin.style.top, 10) > Limits.MAX_Y) {
-    mainPin.style.top = Limits.MAX_Y + 'px';
-  };
-
-  if (parseInt(mainPin.style.left, 10) < Limits.MIN_X) {
-    mainPin.style.left = Limits.MIN_X + 'px';
-  };
-
-  if (parseInt(mainPin.style.left, 10) > Limits.MAX_X) {
-    mainPin.style.left = Limits.MAX_X + 'px';
-  };
-  window.generateAddress(PinCoords, SizeMainPin);
-};
-
-/**
- * Удаляет отслеживание событий и передает координаты в форму при отжатии кнопки мыши
- *
- * @param {Object} upEvt - DOM объект события
- *
- */
-var onMouseUp = function (upEvt) {
-  upEvt.preventDefault();
-  map.removeEventListener('mousemove', onMouseMove);
-  map.removeEventListener('mouseup', onMouseUp);
-  var PinCoords = {
-    X: parseInt(mainPin.style.left, 10),
-    Y: parseInt(mainPin.style.top, 10)
-  };
-  window.generateAddress(PinCoords, SizeMainPin);
-};
-
-map.addEventListener('mousemove', onMouseMove);
-map.addEventListener('mouseup', onMouseUp);
+  map.addEventListener('mousemove', onMouseMove);
+  map.addEventListener('mouseup', onMouseUp);
 });
-
-var test = {};
-test.keys
