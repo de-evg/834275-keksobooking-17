@@ -175,7 +175,7 @@ var isFilterDisabled = function (toggle) {
 };
 
 /**
- * Генерирует и изменяет значение координат главного метки.
+ * Генерирует и изменяет значение координат главной метки.
  *
  * @param {Object} startPinCoordinate - начальные координаты метки.
  * @param {Object} sizeMainPin - перечисление размеров метки
