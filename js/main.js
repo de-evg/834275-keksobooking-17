@@ -2,12 +2,13 @@
 
 var WIDTH_PIN = 50;
 var HEIGHT_PIN = 70;
+var MAX_PINS = 8;
+
 var SizeMainPin = {
   WIDTH: 65,
   HEIGHT: 65,
   POINTER_HEIGHT: 22
 };
-var MAX_PINS = 8;
 
 var CoordinateMaps = {
   MIN_X: 0,
@@ -17,10 +18,22 @@ var CoordinateMaps = {
 };
 
 var Offers = {
-  PALACE: 'Дворец',
-  FLAT: 'Квартира',
-  HOUSE: 'Дом',
-  BUNGALO: 'Бунгало'
+  PALACE: {
+    TYPE:'Дворец',
+    MIN_PRICE: 10000
+  },
+  FLAT: {
+    TYPE:'Квартира',
+    MIN_PRICE: 1000
+  },
+  HOUSE: {
+    TYPE: 'Дом',
+    MIN_PRICE: 5000
+  },
+  BUNGALO: {
+    TYPE: 'Бунгало',
+    MIN_PRICE: 0
+  }
 };
 
 var StartUserPinCoordinate = {
@@ -40,6 +53,7 @@ var selectTypeOffer = formAd.querySelector('#type');
 var selectTimeIn = formAd.querySelector('#timein');
 var selectTimeOut = formAd.querySelector('#timeout');
 var mainPin = map.querySelector('.map__pin--main');
+var price = formAd.querySelector('#price');
 var isMapDisabled = true;
 
 /**
@@ -48,7 +62,7 @@ var isMapDisabled = true;
  * @param {Array} someArray - массив данных.
  * @return {any} someArray[j] - возвращает случайный элемент массива .
  */
- var getElementFormArray = function (someArray) {
+var getElementFormArray = function (someArray) {
   var j = Math.floor(Math.random() * someArray.length);
   return someArray[j];
 };
@@ -60,7 +74,7 @@ var isMapDisabled = true;
  * @param {number} maxNumber - максимальное значение.
  * @return {number} number - случайное значение.
  */
- var generateRandomNumber = function (minNumber, maxNumber) {
+var generateRandomNumber = function (minNumber, maxNumber) {
   var number = Math.floor(minNumber + (Math.random() * (maxNumber + 1 - minNumber)));
   return number;
 };
@@ -74,7 +88,7 @@ var isMapDisabled = true;
  * @param {number} coordinateY - координата Y.
  * @return {Object} - объект данных для метки: строка адреса для автара, строка тип предлложения, координаты метки.
  */
- var generateAd = function (uniqueImgAdress, offerType, coordinateX, coordinateY) {
+var generateAd = function (uniqueImgAdress, offerType, coordinateX, coordinateY) {
   return {
     'author': {
       'avatar': uniqueImgAdress
@@ -97,7 +111,7 @@ var isMapDisabled = true;
  * @param {Array} maxPins - максимальное количество меток .
  * @return {Array} adsArray - массив объектов с данными для меток.
  */
- var getAds = function (offers, coordinates, maxPins) {
+var getAds = function (offers, coordinates, maxPins) {
   var adsArray = [];
   for (var i = 0; i < maxPins; i++) {
     var uniqueImgAdress = 'img/avatars/user0' + (i + 1) + '.png';
@@ -123,7 +137,7 @@ var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pi
  * @param {number} heightPin - высота метки.
  * @return {Object} pinElement - измененный склонированный элемент.
  */
- var generatePin = function (pinProperties, widthPin, heightPin) {
+var generatePin = function (pinProperties, widthPin, heightPin) {
   var pinElement = pinTamplate.cloneNode(true);
   pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
   pinElement.querySelector('img').src = pinProperties.author.avatar;
@@ -138,7 +152,7 @@ var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pi
  * @param {number} widthPin - ширина метки.
  * @param {number} heightPin - высота метки.
  */
- var renderPin = function (dataArray, widthPin, heightPin) {
+var renderPin = function (dataArray, widthPin, heightPin) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < dataArray.length; i++) {
     fragment.appendChild(generatePin(dataArray[i], widthPin, heightPin));
@@ -151,7 +165,7 @@ var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pi
  *
  * @param {boolean} toggle - переключатель disable(true)/active(false).
  */
- var isFilterDisabled = function (toggle) {
+var isFilterDisabled = function (toggle) {
   mapFilters.forEach(function (filter) {
     filter.disabled = toggle;
   });
@@ -168,7 +182,7 @@ var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pi
  * @param {number} widthMainPin - ширина пина
  * @param {number} heightMainPin - высота пина
  */
- window.generateAddress = function (startPinCoordinate, sizeMainPin) {
+window.generateAddress = function (startPinCoordinate, sizeMainPin) {
   var address = formAd.querySelector('#address');
   isMapDisabled ?
   address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2))) :
@@ -182,7 +196,7 @@ window.generateAddress(StartUserPinCoordinate, SizeMainPin);
  *
  * @param {boolean} toggle - переключатель disable(true)/active(false).
  */
- var isAdFormDisabled = function (toggle) {
+var isAdFormDisabled = function (toggle) {
   formAdFieldsets.forEach(function (fieldset) {
     fieldset.disabled = toggle;
   });
@@ -195,7 +209,7 @@ window.generateAddress(StartUserPinCoordinate, SizeMainPin);
  * Отслеживает нажатие кнопки мыши на .map__pin--main
  * и запускает функцию активации карты
  */
- main.addEventListener('mouseup', function (evt) {
+main.addEventListener('mouseup', function (evt) {
   if (evt.target.closest('.map__pin--main')) {
     window.activateMap();
   }
@@ -204,7 +218,7 @@ window.generateAddress(StartUserPinCoordinate, SizeMainPin);
 /**
  * Активирует фильтр, форму и показывает похожие объявления
  */
- window.activateMap = function () {
+window.activateMap = function () {
   map.classList.remove('map--faded');
   renderPin(ads, WIDTH_PIN, HEIGHT_PIN);
   isMapDisabled = false;
@@ -215,7 +229,7 @@ window.generateAddress(StartUserPinCoordinate, SizeMainPin);
 /**
  * Блокирует карту, фильтр и форму
  */
- var disableMap = function () {
+var disableMap = function () {
   if (!map.classList.contains('map--faded')) {
     map.classList.add('map--faded');
   }
@@ -229,37 +243,23 @@ disableMap();
  * Устанавливает плейсхолдер и минимальное значение для цены
  * в зависимости от типа предолжения
  *
- * @param {string} typeOffer - наименование типа жилья
+ * @param {Object} offer - объект с параметрами выбранного типа.
+ * @param {Object} inputFieldElement - DOM элемент для которго устанавилваются атрибуты
  */
- var setMinPrice = function (typeOffer) {
-  var price = formAd.querySelector('#price');
-  switch (typeOffer) {
-    case 'bungalo':
-    price.min = '0';
-    price.placeholder = '0';
-    break;
-    case 'flat':
-    price.min = '1000';
-    price.placeholder = '1000';
-    break;
-    case 'house':
-    price.min = '5000';
-    price.placeholder = '5000';
-    break;
-    case 'palace':
-    price.min = '10000';
-    price.placeholder = '10000';
-    break;
-  }
+var setMinPrice = function (offer, inputFieldElement) {
+  var typeOffer = offer.selectedOption.value.toUpperCase();
+  var attribute = offer.offersObj[typeOffer].MIN_PRICE;
+  inputFieldElement.min = attribute;
+  inputFieldElement.placeholder = attribute;
 };
 
 /**
  * Получает объект option в состоянии selected
  *
- * @return {Object} seletedOption - возвращает выбранный option
- * @return {Collection} select - коллекция option
+ * @param {Collection} select - коллекция option
+ * @return {Object} selectedOption - выбранный option
  */
- var getSelectedOption = function (select) {
+var getSelectedOption = function (select) {
   var index;
   var selectedOption;
   index = select.selectedIndex;
@@ -267,7 +267,6 @@ disableMap();
   select.addEventListener('change', function () {
     index = select.selectedIndex;
     selectedOption = select[index];
-
   });
   return selectedOption;
 };
@@ -277,12 +276,17 @@ disableMap();
  * для option в состоянии selected по-умолчанию
  *
  * @param {Collection} select - коллекция option
+ * @param {Object} offers - перечисление типов предложений
+ * @param {Object} inputFieldElement - DOM элемент для которго устанавилваются атрибуты
  */
- var getDefaultMinPrice = function (select) {
-  var selectedOption = getSelectedOption(select);
-  setMinPrice(selectedOption.value);
+var getDefaultMinPrice = function (select, offers, inputFieldElement) {
+  var offer = {
+    selectedOption: getSelectedOption(select),
+    offersObj: offers
+  }
+  setMinPrice(offer, inputFieldElement);
 };
-getDefaultMinPrice(selectTypeOffer);
+getDefaultMinPrice(selectTypeOffer, Offers, price);
 
 
 /**
@@ -292,7 +296,7 @@ getDefaultMinPrice(selectTypeOffer);
  * @param {Collection} syncTimes - коллекция option, значение одного из них
  * должно быть аналогично selectedTime и выбрано как selected
  */
- var setTime = function (selectedTime, syncTimes) {
+var setTime = function (selectedTime, syncTimes) {
   for (var i = 0; i < syncTimes.length; i++) {
     if (syncTimes[i].value === selectedTime.value) {
       syncTimes[i].selected = true;
@@ -303,8 +307,11 @@ getDefaultMinPrice(selectTypeOffer);
 formAd.addEventListener('click', function (evt) {
   switch (evt.target.id) {
     case 'type':
-    var selectedOption = getSelectedOption(selectTypeOffer);
-    setMinPrice(selectedOption.value);
+    var offer = {
+      selectedOption: getSelectedOption(selectTypeOffer),
+      offersObj: Offers
+    };
+    setMinPrice(offer, price);
     break;
     case 'timein':
     var selectedOption = getSelectedOption(selectTimeIn);
@@ -334,7 +341,7 @@ mainPin.addEventListener('mousedown', function (evt) {
  * @param {Object} moveEvt - DOM объект события
  *
  */
- var onMouseMove = function (moveEvt) {
+var onMouseMove = function (moveEvt) {
   moveEvt.preventDefault();
 
   var shift = {
@@ -386,7 +393,7 @@ mainPin.addEventListener('mousedown', function (evt) {
  * @param {Object} upEvt - DOM объект события
  *
  */
- var onMouseUp = function (upEvt) {
+var onMouseUp = function (upEvt) {
   upEvt.preventDefault();
   map.removeEventListener('mousemove', onMouseMove);
   map.removeEventListener('mouseup', onMouseUp);
@@ -400,3 +407,6 @@ mainPin.addEventListener('mousedown', function (evt) {
 map.addEventListener('mousemove', onMouseMove);
 map.addEventListener('mouseup', onMouseUp);
 });
+
+var test = {};
+test.keys
