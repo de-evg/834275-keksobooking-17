@@ -33,6 +33,10 @@ var formAd = document.querySelector('.ad-form');
 var formAdFieldsets = formAd.querySelectorAll('fieldset');
 var main = document.querySelector('main');
 var pinList = document.querySelector('.map__pins');
+var selectTypeOffer = formAd.querySelector('#type');
+var selectTimeIn = formAd.querySelector('#timein');
+console.log(selectTimeIn);
+var selectTimeOut = formAd.querySelector('#timeout');
 
 /**
  * Получает случайный элемент массива.
@@ -40,7 +44,7 @@ var pinList = document.querySelector('.map__pins');
  * @param {Array} someArray - массив данных.
  * @return {any} someArray[j] - возвращает случайный элемент массива .
  */
-var getElementFormArray = function (someArray) {
+ var getElementFormArray = function (someArray) {
   var j = Math.floor(Math.random() * someArray.length);
   return someArray[j];
 };
@@ -52,7 +56,7 @@ var getElementFormArray = function (someArray) {
  * @param {number} maxNumber - максимальное значение.
  * @return {number} number - случайное значение.
  */
-var generateRandomNumber = function (minNumber, maxNumber) {
+ var generateRandomNumber = function (minNumber, maxNumber) {
   var number = Math.floor(minNumber + (Math.random() * (maxNumber + 1 - minNumber)));
   return number;
 };
@@ -66,7 +70,7 @@ var generateRandomNumber = function (minNumber, maxNumber) {
  * @param {number} coordinateY - координата Y.
  * @return {Object} - объект данных для метки: строка адреса для автара, строка тип предлложения, координаты метки.
  */
-var generateAd = function (uniqueImgAdress, offerType, coordinateX, coordinateY) {
+ var generateAd = function (uniqueImgAdress, offerType, coordinateX, coordinateY) {
   return {
     'author': {
       'avatar': uniqueImgAdress
@@ -89,7 +93,7 @@ var generateAd = function (uniqueImgAdress, offerType, coordinateX, coordinateY)
  * @param {Array} maxPins - максимальное количество меток .
  * @return {Array} adsArray - массив объектов с данными для меток.
  */
-var getAds = function (offers, coordinates, maxPins) {
+ var getAds = function (offers, coordinates, maxPins) {
   var adsArray = [];
   for (var i = 0; i < maxPins; i++) {
     var uniqueImgAdress = 'img/avatars/user0' + (i + 1) + '.png';
@@ -115,7 +119,7 @@ var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pi
  * @param {number} heightPin - высота метки.
  * @return {Object} pinElement - измененный склонированный элемент.
  */
-var generatePin = function (pinProperties, widthPin, heightPin) {
+ var generatePin = function (pinProperties, widthPin, heightPin) {
   var pinElement = pinTamplate.cloneNode(true);
   pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
   pinElement.querySelector('img').src = pinProperties.author.avatar;
@@ -130,7 +134,7 @@ var generatePin = function (pinProperties, widthPin, heightPin) {
  * @param {number} widthPin - ширина метки.
  * @param {number} heightPin - высота метки.
  */
-var renderPin = function (dataArray, widthPin, heightPin) {
+ var renderPin = function (dataArray, widthPin, heightPin) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < dataArray.length; i++) {
     fragment.appendChild(generatePin(dataArray[i], widthPin, heightPin));
@@ -143,7 +147,7 @@ var renderPin = function (dataArray, widthPin, heightPin) {
  *
  * @param {boolean} toggle - переключатель disable(true)/active(false).
  */
-var isFilterDisabled = function (toggle) {
+ var isFilterDisabled = function (toggle) {
   mapFilters.forEach(function (filter) {
     filter.disabled = toggle;
   });
@@ -160,7 +164,7 @@ var isFilterDisabled = function (toggle) {
  * @param {number} widthMainPin - ширина пина
  * @param {number} heightMainPin - высота пина
  */
-window.generateAddress = function (startPinCoordinate, widthMainPin, heightMainPin) {
+ window.generateAddress = function (startPinCoordinate, widthMainPin, heightMainPin) {
   var address = formAd.querySelector('#address');
   address.value = (startPinCoordinate.X + widthMainPin / 2) + ', ' + (startPinCoordinate.Y + heightMainPin / 2);
 };
@@ -171,7 +175,7 @@ window.generateAddress(startUserPinCoordinate, WIDTH_MAIN_PIN, HEIGHT_MAIN_PIN);
  *
  * @param {boolean} toggle - переключатель disable(true)/active(false).
  */
-var isAdFormDisabled = function (toggle) {
+ var isAdFormDisabled = function (toggle) {
   formAdFieldsets.forEach(function (fieldset) {
     fieldset.disabled = toggle;
   });
@@ -184,7 +188,7 @@ var isAdFormDisabled = function (toggle) {
  * Отслеживает нажатие кнопки мыши на .map__pin--main
  * и запускает функцию активации карты
  */
-main.addEventListener('mouseup', function (evt) {
+ main.addEventListener('mouseup', function (evt) {
   if (evt.target.closest('.map__pin--main')) {
     window.activateMap();
   }
@@ -193,7 +197,7 @@ main.addEventListener('mouseup', function (evt) {
 /**
  * Активирует фильтр, форму и показывает похожие объявления
  */
-window.activateMap = function () {
+ window.activateMap = function () {
   map.classList.remove('map--faded');
   renderPin(ads, WIDTH_PIN, HEIGHT_PIN);
   isFilterDisabled(false);
@@ -203,7 +207,7 @@ window.activateMap = function () {
 /**
  * Блокирует карту, фильтр и форму
  */
-var disableMap = function () {
+ var disableMap = function () {
   if (!map.classList.contains('map--faded')) {
     map.classList.add('map--faded');
   }
@@ -218,54 +222,59 @@ disableMap();
  *
  * @param {string} typeOffer - наименование типа жилья
  */
-var setMinPrice = function (typeOffer) {
+ var setMinPrice = function (typeOffer) {
   var price = formAd.querySelector('#price');
   switch (typeOffer) {
     case 'bungalo':
-      price.min = '0';
-      price.placeholder = '0';
-      break;
+    price.min = '0';
+    price.placeholder = '0';
+    break;
     case 'flat':
-      price.min = '1000';
-      price.placeholder = '1000';
-      break;
+    price.min = '1000';
+    price.placeholder = '1000';
+    break;
     case 'house':
-      price.min = '5000';
-      price.placeholder = '5000';
-      break;
+    price.min = '5000';
+    price.placeholder = '5000';
+    break;
     case 'palace':
-      price.min = '10000';
-      price.placeholder = '10000';
-      break;
+    price.min = '10000';
+    price.placeholder = '10000';
+    break;
   }
 };
 
 /**
  * Получает объект option в состоянии selected
  *
- * @return {*} seletedOption - возвращает выбранный option
+ * @return {Object} seletedOption - возвращает выбранный option
+ * @return {Collection} select - коллекция option
  */
-var getSelectedOption = function () {
-  var seletedOption;
-  var options = formAd.querySelector('#type').querySelectorAll('option');
-  options.forEach(function (option) {
-    if (option.selected === true) {
-      seletedOption = option;
-    }
+ var getSelectedOption = function (select) {
+  var index;
+  var selectedOption;
+  index = select.selectedIndex;
+  selectedOption = select[index];
+  select.addEventListener('change', function () {
+    index = select.selectedIndex;
+    selectedOption = select[index];
+
   });
-  return seletedOption;
+  return selectedOption;
 };
 
 /**
  * Устанавливает плейсхолдер и минимальное значение цены
  * для option в состоянии selected по-умолчанию
  *
+ * @param {Collection} select - коллекция option
  */
-var getDefaultMinPrice = function () {
-  var selectedOption = getSelectedOption();
+ var getDefaultMinPrice = function (select) {
+  var selectedOption = getSelectedOption(select);
   setMinPrice(selectedOption.value);
 };
-getDefaultMinPrice();
+getDefaultMinPrice(selectTypeOffer);
+
 
 /**
  * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
@@ -274,29 +283,27 @@ getDefaultMinPrice();
  * @param {Collection} syncTimes - коллекция option, значение одного из них
  * должно быть аналогично selectedTime и выбрано как selected
  */
-var setTime = function (selectedTime, syncTimes) {
-  syncTimes.forEach(function (time) {
-    if (selectedTime === time.value) {
-      time.selected = true;
+ var setTime = function (selectedTime, syncTimes) {
+  for (var i = 0; i < syncTimes.length; i++) {
+    if (syncTimes[i].value === selectedTime.value) {
+      syncTimes[i].selected = true;
     }
-  });
+  }
 };
 
 formAd.addEventListener('click', function (evt) {
   switch (evt.target.id) {
     case 'type':
-      var selectedOption = getSelectedOption();
-      setMinPrice(selectedOption.value);
-      break;
+    var selectedOption = getSelectedOption(selectTypeOffer);
+    setMinPrice(selectedOption.value);
+    break;
     case 'timein':
-      var selectedTime = evt.target.value;
-      var syncTimes = formAd.querySelector('#timeout').querySelectorAll('option');
-      setTime(selectedTime, syncTimes);
-      break;
+    var selectedOption = getSelectedOption(selectTimeIn);
+    setTime(selectedOption, selectTimeOut);
+    break;
     case 'timeout':
-      selectedTime = evt.target.value;
-      syncTimes = formAd.querySelector('#timein').querySelectorAll('option');
-      setTime(selectedTime, syncTimes);
-      break;
+    var selectedOption = getSelectedOption(selectTimeOut);
+    setTime(selectedOption, selectTimeIn);
+    break;
   }
 });
