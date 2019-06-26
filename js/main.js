@@ -40,6 +40,7 @@ var selectTypeOffer = formAd.querySelector('#type');
 var selectTimeIn = formAd.querySelector('#timein');
 var selectTimeOut = formAd.querySelector('#timeout');
 var mainPin = map.querySelector('.map__pin--main');
+var isMapDisabled = true;
 
 /**
  * Получает случайный элемент массива.
@@ -169,9 +170,12 @@ var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pi
  */
  window.generateAddress = function (startPinCoordinate, sizeMainPin) {
   var address = formAd.querySelector('#address');
-  address.value = (startPinCoordinate.X + sizeMainPin.WIDTH / 2) + ', ' + (startPinCoordinate.Y + sizeMainPin.HEIGHT / 2);
+  isMapDisabled ?
+  address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2))) :
+  address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
 };
 window.generateAddress(startUserPinCoordinate, SizeMainPin);
+
 
 /**
  * Переключает состояние формы disable/active.
@@ -203,6 +207,7 @@ window.generateAddress(startUserPinCoordinate, SizeMainPin);
  window.activateMap = function () {
   map.classList.remove('map--faded');
   renderPin(ads, WIDTH_PIN, HEIGHT_PIN);
+  isMapDisabled = false;
   isFilterDisabled(false);
   isAdFormDisabled(false);
 };
@@ -214,6 +219,7 @@ window.generateAddress(startUserPinCoordinate, SizeMainPin);
   if (!map.classList.contains('map--faded')) {
     map.classList.add('map--faded');
   }
+  isMapDisabled = true;
   isFilterDisabled(true);
   isAdFormDisabled(true);
 };
@@ -315,11 +321,12 @@ formAd.addEventListener('click', function (evt) {
 mainPin.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
   window.activateMap();
+  isMapDisabled = false;
 
   var startCoords = {
     x: evt.clientX,
     y: evt.clientY
-  }
+  };
 
 /**
  * Перемещенает метку
@@ -334,8 +341,10 @@ mainPin.addEventListener('mousedown', function (evt) {
     x: startCoords.x - moveEvt.clientX,
     y: startCoords.y - moveEvt.clientY
   };
-
-  console.log('shift', shift.x, shift.y);
+  var PinCoords = {
+    X: parseInt(mainPin.style.left, 10),
+    Y: parseInt(mainPin.style.top, 10)
+  };
 
   startCoords = {
     x: moveEvt.clientX,
@@ -367,6 +376,7 @@ mainPin.addEventListener('mousedown', function (evt) {
   if (parseInt(mainPin.style.left, 10) > Limits.MAX_X) {
     mainPin.style.left = Limits.MAX_X + 'px';
   };
+  window.generateAddress(PinCoords, SizeMainPin);
 };
 
 /**
@@ -379,6 +389,11 @@ mainPin.addEventListener('mousedown', function (evt) {
   upEvt.preventDefault();
   map.removeEventListener('mousemove', onMouseMove);
   map.removeEventListener('mouseup', onMouseUp);
+  var PinCoords = {
+    X: parseInt(mainPin.style.left, 10),
+    Y: parseInt(mainPin.style.top, 10)
+  };
+  window.generateAddress(PinCoords, SizeMainPin);
 };
 
 map.addEventListener('mousemove', onMouseMove);
