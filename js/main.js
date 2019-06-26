@@ -23,7 +23,7 @@ var Offers = {
   BUNGALO: 'Бунгало'
 };
 
-var startUserPinCoordinate = {
+var StartUserPinCoordinate = {
   X: 570,
   Y: 375
 };
@@ -174,7 +174,7 @@ var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pi
   address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2))) :
   address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
 };
-window.generateAddress(startUserPinCoordinate, SizeMainPin);
+window.generateAddress(StartUserPinCoordinate, SizeMainPin);
 
 
 /**
@@ -329,7 +329,7 @@ mainPin.addEventListener('mousedown', function (evt) {
   };
 
 /**
- * Перемещенает метку
+ * Перемещенает метку и передает координаты в форму
  *
  * @param {Object} moveEvt - DOM объект события
  *
@@ -341,6 +341,7 @@ mainPin.addEventListener('mousedown', function (evt) {
     x: startCoords.x - moveEvt.clientX,
     y: startCoords.y - moveEvt.clientY
   };
+
   var PinCoords = {
     X: parseInt(mainPin.style.left, 10),
     Y: parseInt(mainPin.style.top, 10)
@@ -380,7 +381,7 @@ mainPin.addEventListener('mousedown', function (evt) {
 };
 
 /**
- * Удаляет отслеживание событий при отжатии кнопки мыши
+ * Удаляет отслеживание событий и передает координаты в форму при отжатии кнопки мыши
  *
  * @param {Object} upEvt - DOM объект события
  *
