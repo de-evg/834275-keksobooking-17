@@ -2,8 +2,11 @@
 
 var WIDTH_PIN = 50;
 var HEIGHT_PIN = 70;
-var WIDTH_MAIN_PIN = 65;
-var HEIGHT_MAIN_PIN = 65;
+var SizeMainPin = {
+  WIDTH: 65,
+  HEIGHT: 65,
+  POINTER_HEIGHT: 22
+};
 var MAX_PINS = 8;
 
 var CoordinateMaps = {
@@ -35,8 +38,8 @@ var main = document.querySelector('main');
 var pinList = document.querySelector('.map__pins');
 var selectTypeOffer = formAd.querySelector('#type');
 var selectTimeIn = formAd.querySelector('#timein');
-console.log(selectTimeIn);
 var selectTimeOut = formAd.querySelector('#timeout');
+var mainPin = map.querySelector('.map__pin--main');
 
 /**
  * Получает случайный элемент массива.
@@ -164,11 +167,11 @@ var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pi
  * @param {number} widthMainPin - ширина пина
  * @param {number} heightMainPin - высота пина
  */
- window.generateAddress = function (startPinCoordinate, widthMainPin, heightMainPin) {
+ window.generateAddress = function (startPinCoordinate, sizeMainPin) {
   var address = formAd.querySelector('#address');
-  address.value = (startPinCoordinate.X + widthMainPin / 2) + ', ' + (startPinCoordinate.Y + heightMainPin / 2);
+  address.value = (startPinCoordinate.X + sizeMainPin.WIDTH / 2) + ', ' + (startPinCoordinate.Y + sizeMainPin.HEIGHT / 2);
 };
-window.generateAddress(startUserPinCoordinate, WIDTH_MAIN_PIN, HEIGHT_MAIN_PIN);
+window.generateAddress(startUserPinCoordinate, SizeMainPin);
 
 /**
  * Переключает состояние формы disable/active.
@@ -306,4 +309,78 @@ formAd.addEventListener('click', function (evt) {
     setTime(selectedOption, selectTimeIn);
     break;
   }
+});
+
+// Перемещение метки
+mainPin.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+  window.activateMap();
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  }
+
+/**
+ * Перемещенает метку
+ *
+ * @param {Object} moveEvt - DOM объект события
+ *
+ */
+ var onMouseMove = function (moveEvt) {
+  moveEvt.preventDefault();
+
+  var shift = {
+    x: startCoords.x - moveEvt.clientX,
+    y: startCoords.y - moveEvt.clientY
+  };
+
+  console.log('shift', shift.x, shift.y);
+
+  startCoords = {
+    x: moveEvt.clientX,
+    y: moveEvt.clientY
+  };
+
+  mainPin.style.top = mainPin.offsetTop - shift.y + 'px';
+  mainPin.style.left = mainPin.offsetLeft - shift.x + 'px';
+
+  var Limits = {
+    MIN_X: CoordinateMaps.MIN_X,
+    MAX_X: CoordinateMaps.MAX_X - SizeMainPin.WIDTH,
+    MIN_Y: CoordinateMaps.MIN_Y - SizeMainPin.HEIGHT / 2 - SizeMainPin.POINTER_HEIGHT,
+    MAX_Y: CoordinateMaps.MAX_Y - SizeMainPin.HEIGHT / 2 - SizeMainPin.POINTER_HEIGHT
+  };
+
+  if (parseInt(mainPin.style.top, 10) < Limits.MIN_Y) {
+    mainPin.style.top = Limits.MIN_Y + 'px';
+  };
+
+  if (parseInt(mainPin.style.top, 10) > Limits.MAX_Y) {
+    mainPin.style.top = Limits.MAX_Y + 'px';
+  };
+
+  if (parseInt(mainPin.style.left, 10) < Limits.MIN_X) {
+    mainPin.style.left = Limits.MIN_X + 'px';
+  };
+
+  if (parseInt(mainPin.style.left, 10) > Limits.MAX_X) {
+    mainPin.style.left = Limits.MAX_X + 'px';
+  };
+};
+
+/**
+ * Удаляет отслеживание событий при отжатии кнопки мыши
+ *
+ * @param {Object} upEvt - DOM объект события
+ *
+ */
+ var onMouseUp = function (upEvt) {
+  upEvt.preventDefault();
+  map.removeEventListener('mousemove', onMouseMove);
+  map.removeEventListener('mouseup', onMouseUp);
+};
+
+map.addEventListener('mousemove', onMouseMove);
+map.addEventListener('mouseup', onMouseUp);
 });
