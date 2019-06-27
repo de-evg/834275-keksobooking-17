@@ -2,9 +2,13 @@
 
 var WIDTH_PIN = 50;
 var HEIGHT_PIN = 70;
-var WIDTH_MAIN_PIN = 65;
-var HEIGHT_MAIN_PIN = 65;
 var MAX_PINS = 8;
+
+var SizeMainPin = {
+  WIDTH: 65,
+  HEIGHT: 65,
+  POINTER_HEIGHT: 22
+};
 
 var CoordinateMaps = {
   MIN_X: 0,
@@ -14,13 +18,25 @@ var CoordinateMaps = {
 };
 
 var Offers = {
-  PALACE: 'Дворец',
-  FLAT: 'Квартира',
-  HOUSE: 'Дом',
-  BUNGALO: 'Бунгало'
+  PALACE: {
+    TYPE: 'Дворец',
+    MIN_PRICE: 10000
+  },
+  FLAT: {
+    TYPE: 'Квартира',
+    MIN_PRICE: 1000
+  },
+  HOUSE: {
+    TYPE: 'Дом',
+    MIN_PRICE: 5000
+  },
+  BUNGALO: {
+    TYPE: 'Бунгало',
+    MIN_PRICE: 0
+  }
 };
 
-var startUserPinCoordinate = {
+var StartUserPinCoordinate = {
   X: 570,
   Y: 375
 };
@@ -31,8 +47,13 @@ var mapFilters = formMapFilters.querySelectorAll('.map__filter');
 var mapFiterFieldset = formMapFilters.querySelector('fieldset');
 var formAd = document.querySelector('.ad-form');
 var formAdFieldsets = formAd.querySelectorAll('fieldset');
-var main = document.querySelector('main');
 var pinList = document.querySelector('.map__pins');
+var selectTypeOffer = formAd.querySelector('#type');
+var selectTimeIn = formAd.querySelector('#timein');
+var selectTimeOut = formAd.querySelector('#timeout');
+var mainPin = map.querySelector('.map__pin--main');
+var price = formAd.querySelector('#price');
+var isMapDisabled = true;
 
 /**
  * Получает случайный элемент массива.
@@ -154,17 +175,22 @@ var isFilterDisabled = function (toggle) {
 };
 
 /**
- * Генерирует и изменяет значение координат главного пина.
+ * Генерирует и изменяет значение координат главной метки.
  *
- * @param {Object} startPinCoordinate - начальные координаты пина.
- * @param {number} widthMainPin - ширина пина
- * @param {number} heightMainPin - высота пина
+ * @param {Object} startPinCoordinate - начальные координаты метки.
+ * @param {Object} sizeMainPin - перечисление размеров метки
+ * @param {boolean} flag - состояние активности карты
  */
-window.generateAddress = function (startPinCoordinate, widthMainPin, heightMainPin) {
+window.generateAddress = function (startPinCoordinate, sizeMainPin, flag) {
   var address = formAd.querySelector('#address');
-  address.value = (startPinCoordinate.X + widthMainPin / 2) + ', ' + (startPinCoordinate.Y + heightMainPin / 2);
+  if (flag) {
+    address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2)));
+  } else {
+    address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
+  }
 };
-window.generateAddress(startUserPinCoordinate, WIDTH_MAIN_PIN, HEIGHT_MAIN_PIN);
+window.generateAddress(StartUserPinCoordinate, SizeMainPin, isMapDisabled);
+
 
 /**
  * Переключает состояние формы disable/active.
@@ -181,21 +207,12 @@ var isAdFormDisabled = function (toggle) {
 };
 
 /**
- * Отслеживает нажатие кнопки мыши на .map__pin--main
- * и запускает функцию активации карты
- */
-main.addEventListener('mouseup', function (evt) {
-  if (evt.target.closest('.map__pin--main')) {
-    window.activateMap();
-  }
-}, false);
-
-/**
  * Активирует фильтр, форму и показывает похожие объявления
  */
 window.activateMap = function () {
   map.classList.remove('map--faded');
   renderPin(ads, WIDTH_PIN, HEIGHT_PIN);
+  isMapDisabled = false;
   isFilterDisabled(false);
   isAdFormDisabled(false);
 };
@@ -207,6 +224,7 @@ var disableMap = function () {
   if (!map.classList.contains('map--faded')) {
     map.classList.add('map--faded');
   }
+  isMapDisabled = true;
   isFilterDisabled(true);
   isAdFormDisabled(true);
 };
@@ -216,56 +234,51 @@ disableMap();
  * Устанавливает плейсхолдер и минимальное значение для цены
  * в зависимости от типа предолжения
  *
- * @param {string} typeOffer - наименование типа жилья
+ * @param {Object} offer - объект с параметрами выбранного типа.
+ * @param {Object} inputFieldElement - DOM элемент для которго устанавилваются атрибуты
  */
-var setMinPrice = function (typeOffer) {
-  var price = formAd.querySelector('#price');
-  switch (typeOffer) {
-    case 'bungalo':
-      price.min = '0';
-      price.placeholder = '0';
-      break;
-    case 'flat':
-      price.min = '1000';
-      price.placeholder = '1000';
-      break;
-    case 'house':
-      price.min = '5000';
-      price.placeholder = '5000';
-      break;
-    case 'palace':
-      price.min = '10000';
-      price.placeholder = '10000';
-      break;
-  }
+var setMinPrice = function (offer, inputFieldElement) {
+  var typeOffer = offer.selectedOption.value.toUpperCase();
+  var attribute = offer.offersObj[typeOffer].MIN_PRICE;
+  inputFieldElement.min = attribute;
+  inputFieldElement.placeholder = attribute;
 };
 
 /**
  * Получает объект option в состоянии selected
  *
- * @return {*} seletedOption - возвращает выбранный option
+ * @param {Collection} select - коллекция option
+ * @return {Object} selectedOption - выбранный option
  */
-var getSelectedOption = function () {
-  var seletedOption;
-  var options = formAd.querySelector('#type').querySelectorAll('option');
-  options.forEach(function (option) {
-    if (option.selected === true) {
-      seletedOption = option;
-    }
+var getSelectedOption = function (select) {
+  var index;
+  var selectedOption;
+  index = select.selectedIndex;
+  selectedOption = select[index];
+  select.addEventListener('change', function () {
+    index = select.selectedIndex;
+    selectedOption = select[index];
   });
-  return seletedOption;
+  return selectedOption;
 };
 
 /**
  * Устанавливает плейсхолдер и минимальное значение цены
  * для option в состоянии selected по-умолчанию
  *
+ * @param {Collection} select - коллекция option
+ * @param {Object} offers - перечисление типов предложений
+ * @param {Object} inputFieldElement - DOM элемент для которго устанавилваются атрибуты
  */
-var getDefaultMinPrice = function () {
-  var selectedOption = getSelectedOption();
-  setMinPrice(selectedOption.value);
+var getDefaultMinPrice = function (select, offers, inputFieldElement) {
+  var offer = {
+    selectedOption: getSelectedOption(select),
+    offersObj: offers
+  };
+  setMinPrice(offer, inputFieldElement);
 };
-getDefaultMinPrice();
+getDefaultMinPrice(selectTypeOffer, Offers, price);
+
 
 /**
  * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
@@ -275,28 +288,113 @@ getDefaultMinPrice();
  * должно быть аналогично selectedTime и выбрано как selected
  */
 var setTime = function (selectedTime, syncTimes) {
-  syncTimes.forEach(function (time) {
-    if (selectedTime === time.value) {
-      time.selected = true;
+  for (var i = 0; i < syncTimes.length; i++) {
+    if (syncTimes[i].value === selectedTime.value) {
+      syncTimes[i].selected = true;
     }
-  });
+  }
 };
 
 formAd.addEventListener('click', function (evt) {
   switch (evt.target.id) {
     case 'type':
-      var selectedOption = getSelectedOption();
-      setMinPrice(selectedOption.value);
+      var offer = {
+        selectedOption: getSelectedOption(selectTypeOffer),
+        offersObj: Offers
+      };
+      setMinPrice(offer, price);
       break;
     case 'timein':
-      var selectedTime = evt.target.value;
-      var syncTimes = formAd.querySelector('#timeout').querySelectorAll('option');
-      setTime(selectedTime, syncTimes);
+      var selectedOption = getSelectedOption(selectTimeIn);
+      setTime(selectedOption, selectTimeOut);
       break;
     case 'timeout':
-      selectedTime = evt.target.value;
-      syncTimes = formAd.querySelector('#timein').querySelectorAll('option');
-      setTime(selectedTime, syncTimes);
+      selectedOption = getSelectedOption(selectTimeOut);
+      setTime(selectedOption, selectTimeIn);
       break;
   }
+});
+
+// Перемещение метки
+mainPin.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+  window.activateMap();
+  isMapDisabled = false;
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  /**
+   * Перемещенает метку и передает координаты в форму
+   *
+   * @param {Object} moveEvt - DOM объект события
+   *
+   */
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    var PinCoords = {
+      X: parseInt(mainPin.style.left, 10),
+      Y: parseInt(mainPin.style.top, 10)
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    mainPin.style.top = mainPin.offsetTop - shift.y + 'px';
+    mainPin.style.left = mainPin.offsetLeft - shift.x + 'px';
+
+    var Limits = {
+      MIN_X: CoordinateMaps.MIN_X,
+      MAX_X: CoordinateMaps.MAX_X - SizeMainPin.WIDTH,
+      MIN_Y: CoordinateMaps.MIN_Y - SizeMainPin.HEIGHT / 2 - SizeMainPin.POINTER_HEIGHT,
+      MAX_Y: CoordinateMaps.MAX_Y - SizeMainPin.HEIGHT / 2 - SizeMainPin.POINTER_HEIGHT
+    };
+
+    if (parseInt(mainPin.style.top, 10) < Limits.MIN_Y) {
+      mainPin.style.top = Limits.MIN_Y + 'px';
+    }
+
+    if (parseInt(mainPin.style.top, 10) > Limits.MAX_Y) {
+      mainPin.style.top = Limits.MAX_Y + 'px';
+    }
+
+    if (parseInt(mainPin.style.left, 10) < Limits.MIN_X) {
+      mainPin.style.left = Limits.MIN_X + 'px';
+    }
+
+    if (parseInt(mainPin.style.left, 10) > Limits.MAX_X) {
+      mainPin.style.left = Limits.MAX_X + 'px';
+    }
+    window.generateAddress(PinCoords, SizeMainPin, isMapDisabled);
+  };
+
+  /**
+   * Удаляет отслеживание событий и передает координаты в форму при отжатии кнопки мыши
+   *
+   * @param {Object} upEvt - DOM объект события
+   *
+   */
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    map.removeEventListener('mousemove', onMouseMove);
+    map.removeEventListener('mouseup', onMouseUp);
+    var PinCoords = {
+      X: parseInt(mainPin.style.left, 10),
+      Y: parseInt(mainPin.style.top, 10)
+    };
+    window.generateAddress(PinCoords, SizeMainPin, isMapDisabled);
+  };
+
+  map.addEventListener('mousemove', onMouseMove);
+  map.addEventListener('mouseup', onMouseUp);
 });
