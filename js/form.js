@@ -90,6 +90,7 @@
     for (var i = 0; i < syncTimes.length; i++) {
       if (syncTimes[i].value === selectedTime.value) {
         syncTimes[i].selected = true;
+        break;
       }
     }
   };
