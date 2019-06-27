@@ -92,12 +92,18 @@
    * должно быть аналогично selectedTime и выбрано как selected
    */
   var setTime = function (selectedTime, syncTimes) {
-    for (var i = 0; i < syncTimes.length; i++) {
-      if (syncTimes[i].value === selectedTime.value) {
-        syncTimes[i].selected = true;
-        break;
+    var syncTimesOptions = Array.from(syncTimes);
+    syncTimesOptions.forEach(function (option) {
+      if (option.value === selectedTime.value) {
+        option.selected = true;
       }
-    }
+    });
+    // for (var i = 0; i < syncTimes.length; i++) {
+    //   if (syncTimes[i].value === selectedTime.value) {
+    //     syncTimes[i].selected = true;
+    //     break;
+    //   }
+    // }
   };
 
   main.formAd.addEventListener('click', function (evt) {
