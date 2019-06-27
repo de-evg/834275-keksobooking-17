@@ -7,7 +7,6 @@
     POINTER_HEIGHT: 22
   };
 
-
   var selectTypeOffer = window.formAd.querySelector('#type');
   var selectTimeIn = window.formAd.querySelector('#timein');
   var selectTimeOut = window.formAd.querySelector('#timeout');
@@ -77,7 +76,6 @@
     setMinPrice(offer, inputFieldElement);
   };
   getDefaultMinPrice(selectTypeOffer, window.Offers, price);
-
 
   /**
    * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
