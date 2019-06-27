@@ -31,7 +31,7 @@
    *
    * @param {boolean} toggle - переключатель disable(true)/active(false).
    */
-   var isAdFormDisabled = function (toggle) {
+  var isAdFormDisabled = function (toggle) {
     formAdFieldsets.forEach(function (fieldset) {
       fieldset.disabled = toggle;
     });
@@ -40,27 +40,27 @@
     }
   };
 
-/**
- * Активирует фильтр, форму и показывает похожие объявления
- */
- window.activateMap = function () {
-  window.map.classList.remove('map--faded');
-  window.renderPin(window.ads, WIDTH_PIN, HEIGHT_PIN);
-  window.isMapDisabled = false;
-  isFilterDisabled(false);
-  isAdFormDisabled(false);
-};
+  /**
+   * Активирует фильтр, форму и показывает похожие объявления
+   */
+  window.activateMap = function () {
+    window.map.classList.remove('map--faded');
+    window.renderPin(window.ads, WIDTH_PIN, HEIGHT_PIN);
+    window.isMapDisabled = false;
+    isFilterDisabled(false);
+    isAdFormDisabled(false);
+  };
 
-/**
- * Блокирует карту, фильтр и форму
- */
- var disableMap = function () {
-  if (!map.classList.contains('map--faded')) {
-    window.map.classList.add('map--faded');
-  }
-  window.isMapDisabled = true;
-  isFilterDisabled(true);
-  isAdFormDisabled(true);
-};
-disableMap();
+  /**
+   * Блокирует карту, фильтр и форму
+   */
+  var disableMap = function () {
+    if (!window.map.classList.contains('map--faded')) {
+      window.map.classList.add('map--faded');
+    }
+    window.isMapDisabled = true;
+    isFilterDisabled(true);
+    isAdFormDisabled(true);
+  };
+  disableMap();
 })();

@@ -97,20 +97,20 @@
   window.formAd.addEventListener('click', function (evt) {
     switch (evt.target.id) {
       case 'type':
-      var offer = {
-        selectedOption: getSelectedOption(selectTypeOffer),
-        offersObj: window.Offers
-      };
-      setMinPrice(offer, price);
-      break;
+        var offer = {
+          selectedOption: getSelectedOption(selectTypeOffer),
+          offersObj: window.Offers
+        };
+        setMinPrice(offer, price);
+        break;
       case 'timein':
-      var selectedOption = getSelectedOption(selectTimeIn);
-      setTime(selectedOption, selectTimeOut);
-      break;
+        var selectedOption = getSelectedOption(selectTimeIn);
+        setTime(selectedOption, selectTimeOut);
+        break;
       case 'timeout':
-      selectedOption = getSelectedOption(selectTimeOut);
-      setTime(selectedOption, selectTimeIn);
-      break;
+        selectedOption = getSelectedOption(selectTimeOut);
+        setTime(selectedOption, selectTimeIn);
+        break;
     }
   });
 })();
