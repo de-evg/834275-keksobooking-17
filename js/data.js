@@ -2,8 +2,9 @@
 
 (function () {
   var MAX_PINS = 8;
+  var utils = window.utils;
 
-  window.Offers = {
+  var Offers = {
     PALACE: {
       TYPE: 'Дворец',
       MIN_PRICE: 10000
@@ -22,19 +23,12 @@
     }
   };
 
-  window.CoordinateMaps = {
+  var CoordinateMaps = {
     MIN_X: 0,
     MAX_X: 1200,
     MIN_Y: 130,
     MAX_Y: 630
   };
-
-  window.StartUserPinCoordinate = {
-    X: 570,
-    Y: 375
-  };
-
-  var utils = window.utils;
 
   /**
    * Генерирует объект данных для метки.
@@ -82,5 +76,11 @@
     return adsArray;
   };
 
-  window.ads = getAds(window.Offers, window.CoordinateMaps, MAX_PINS);
+  var ads = getAds(Offers, CoordinateMaps, MAX_PINS);
+
+  window.data = {
+    Offers: Offers,
+    CoordinateMaps: CoordinateMaps,
+    ads: ads
+  };
 })();

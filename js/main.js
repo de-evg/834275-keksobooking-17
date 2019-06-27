@@ -3,13 +3,14 @@
 (function () {
   var WIDTH_PIN = 50;
   var HEIGHT_PIN = 70;
+  var data = window.data;
+  var map = document.querySelector('.map');
+  var formAd = document.querySelector('.ad-form');
   var formMapFilters = document.querySelector('.map__filters');
   var mapFilters = formMapFilters.querySelectorAll('.map__filter');
   var mapFiterFieldset = formMapFilters.querySelector('fieldset');
-  window.map = document.querySelector('.map');
-  window.formAd = document.querySelector('.ad-form');
-  var formAdFieldsets = window.formAd.querySelectorAll('fieldset');
-  window.isMapDisabled = true;
+  var formAdFieldsets = formAd.querySelectorAll('fieldset');
+  var isMapDisabled = true;
 
   /**
    * Переключает состояние фильтра disable/active.
@@ -35,18 +36,20 @@
     formAdFieldsets.forEach(function (fieldset) {
       fieldset.disabled = toggle;
     });
-    if (toggle !== window.formAd.classList.contains('ad-form--disabled')) {
-      window.formAd.classList.toggle('ad-form--disabled');
+    if (toggle !== formAd.classList.contains('ad-form--disabled')) {
+      formAd.classList.toggle('ad-form--disabled');
     }
   };
 
   /**
    * Активирует фильтр, форму и показывает похожие объявления
+   *
+   * @param {Object} module - объект модуля содержащий фукцию renderPin
    */
-  window.activateMap = function () {
-    window.map.classList.remove('map--faded');
-    window.renderPin(window.ads, WIDTH_PIN, HEIGHT_PIN);
-    window.isMapDisabled = false;
+  var activateMap = function (module) {
+    map.classList.remove('map--faded');
+    module.renderPin(data.ads, WIDTH_PIN, HEIGHT_PIN);
+    isMapDisabled = false;
     isFilterDisabled(false);
     isAdFormDisabled(false);
   };
@@ -55,12 +58,19 @@
    * Блокирует карту, фильтр и форму
    */
   var disableMap = function () {
-    if (!window.map.classList.contains('map--faded')) {
-      window.map.classList.add('map--faded');
+    if (!map.classList.contains('map--faded')) {
+      map.classList.add('map--faded');
     }
-    window.isMapDisabled = true;
+    isMapDisabled = true;
     isFilterDisabled(true);
     isAdFormDisabled(true);
   };
   disableMap();
+
+  window.main = {
+    map: map,
+    formAd: formAd,
+    isMapDisabled: isMapDisabled,
+    activateMap: activateMap
+  };
 })();

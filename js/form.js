@@ -1,16 +1,23 @@
 'use strict';
 
 (function () {
-  window.SizeMainPin = {
+  var main = window.main;
+  var data = window.data;
+  var SizeMainPin = {
     WIDTH: 65,
     HEIGHT: 65,
     POINTER_HEIGHT: 22
   };
 
-  var selectTypeOffer = window.formAd.querySelector('#type');
-  var selectTimeIn = window.formAd.querySelector('#timein');
-  var selectTimeOut = window.formAd.querySelector('#timeout');
-  var price = window.formAd.querySelector('#price');
+  var StartUserPinCoordinate = {
+    X: 570,
+    Y: 375
+  };
+
+  var selectTypeOffer = main.formAd.querySelector('#type');
+  var selectTimeIn = main.formAd.querySelector('#timein');
+  var selectTimeOut = main.formAd.querySelector('#timeout');
+  var price = main.formAd.querySelector('#price');
   /**
    * Генерирует и изменяет значение координат главной метки.
    *
@@ -18,15 +25,15 @@
    * @param {Object} sizeMainPin - перечисление размеров метки
    * @param {boolean} flag - состояние активности карты
    */
-  window.generateAddress = function (startPinCoordinate, sizeMainPin, flag) {
-    var address = window.formAd.querySelector('#address');
+  var generateAddress = function (startPinCoordinate, sizeMainPin, flag) {
+    var address = main.formAd.querySelector('#address');
     if (flag) {
       address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2)));
     } else {
       address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
     }
   };
-  window.generateAddress(window.StartUserPinCoordinate, window.SizeMainPin, window.isMapDisabled);
+  generateAddress(StartUserPinCoordinate, SizeMainPin, main.isMapDisabled);
 
   /**
    * Устанавливает плейсхолдер и минимальное значение для цены
@@ -75,7 +82,7 @@
     };
     setMinPrice(offer, inputFieldElement);
   };
-  getDefaultMinPrice(selectTypeOffer, window.Offers, price);
+  getDefaultMinPrice(selectTypeOffer, data.Offers, price);
 
   /**
    * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
@@ -93,12 +100,12 @@
     }
   };
 
-  window.formAd.addEventListener('click', function (evt) {
+  main.formAd.addEventListener('click', function (evt) {
     switch (evt.target.id) {
       case 'type':
         var offer = {
           selectedOption: getSelectedOption(selectTypeOffer),
-          offersObj: window.Offers
+          offersObj: data.Offers
         };
         setMinPrice(offer, price);
         break;
@@ -112,4 +119,9 @@
         break;
     }
   });
+
+  window.form = {
+    SizeMainPin: SizeMainPin,
+    generateAddress: generateAddress
+  };
 })();
