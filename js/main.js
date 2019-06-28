@@ -1,8 +1,6 @@
 'use strict';
 
 (function () {
-  var WIDTH_PIN = 50;
-  var HEIGHT_PIN = 70;
   var data = window.data;
   var map = document.querySelector('.map');
   var formAd = document.querySelector('.ad-form');
@@ -46,9 +44,8 @@
    *
    * @param {Object} module - объект модуля содержащий фукцию renderPin
    */
-  var activateMap = function (module) {
+  var activateMap = function () {
     map.classList.remove('map--faded');
-    module.renderPin(data.ads, WIDTH_PIN, HEIGHT_PIN);
     isMapDisabled = false;
     isFilterDisabled(false);
     isAdFormDisabled(false);
@@ -68,9 +65,9 @@
   disableMap();
 
   window.main = {
-    map: map,
-    formAd: formAd,
-    isMapDisabled: isMapDisabled,
-    activateMap: activateMap
+    mapElement: map,
+    formAdElement: formAd,
+    mapDisabled: isMapDisabled,
+    activate: activateMap
   };
 })();

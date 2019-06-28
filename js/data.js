@@ -3,7 +3,9 @@
 (function () {
   var MAX_PINS = 8;
   var utils = window.utils;
-
+  var dataOffers = {};
+  var isLoadSuccess = false;
+  var errorTemplate = document.querySelector('#error');
   var Offers = {
     PALACE: {
       TYPE: 'Дворец',
@@ -29,6 +31,23 @@
     MIN_Y: 130,
     MAX_Y: 630
   };
+
+  var onError = function (message) {
+    console.error(message);
+    var generateError = function () {
+      var error = errorTemplate.cloneNode(true);
+      error.display = 'block';
+    }
+  };
+
+  var onSuccess = function (data, isLoad) {
+    var dataOffers = data;
+    isLoadSuccess = isLoad;
+    return dataOffers;
+  };
+ dataOffers = window.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
+  console.log(dataOffers)
+
 
   /**
    * Генерирует объект данных для метки.
@@ -62,25 +81,26 @@
    * @param {Array} maxPins - максимальное количество меток .
    * @return {Array} adsArray - массив объектов с данными для меток.
    */
-  var getAds = function (offers, coordinates, maxPins) {
+  var getAds = function (offers, maximumPins) {
     var adsArray = [];
-    for (var i = 0; i < maxPins; i++) {
-      var uniqueImgAdress = 'img/avatars/user0' + (i + 1) + '.png';
+    for (var i = 0; i < maximumPins; i++) {
+      var uniqueImgAdress = offers[i].author.avatar;
       var newCoordinates = [];
-      newCoordinates.push(utils.generateRandomNumber(coordinates.MIN_X, coordinates.MAX_X));
-      newCoordinates.push(utils.generateRandomNumber(coordinates.MIN_Y, coordinates.MAX_Y));
-      var offersKeys = (Object.values(offers));
-      var offerType = utils.getElementFormArray(offersKeys);
+      newCoordinates.push(offers[i].location.x);
+      newCoordinates.push(offers[i].location.y);
+      var offerType = offers[i].offer.type;
       adsArray.push(generateAd(uniqueImgAdress, offerType, newCoordinates[0], newCoordinates[1]));
     }
     return adsArray;
   };
 
-  var ads = getAds(Offers, CoordinateMaps, MAX_PINS);
+  var ads = getAds(window.dataOffers, window.maxPins);
 
   window.data = {
-    Offers: Offers,
-    CoordinateMaps: CoordinateMaps,
-    ads: ads
+    offers: Offers,
+    coordinate: CoordinateMaps,
+    adArray: ads,
+    load: isLoadSuccess,
+    loadedData: dataOffers
   };
 })();
