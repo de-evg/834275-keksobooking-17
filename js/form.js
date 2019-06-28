@@ -87,7 +87,7 @@
   /**
    * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
    *
-   * @param {string} selectedTime - значение выбранного option
+   * @param {Object} selectedTime - выбранный option
    * @param {Collection} syncTimes - коллекция option, значение одного из них
    * должно быть аналогично selectedTime и выбрано как selected
    */
@@ -98,15 +98,9 @@
         option.selected = true;
       }
     });
-    // for (var i = 0; i < syncTimes.length; i++) {
-    //   if (syncTimes[i].value === selectedTime.value) {
-    //     syncTimes[i].selected = true;
-    //     break;
-    //   }
-    // }
   };
 
-  main.formAd.addEventListener('click', function (evt) {
+  main.formAd.addEventListener('change', function (evt) {
     switch (evt.target.id) {
       case 'type':
         var offer = {
