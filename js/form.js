@@ -106,7 +106,7 @@
     // }
   };
 
-  main.formAd.addEventListener('click', function (evt) {
+  main.formAd.addEventListener('change', function (evt) {
     switch (evt.target.id) {
       case 'type':
         var offer = {
