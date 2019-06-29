@@ -1,14 +1,16 @@
 'use strict';
 
 (function () {
-  var WIDTH_PIN = 50;
-  var HEIGHT_PIN = 70;
   var data = window.data;
   var main = window.main;
   var form = window.form;
-  var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pin');
+  var Templates = {
+    pinTamplate: document.querySelector('#pin').content.querySelector('.map__pin'),
+    errorTemplate: document.querySelector('#error').content.querySelector('.error')
+  };
   var pinList = document.querySelector('.map__pins');
   var mainPin = main.mapElement.querySelector('.map__pin--main');
+  var mainElement = document.querySelector('main');
 
 
   /**
@@ -20,7 +22,7 @@
    * @return {Object} pinElement - измененный склонированный элемент.
    */
   var generatePin = function (pinProperties, widthPin, heightPin) {
-    var pinElement = pinTamplate.cloneNode(true);
+    var pinElement = Templates.pinTamplate.cloneNode(true);
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinElement.querySelector('img').src = pinProperties.author.avatar;
     pinElement.querySelector('img').alt = 'Метка похожего объявления';
@@ -34,21 +36,31 @@
    * @param {number} widthPin - ширина метки.
    * @param {number} heightPin - высота метки.
    */
-  var renderPin = function (dataArray, widthPin, heightPin) {
+  var renderPin = function (dataArray) {
+    var WIDTH_PIN = 50;
+    var HEIGHT_PIN = 70;
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < dataArray.length; i++) {
-      fragment.appendChild(generatePin(dataArray[i], widthPin, heightPin));
+      fragment.appendChild(generatePin(dataArray[i], WIDTH_PIN, HEIGHT_PIN));
     }
     pinList.appendChild(fragment);
   };
 
-  // Перемещение метки
+  var onSuccess = function (loadedData) {
+    renderPin(loadedData);
+  };
+  var onError = function () {
+    var error = Templates.errorTemplate.cloneNode(true);
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(error);
+    mainElement.appendChild(fragment);
+    error.display = 'block';
+  };
+
+  // Взаимодействие с меткой
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
-    main.activate();
-    if (data.load) {
-      renderPin(window.dataArray, WIDTH_PIN, HEIGHT_PIN);
-    };
+    main.activate(onSuccess, onError);
     main.mapDisabled = false;
 
     var startCoords = {
@@ -130,7 +142,7 @@
   });
 
   window.pin = {
-    render: renderPin
+    render: renderPin,
+    url: URL
   };
-  var pin = window.pin;
 })();

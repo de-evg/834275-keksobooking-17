@@ -1,7 +1,8 @@
 'use strict';
 
 (function () {
-  var data = window.data;
+
+  var URL = 'https://js.dump.academy/keksobooking/data';
   var map = document.querySelector('.map');
   var formAd = document.querySelector('.ad-form');
   var formMapFilters = document.querySelector('.map__filters');
@@ -44,7 +45,8 @@
    *
    * @param {Object} module - объект модуля содержащий фукцию renderPin
    */
-  var activateMap = function () {
+  var activateMap = function (onSuccess, onError) {
+    window.load(URL, onSuccess, onError);
     map.classList.remove('map--faded');
     isMapDisabled = false;
     isFilterDisabled(false);
