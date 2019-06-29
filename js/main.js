@@ -1,8 +1,6 @@
 'use strict';
 
 (function () {
-
-  var URL = 'https://js.dump.academy/keksobooking/data';
   var map = document.querySelector('.map');
   var formAd = document.querySelector('.ad-form');
   var formMapFilters = document.querySelector('.map__filters');
@@ -43,9 +41,11 @@
   /**
    * Активирует фильтр, форму и показывает похожие объявления
    *
-   * @param {Object} module - объект модуля содержащий фукцию renderPin
+   * @param {function} onSuccess - функция обработки успешного получения данных
+   * @param {function} onError - функция обработки ошибки при запросе/получении данных
    */
   var activateMap = function (onSuccess, onError) {
+    var URL = 'https://js.dump.academy/keksobooking/data';
     window.load(URL, onSuccess, onError);
     map.classList.remove('map--faded');
     isMapDisabled = false;

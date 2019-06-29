@@ -19,7 +19,7 @@
   var selectTimeOut = main.formAdElement.querySelector('#timeout');
   var price = main.formAdElement.querySelector('#price');
   /**
-   * Генерирует и изменяет значение координат главной метки.
+   * Генерирует и изменяет значения координат главной метки в поле адреса в форме.
    *
    * @param {Object} startPinCoordinate - начальные координаты метки.
    * @param {Object} sizeMainPin - перечисление размеров метки

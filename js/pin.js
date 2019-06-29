@@ -46,9 +46,19 @@
     pinList.appendChild(fragment);
   };
 
+  /**
+   * Отриосвывает метки при успешном получении данных с сервера.
+   *
+   * @param {Array} loadedData - массив с данными полученный от сервера.
+   */
   var onSuccess = function (loadedData) {
     renderPin(loadedData);
   };
+
+  /**
+   * Показывает окно с ошибкой при ошибке загрузки данных с сервера.
+   *
+   */
   var onError = function () {
     var error = Templates.errorTemplate.cloneNode(true);
     var fragment = document.createDocumentFragment();
