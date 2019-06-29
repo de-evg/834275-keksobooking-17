@@ -4,9 +4,9 @@
   var data = window.data;
   var main = window.main;
   var form = window.form;
-  var Templates = {
-    pinTamplate: document.querySelector('#pin').content.querySelector('.map__pin'),
-    errorTemplate: document.querySelector('#error').content.querySelector('.error')
+  var Template = {
+    PIN: document.querySelector('#pin').content.querySelector('.map__pin'),
+    ERROR: document.querySelector('#error').content.querySelector('.error')
   };
   var pinList = document.querySelector('.map__pins');
   var mainPin = main.mapElement.querySelector('.map__pin--main');
@@ -22,7 +22,7 @@
    * @return {Object} pinElement - измененный склонированный элемент.
    */
   var generatePin = function (pinProperties, widthPin, heightPin) {
-    var pinElement = Templates.pinTamplate.cloneNode(true);
+    var pinElement = Template.PIN.cloneNode(true);
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinElement.querySelector('img').src = pinProperties.author.avatar;
     pinElement.querySelector('img').alt = 'Метка похожего объявления';
@@ -60,7 +60,7 @@
    *
    */
   var onError = function () {
-    var error = Templates.errorTemplate.cloneNode(true);
+    var error = Template.ERROR.cloneNode(true);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(error);
     mainElement.appendChild(fragment);
