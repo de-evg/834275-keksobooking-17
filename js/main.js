@@ -69,6 +69,7 @@
   window.main = {
     mapElement: map,
     formAdElement: formAd,
+    formFilterElement: formMapFilters,
     mapDisabled: isMapDisabled,
     activate: activateMap
   };

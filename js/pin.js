@@ -46,9 +46,17 @@
     pinList.appendChild(fragment);
   };
 
-  var sortingData = function (dataArray) {
-    return dataArray.slice(0, 5);
+  var filter = function (dataArray, query) {
+    return dataArray.offer.type === query;
   };
+
+  var sortingData = function (dataArray) {
+    var x = dataArray.slice();
+    x.filter(filter(dataArray, 'house'));
+    x.join(dataArray);
+    return x;
+  };
+
 
   /**
    * Отриосвывает метки при успешном получении данных с сервера.
@@ -56,8 +64,15 @@
    * @param {Array} loadedData - массив с данными полученный от сервера.
    */
   var onSuccess = function (loadedData) {
-    var sortedData = sortingData(loadedData);
-    renderPin(sortedData);
+    var newData;
+    main.formFilterElement.addEventListener('change', function (evt) {
+      switch (evt.target.value) {
+        case 'house':
+          newData = sortingData(loadedData);
+          break;
+      }
+    });
+    renderPin(newData);
   };
 
   /**
