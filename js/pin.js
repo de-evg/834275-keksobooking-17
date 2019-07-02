@@ -4,9 +4,13 @@
   var data = window.data;
   var main = window.main;
   var form = window.form;
-  var pinTamplate = document.querySelector('#pin').content.querySelector('.map__pin');
+  var Template = {
+    PIN: document.querySelector('#pin').content.querySelector('.map__pin'),
+    ERROR: document.querySelector('#error').content.querySelector('.error')
+  };
   var pinList = document.querySelector('.map__pins');
-  var mainPin = main.map.querySelector('.map__pin--main');
+  var mainPin = main.mapElement.querySelector('.map__pin--main');
+  var mainElement = document.querySelector('main');
 
 
   /**
@@ -18,7 +22,7 @@
    * @return {Object} pinElement - измененный склонированный элемент.
    */
   var generatePin = function (pinProperties, widthPin, heightPin) {
-    var pinElement = pinTamplate.cloneNode(true);
+    var pinElement = Template.PIN.cloneNode(true);
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinElement.querySelector('img').src = pinProperties.author.avatar;
     pinElement.querySelector('img').alt = 'Метка похожего объявления';
@@ -32,19 +36,42 @@
    * @param {number} widthPin - ширина метки.
    * @param {number} heightPin - высота метки.
    */
-  var renderPin = function (dataArray, widthPin, heightPin) {
+  var renderPin = function (dataArray) {
+    var WIDTH_PIN = 50;
+    var HEIGHT_PIN = 70;
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < dataArray.length; i++) {
-      fragment.appendChild(generatePin(dataArray[i], widthPin, heightPin));
+      fragment.appendChild(generatePin(dataArray[i], WIDTH_PIN, HEIGHT_PIN));
     }
     pinList.appendChild(fragment);
   };
 
-  // Перемещение метки
+  /**
+   * Отриосвывает метки при успешном получении данных с сервера.
+   *
+   * @param {Array} loadedData - массив с данными полученный от сервера.
+   */
+  var onSuccess = function (loadedData) {
+    renderPin(loadedData);
+  };
+
+  /**
+   * Показывает окно с ошибкой при ошибке загрузки данных с сервера.
+   *
+   */
+  var onError = function () {
+    var error = Template.ERROR.cloneNode(true);
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(error);
+    mainElement.appendChild(fragment);
+    error.display = 'block';
+  };
+
+  // Взаимодействие с меткой
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
-    main.activateMap(pin);
-    main.map.isMapDisabled = false;
+    main.activate(onSuccess, onError);
+    main.mapDisabled = false;
 
     var startCoords = {
       x: evt.clientX,
@@ -79,10 +106,10 @@
       mainPin.style.left = mainPin.offsetLeft - shift.x + 'px';
 
       var Limits = {
-        MIN_X: data.CoordinateMaps.MIN_X,
-        MAX_X: data.CoordinateMaps.MAX_X - form.SizeMainPin.WIDTH,
-        MIN_Y: data.CoordinateMaps.MIN_Y - form.SizeMainPin.HEIGHT / 2 - form.SizeMainPin.POINTER_HEIGHT,
-        MAX_Y: data.CoordinateMaps.MAX_Y - form.SizeMainPin.HEIGHT / 2 - form.SizeMainPin.POINTER_HEIGHT
+        MIN_X: data.coordinate.MIN_X,
+        MAX_X: data.coordinate.MAX_X - form.sizePin.WIDTH,
+        MIN_Y: data.coordinate.MIN_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT,
+        MAX_Y: data.coordinate.MAX_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT
       };
 
       if (parseInt(mainPin.style.top, 10) < Limits.MIN_Y) {
@@ -100,7 +127,7 @@
       if (parseInt(mainPin.style.left, 10) > Limits.MAX_X) {
         mainPin.style.left = Limits.MAX_X + 'px';
       }
-      form.generateAddress(PinCoords, form.SizeMainPin, main.map.isMapDisabled);
+      form.address(PinCoords, form.sizePin, main.mapDisabled);
     };
 
     /**
@@ -111,21 +138,21 @@
      */
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
-      main.map.removeEventListener('mousemove', onMouseMove);
-      main.map.removeEventListener('mouseup', onMouseUp);
+      main.mapElement.removeEventListener('mousemove', onMouseMove);
+      main.mapElement.removeEventListener('mouseup', onMouseUp);
       var PinCoords = {
         X: parseInt(mainPin.style.left, 10),
         Y: parseInt(mainPin.style.top, 10)
       };
-      form.generateAddress(PinCoords, form.SizeMainPin, main.map.isMapDisabled);
+      form.address(PinCoords, form.sizePin, main.mapDisabled);
     };
 
-    main.map.addEventListener('mousemove', onMouseMove);
-    main.map.addEventListener('mouseup', onMouseUp);
+    main.mapElement.addEventListener('mousemove', onMouseMove);
+    main.mapElement.addEventListener('mouseup', onMouseUp);
   });
 
   window.pin = {
-    renderPin: renderPin
+    render: renderPin,
+    url: URL
   };
-  var pin = window.pin;
 })();
