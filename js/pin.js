@@ -46,13 +46,18 @@
     pinList.appendChild(fragment);
   };
 
+  var sortingData = function (dataArray) {
+    return dataArray.slice(0, 5);
+  };
+
   /**
    * Отриосвывает метки при успешном получении данных с сервера.
    *
    * @param {Array} loadedData - массив с данными полученный от сервера.
    */
   var onSuccess = function (loadedData) {
-    renderPin(loadedData);
+    var sortedData = sortingData(loadedData);
+    renderPin(sortedData);
   };
 
   /**
