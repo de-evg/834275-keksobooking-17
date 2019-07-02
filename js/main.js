@@ -1,9 +1,6 @@
 'use strict';
 
 (function () {
-  var WIDTH_PIN = 50;
-  var HEIGHT_PIN = 70;
-  var data = window.data;
   var map = document.querySelector('.map');
   var formAd = document.querySelector('.ad-form');
   var formMapFilters = document.querySelector('.map__filters');
@@ -44,11 +41,13 @@
   /**
    * Активирует фильтр, форму и показывает похожие объявления
    *
-   * @param {Object} module - объект модуля содержащий фукцию renderPin
+   * @param {function} onSuccess - функция обработки успешного получения данных
+   * @param {function} onError - функция обработки ошибки при запросе/получении данных
    */
-  var activateMap = function (module) {
+  var activateMap = function (onSuccess, onError) {
+    var URL = 'https://js.dump.academy/keksobooking/data';
+    window.load(URL, onSuccess, onError);
     map.classList.remove('map--faded');
-    module.renderPin(data.ads, WIDTH_PIN, HEIGHT_PIN);
     isMapDisabled = false;
     isFilterDisabled(false);
     isAdFormDisabled(false);
@@ -68,9 +67,9 @@
   disableMap();
 
   window.main = {
-    map: map,
-    formAd: formAd,
-    isMapDisabled: isMapDisabled,
-    activateMap: activateMap
+    mapElement: map,
+    formAdElement: formAd,
+    mapDisabled: isMapDisabled,
+    activate: activateMap
   };
 })();

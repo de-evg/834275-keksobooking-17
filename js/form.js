@@ -14,26 +14,26 @@
     Y: 375
   };
 
-  var selectTypeOffer = main.formAd.querySelector('#type');
-  var selectTimeIn = main.formAd.querySelector('#timein');
-  var selectTimeOut = main.formAd.querySelector('#timeout');
-  var price = main.formAd.querySelector('#price');
+  var selectTypeOffer = main.formAdElement.querySelector('#type');
+  var selectTimeIn = main.formAdElement.querySelector('#timein');
+  var selectTimeOut = main.formAdElement.querySelector('#timeout');
+  var price = main.formAdElement.querySelector('#price');
   /**
-   * Генерирует и изменяет значение координат главной метки.
+   * Генерирует и изменяет значения координат главной метки в поле адреса в форме.
    *
    * @param {Object} startPinCoordinate - начальные координаты метки.
    * @param {Object} sizeMainPin - перечисление размеров метки
    * @param {boolean} flag - состояние активности карты
    */
   var generateAddress = function (startPinCoordinate, sizeMainPin, flag) {
-    var address = main.formAd.querySelector('#address');
+    var address = main.formAdElement.querySelector('#address');
     if (flag) {
       address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2)));
     } else {
       address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
     }
   };
-  generateAddress(StartUserPinCoordinate, SizeMainPin, main.isMapDisabled);
+  generateAddress(StartUserPinCoordinate, SizeMainPin, main.mapDisabled);
 
   /**
    * Устанавливает плейсхолдер и минимальное значение для цены
@@ -82,12 +82,12 @@
     };
     setMinPrice(offer, inputFieldElement);
   };
-  getDefaultMinPrice(selectTypeOffer, data.Offers, price);
+  getDefaultMinPrice(selectTypeOffer, data.offers, price);
 
   /**
    * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
    *
-   * @param {string} selectedTime - значение выбранного option
+   * @param {Object} selectedTime - выбранный option
    * @param {Collection} syncTimes - коллекция option, значение одного из них
    * должно быть аналогично selectedTime и выбрано как selected
    */
@@ -98,20 +98,14 @@
         option.selected = true;
       }
     });
-    // for (var i = 0; i < syncTimes.length; i++) {
-    //   if (syncTimes[i].value === selectedTime.value) {
-    //     syncTimes[i].selected = true;
-    //     break;
-    //   }
-    // }
   };
 
-  main.formAd.addEventListener('click', function (evt) {
+  main.formAdElement.addEventListener('change', function (evt) {
     switch (evt.target.id) {
       case 'type':
         var offer = {
           selectedOption: getSelectedOption(selectTypeOffer),
-          offersObj: data.Offers
+          offersObj: data.offers
         };
         setMinPrice(offer, price);
         break;
@@ -127,7 +121,7 @@
   });
 
   window.form = {
-    SizeMainPin: SizeMainPin,
-    generateAddress: generateAddress
+    sizePin: SizeMainPin,
+    address: generateAddress
   };
 })();
