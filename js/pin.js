@@ -10,7 +10,6 @@
   };
   var pinList = document.querySelector('.map__pins');
   var mainPin = main.mapElement.querySelector('.map__pin--main');
-  var pin = main.mapElement.querySelector('.map__pin');
   var mainElement = document.querySelector('main');
 
 
@@ -40,9 +39,10 @@
    var renderPin = function (dataArray) {
     var WIDTH_PIN = 50;
     var HEIGHT_PIN = 70;
+    var newData = dataArray.slice(0, 5);
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < dataArray.length; i++) {
-      fragment.appendChild(generatePin(dataArray[i], WIDTH_PIN, HEIGHT_PIN));
+    for (var i = 0; i < newData.length; i++) {
+      fragment.appendChild(generatePin(newData[i], WIDTH_PIN, HEIGHT_PIN));
     }
     pinList.appendChild(fragment);
   };
@@ -54,29 +54,49 @@
    */
    var onSuccess = function (loadedData) {
     window.backendData = loadedData;
+    renderPin(window.backendData);
     main.formFilterElement.addEventListener('change', function (evt) {
       switch (evt.target.value) {
         case 'house':
-          pinList.removeChild(pin);
+          removePins();
           var updatedData = sortingData(window.backendData, 'house');
           renderPin(updatedData);
           break;
         case 'flat':
+          removePins();
           var updatedData = sortingData(window.backendData, 'flat');
           renderPin(updatedData);
           break;
         case 'palace':
+          removePins();
           var updatedData = sortingData(window.backendData, 'palace');
           renderPin(updatedData);
           break;
         case 'bungalo':
+          removePins();
           var updatedData = sortingData(window.backendData, 'bungalo');
           renderPin(updatedData);
           break;
+        case 'any':
+          removePins();
+          var updatedData = sortingData(window.backendData);
+          renderPin(updatedData);
       }
     });
   };
 
+
+  /**
+   * Удаляет метки из DOM дерева.
+   *
+   */
+  var removePins = function () {
+    var similarPins = document.querySelectorAll('.map__pin');
+    var pins = Array.from(similarPins).slice(1);
+      pins.forEach(function (pin) {
+      pinList.removeChild(pin);
+    })
+  }
 
   /**
    * Фильтрует массив предложений по значению type.
@@ -85,6 +105,9 @@
    * @param {String} query - тип предложения
    */
   var sortingData = function (dataArray, type) {
+    if (!type) {
+      return dataArray.slice(0, 5);
+    } else {
     var newData = dataArray
       .slice()
       .filter(function (currentOffer) {
@@ -92,8 +115,8 @@
           return currentOffer.offer.type;
         }
       });
-      console.log(newData.concat(dataArray).slice(0, 5));
-    return newData.concat(dataArray).slice(0, 5);
+    };
+    return newData.slice(0, 5);
   };
 
   /**
@@ -101,7 +124,6 @@
    *
    */
    var onError = function (message) {
-    console.log(message);
     var error = Template.ERROR.cloneNode(true);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(error);
