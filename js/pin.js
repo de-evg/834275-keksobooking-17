@@ -110,7 +110,7 @@
       return dataArray;
     } else {
       var newData = dataArray.slice().filter(function (newDataInner) {
-        return newDataInner.offer.type === type ? true : false;
+        return newDataInner.offer.type === type;
       });
     }
     return newData;
@@ -131,7 +131,9 @@
   // Взаимодействие с меткой
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
-    main.activate(onSuccess, onError);
+    if (main.mapDisabled) {
+      main.activate(onSuccess, onError);
+    }
     main.mapDisabled = false;
 
     var startCoords = {
