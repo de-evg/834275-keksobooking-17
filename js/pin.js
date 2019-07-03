@@ -10,6 +10,7 @@
   };
   var pinList = document.querySelector('.map__pins');
   var mainPin = main.mapElement.querySelector('.map__pin--main');
+  var pin = main.mapElement.querySelector('.map__pin');
   var mainElement = document.querySelector('main');
 
 
@@ -21,7 +22,7 @@
    * @param {number} heightPin - высота метки.
    * @return {Object} pinElement - измененный склонированный элемент.
    */
-  var generatePin = function (pinProperties, widthPin, heightPin) {
+   var generatePin = function (pinProperties, widthPin, heightPin) {
     var pinElement = Template.PIN.cloneNode(true);
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinElement.querySelector('img').src = pinProperties.author.avatar;
@@ -36,7 +37,7 @@
    * @param {number} widthPin - ширина метки.
    * @param {number} heightPin - высота метки.
    */
-  var renderPin = function (dataArray) {
+   var renderPin = function (dataArray) {
     var WIDTH_PIN = 50;
     var HEIGHT_PIN = 70;
     var fragment = document.createDocumentFragment();
@@ -46,40 +47,61 @@
     pinList.appendChild(fragment);
   };
 
-  var filter = function (dataArray, query) {
-    return dataArray.offer.type === query;
-  };
-
-  var sortingData = function (dataArray) {
-    var x = dataArray.slice();
-    x.filter(filter(dataArray, 'house'));
-    x.join(dataArray);
-    return x;
-  };
-
-
   /**
    * Отриосвывает метки при успешном получении данных с сервера.
    *
    * @param {Array} loadedData - массив с данными полученный от сервера.
    */
-  var onSuccess = function (loadedData) {
-    var newData;
+   var onSuccess = function (loadedData) {
+    window.backendData = loadedData;
     main.formFilterElement.addEventListener('change', function (evt) {
       switch (evt.target.value) {
         case 'house':
-          newData = sortingData(loadedData);
+          pinList.removeChild(pin);
+          var updatedData = sortingData(window.backendData, 'house');
+          renderPin(updatedData);
+          break;
+        case 'flat':
+          var updatedData = sortingData(window.backendData, 'flat');
+          renderPin(updatedData);
+          break;
+        case 'palace':
+          var updatedData = sortingData(window.backendData, 'palace');
+          renderPin(updatedData);
+          break;
+        case 'bungalo':
+          var updatedData = sortingData(window.backendData, 'bungalo');
+          renderPin(updatedData);
           break;
       }
     });
-    renderPin(newData);
+  };
+
+
+  /**
+   * Фильтрует массив предложений по значению type.
+   *
+   * @param {Array} dataArray - массив с предложениями.
+   * @param {String} query - тип предложения
+   */
+  var sortingData = function (dataArray, type) {
+    var newData = dataArray
+      .slice()
+      .filter(function (currentOffer) {
+        if (currentOffer.offer.type === type) {
+          return currentOffer.offer.type;
+        }
+      });
+      console.log(newData.concat(dataArray).slice(0, 5));
+    return newData.concat(dataArray).slice(0, 5);
   };
 
   /**
    * Показывает окно с ошибкой при ошибке загрузки данных с сервера.
    *
    */
-  var onError = function () {
+   var onError = function (message) {
+    console.log(message);
     var error = Template.ERROR.cloneNode(true);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(error);
@@ -104,7 +126,7 @@
      * @param {Object} moveEvt - DOM объект события
      *
      */
-    var onMouseMove = function (moveEvt) {
+     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
       var shift = {
@@ -156,7 +178,7 @@
      * @param {Object} upEvt - DOM объект события
      *
      */
-    var onMouseUp = function (upEvt) {
+     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
       main.mapElement.removeEventListener('mousemove', onMouseMove);
       main.mapElement.removeEventListener('mouseup', onMouseUp);
