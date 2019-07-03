@@ -21,7 +21,7 @@
    * @param {number} heightPin - высота метки.
    * @return {Object} pinElement - измененный склонированный элемент.
    */
-   var generatePin = function (pinProperties, widthPin, heightPin) {
+  var generatePin = function (pinProperties, widthPin, heightPin) {
     var pinElement = Template.PIN.cloneNode(true);
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinElement.querySelector('img').src = pinProperties.author.avatar;
@@ -36,7 +36,7 @@
    * @param {number} widthPin - ширина метки.
    * @param {number} heightPin - высота метки.
    */
-   var renderPin = function (dataArray) {
+  var renderPin = function (dataArray) {
     var WIDTH_PIN = 50;
     var HEIGHT_PIN = 70;
     var newData = dataArray.slice(0, 5);
@@ -52,7 +52,7 @@
    *
    * @param {Array} loadedData - массив с данными полученный от сервера.
    */
-   var onSuccess = function (loadedData) {
+  var onSuccess = function (loadedData) {
     window.backendData = loadedData;
     renderPin(window.backendData);
     main.formFilterElement.addEventListener('change', function (evt) {
@@ -64,22 +64,22 @@
           break;
         case 'flat':
           removePins();
-          var updatedData = sortingData(window.backendData, 'flat');
+          updatedData = sortingData(window.backendData, 'flat');
           renderPin(updatedData);
           break;
         case 'palace':
           removePins();
-          var updatedData = sortingData(window.backendData, 'palace');
+          updatedData = sortingData(window.backendData, 'palace');
           renderPin(updatedData);
           break;
         case 'bungalo':
           removePins();
-          var updatedData = sortingData(window.backendData, 'bungalo');
+          updatedData = sortingData(window.backendData, 'bungalo');
           renderPin(updatedData);
           break;
         case 'any':
           removePins();
-          var updatedData = sortingData(window.backendData);
+          updatedData = sortingData(window.backendData);
           renderPin(updatedData);
       }
     });
@@ -93,37 +93,34 @@
   var removePins = function () {
     var similarPins = document.querySelectorAll('.map__pin');
     var pins = Array.from(similarPins).slice(1);
-      pins.forEach(function (pin) {
+    pins.forEach(function (pin) {
       pinList.removeChild(pin);
-    })
-  }
+    });
+  };
 
   /**
    * Фильтрует массив предложений по значению type.
    *
    * @param {Array} dataArray - массив с предложениями.
-   * @param {String} query - тип предложения
+   * @param {String} type - тип предложения
+   * @return {Array} отфильтрованный массив
    */
   var sortingData = function (dataArray, type) {
     if (!type) {
-      return dataArray.slice(0, 5);
+      return dataArray;
     } else {
-    var newData = dataArray
-      .slice()
-      .filter(function (currentOffer) {
-        if (currentOffer.offer.type === type) {
-          return currentOffer.offer.type;
-        }
+      var newData = dataArray.slice().filter(function (newDataInner) {
+        return newDataInner.offer.type === type ? true : false;
       });
-    };
-    return newData.slice(0, 5);
+    }
+    return newData;
   };
 
   /**
    * Показывает окно с ошибкой при ошибке загрузки данных с сервера.
    *
    */
-   var onError = function (message) {
+  var onError = function () {
     var error = Template.ERROR.cloneNode(true);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(error);
@@ -148,7 +145,7 @@
      * @param {Object} moveEvt - DOM объект события
      *
      */
-     var onMouseMove = function (moveEvt) {
+    var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
       var shift = {
@@ -200,7 +197,7 @@
      * @param {Object} upEvt - DOM объект события
      *
      */
-     var onMouseUp = function (upEvt) {
+    var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
       main.mapElement.removeEventListener('mousemove', onMouseMove);
       main.mapElement.removeEventListener('mouseup', onMouseUp);
