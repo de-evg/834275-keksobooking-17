@@ -39,9 +39,10 @@
   var renderPin = function (dataArray) {
     var WIDTH_PIN = 50;
     var HEIGHT_PIN = 70;
+    var newData = dataArray.slice(0, 5);
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < dataArray.length; i++) {
-      fragment.appendChild(generatePin(dataArray[i], WIDTH_PIN, HEIGHT_PIN));
+    for (var i = 0; i < newData.length; i++) {
+      fragment.appendChild(generatePin(newData[i], WIDTH_PIN, HEIGHT_PIN));
     }
     pinList.appendChild(fragment);
   };
@@ -52,7 +53,67 @@
    * @param {Array} loadedData - массив с данными полученный от сервера.
    */
   var onSuccess = function (loadedData) {
-    renderPin(loadedData);
+    window.backendData = loadedData;
+    renderPin(window.backendData);
+    main.formFilterElement.addEventListener('change', function (evt) {
+      switch (evt.target.value) {
+        case 'house':
+          removePins();
+          var updatedData = sortingData(window.backendData, 'house');
+          renderPin(updatedData);
+          break;
+        case 'flat':
+          removePins();
+          updatedData = sortingData(window.backendData, 'flat');
+          renderPin(updatedData);
+          break;
+        case 'palace':
+          removePins();
+          updatedData = sortingData(window.backendData, 'palace');
+          renderPin(updatedData);
+          break;
+        case 'bungalo':
+          removePins();
+          updatedData = sortingData(window.backendData, 'bungalo');
+          renderPin(updatedData);
+          break;
+        case 'any':
+          removePins();
+          updatedData = sortingData(window.backendData);
+          renderPin(updatedData);
+      }
+    });
+  };
+
+
+  /**
+   * Удаляет метки из DOM дерева.
+   *
+   */
+  var removePins = function () {
+    var similarPins = document.querySelectorAll('.map__pin');
+    var pins = Array.from(similarPins).slice(1);
+    pins.forEach(function (pin) {
+      pinList.removeChild(pin);
+    });
+  };
+
+  /**
+   * Фильтрует массив предложений по значению type.
+   *
+   * @param {Array} dataArray - массив с предложениями.
+   * @param {String} type - тип предложения
+   * @return {Array} отфильтрованный массив
+   */
+  var sortingData = function (dataArray, type) {
+    if (!type) {
+      return dataArray;
+    } else {
+      var newData = dataArray.slice().filter(function (newDataInner) {
+        return newDataInner.offer.type === type;
+      });
+    }
+    return newData;
   };
 
   /**
@@ -70,7 +131,9 @@
   // Взаимодействие с меткой
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
-    main.activate(onSuccess, onError);
+    if (main.mapDisabled) {
+      main.activate(onSuccess, onError);
+    }
     main.mapDisabled = false;
 
     var startCoords = {

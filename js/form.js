@@ -122,6 +122,7 @@
 
   window.form = {
     sizePin: SizeMainPin,
-    address: generateAddress
+    address: generateAddress,
+    option: getSelectedOption
   };
 })();

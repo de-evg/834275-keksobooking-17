@@ -2,9 +2,9 @@
 
 (function () {
   window.load = function (url, onSuccess, onError) {
-    var xhr = new XMLHttpRequest();
     var SUCCESS_CODE = 200;
     var TIMEOUT = 10000;
+    var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.addEventListener('load', function () {
       if (xhr.status === SUCCESS_CODE) {
