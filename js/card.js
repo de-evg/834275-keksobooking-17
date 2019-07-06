@@ -48,16 +48,14 @@
     var photos = cardElement.querySelector('.popup__photos');
     var img = photos.querySelector('img');
 
-    dataForCard.offer.photos.forEach(function (photo) {
-      photo = img.cloneNode();
-      photos.appendChild(photo);
+    dataForCard.offer.photos.forEach(function (addressPhoto) {
+      var newImg = img.cloneNode();
+      newImg.src = addressPhoto;
+      photos.appendChild(newImg);
     });
+    photos.removeChild(img);
 
-    var images = photos.querySelectorAll('img');
-    images.forEach(function (imgNode, i) {
-      imgNode.src = dataForCard.offer.photos[i];
-    });
-
+    // вставка аватара
     cardElement.querySelector('.popup__avatar').src = dataForCard.author.avatar;
 
     return cardElement;
