@@ -17,7 +17,7 @@
     cardElement.querySelector('img').src = dataForCard.author.avatar;
     cardElement.querySelector('.popup__title').textContent = dataForCard.offer.title;
     cardElement.querySelector('.popup__text--address').textContent = dataForCard.offer.address;
-    cardElement.querySelector('.popup__text--price').textContent = dataForCard.offer.price + 'Р/ночь';
+    cardElement.querySelector('.popup__text--price').textContent = dataForCard.offer.price + '₽/ночь';
 
     // вставка типа жилья на русском языке
     Object.keys(types).forEach(function (key) {
