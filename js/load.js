@@ -1,16 +1,18 @@
 'use strict';
 
 (function () {
-  window.load = function (url, onSuccess, onError) {
-    var SUCCESS_CODE = 200;
-    var TIMEOUT = 10000;
+  var utils = window.utils;
+  var pin = window.pin;
+  var SUCCESS_CODE = 200;
+  var TIMEOUT = 10000;
+  window.load = function (url, renderPins, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.addEventListener('load', function () {
       if (xhr.status === SUCCESS_CODE) {
-        onSuccess(xhr.response);
+        renderPins(xhr.response);
       } else {
-        onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
+        utils.error(pin.template, pin.nodeElement);
       }
     });
 

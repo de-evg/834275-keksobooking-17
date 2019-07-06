@@ -25,8 +25,22 @@
     return number;
   };
 
+  /**
+   * Показывает окно с ошибкой при ошибке загрузки данных с сервера.
+   * @param {Object} template - перечисление шаблонов
+   * @param {Object} parentElement - DOM элемент, в который добавится склонированный элемент
+   */
+  var onError = function (template, parentElement) {
+    var error = template.ERROR.cloneNode(true);
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(error);
+    parentElement.appendChild(fragment);
+    error.display = 'block';
+  };
+
   window.utils = {
     getElementFormArray: getElementFormArray,
-    generateRandomNumber: generateRandomNumber
+    generateRandomNumber: generateRandomNumber,
+    error: onError
   };
 })();

@@ -1,9 +1,15 @@
 'use strict';
 
 (function () {
+  var utils = window.utils;
   var data = window.data;
   var main = window.main;
   var form = window.form;
+  var PinsSettings = {
+    WIDTH_PIN: 50,
+    HEIGHT_PIN: 70,
+    MAX_PINS: 5
+  };
   var Template = {
     PIN: document.querySelector('#pin').content.querySelector('.map__pin'),
     ERROR: document.querySelector('#error').content.querySelector('.error')
@@ -30,19 +36,16 @@
   };
 
   /**
-   * Добавляет в DOM склонированные элементы.
+   * Получает необходимое количество DOM элементов для их рендера.
    *
    * @param {Array} dataArray - массив с данными для рендера меток.
-   * @param {number} widthPin - ширина метки.
-   * @param {number} heightPin - высота метки.
+   * @param {Object} pinsSettings - перечисление параметров меток.
    */
-  var renderPin = function (dataArray) {
-    var WIDTH_PIN = 50;
-    var HEIGHT_PIN = 70;
-    var newData = dataArray.slice(0, 5);
+  var getPins = function (dataArray, pinsSettings) {
+    var newData = dataArray.slice(0, pinsSettings.MAX_PINS);
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < newData.length; i++) {
-      fragment.appendChild(generatePin(newData[i], WIDTH_PIN, HEIGHT_PIN));
+      fragment.appendChild(generatePin(newData[i], pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN));
     }
     pinList.appendChild(fragment);
   };
@@ -52,37 +55,19 @@
    *
    * @param {Array} loadedData - массив с данными полученный от сервера.
    */
-  var onSuccess = function (loadedData) {
-    window.backendData = loadedData;
-    renderPin(window.backendData);
-    main.formFilterElement.addEventListener('change', function (evt) {
-      switch (evt.target.value) {
-        case 'house':
+  var renderPins = function (loadedData) {
+    getPins(loadedData, PinsSettings);
+    var filterData = function (evt) {
+      switch (evt.target.id) {
+        case 'housing-type':
           removePins();
-          var updatedData = sortingData(window.backendData, 'house');
-          renderPin(updatedData);
+          var updatedData = sortingData(loadedData, evt.target.value);
+          getPins(updatedData, PinsSettings);
           break;
-        case 'flat':
-          removePins();
-          updatedData = sortingData(window.backendData, 'flat');
-          renderPin(updatedData);
-          break;
-        case 'palace':
-          removePins();
-          updatedData = sortingData(window.backendData, 'palace');
-          renderPin(updatedData);
-          break;
-        case 'bungalo':
-          removePins();
-          updatedData = sortingData(window.backendData, 'bungalo');
-          renderPin(updatedData);
-          break;
-        case 'any':
-          removePins();
-          updatedData = sortingData(window.backendData);
-          renderPin(updatedData);
       }
-    });
+    };
+    getPins(loadedData, PinsSettings);
+    main.formFilterElement.addEventListener('change', filterData);
   };
 
 
@@ -91,8 +76,8 @@
    *
    */
   var removePins = function () {
-    var similarPins = document.querySelectorAll('.map__pin');
-    var pins = Array.from(similarPins).slice(1);
+    var similarPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    var pins = Array.from(similarPins);
     pins.forEach(function (pin) {
       pinList.removeChild(pin);
     });
@@ -106,7 +91,7 @@
    * @return {Array} отфильтрованный массив
    */
   var sortingData = function (dataArray, type) {
-    if (!type) {
+    if (type === 'any') {
       return dataArray;
     } else {
       var newData = dataArray.slice().filter(function (newDataInner) {
@@ -116,23 +101,11 @@
     return newData;
   };
 
-  /**
-   * Показывает окно с ошибкой при ошибке загрузки данных с сервера.
-   *
-   */
-  var onError = function () {
-    var error = Template.ERROR.cloneNode(true);
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(error);
-    mainElement.appendChild(fragment);
-    error.display = 'block';
-  };
-
   // Взаимодействие с меткой
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     if (main.mapDisabled) {
-      main.activate(onSuccess, onError);
+      main.activate(renderPins, utils.error);
     }
     main.mapDisabled = false;
 
@@ -213,9 +186,8 @@
     main.mapElement.addEventListener('mousemove', onMouseMove);
     main.mapElement.addEventListener('mouseup', onMouseUp);
   });
-
   window.pin = {
-    render: renderPin,
-    url: URL
+    template: Template,
+    nodeMain: mainElement
   };
 })();
