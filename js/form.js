@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var utils = window.utils;
   var main = window.main;
   var data = window.data;
   var SizeMainPin = {
@@ -14,10 +15,10 @@
     Y: 375
   };
 
-  var selectTypeOffer = main.formAdElement.querySelector('#type');
-  var selectTimeIn = main.formAdElement.querySelector('#timein');
-  var selectTimeOut = main.formAdElement.querySelector('#timeout');
-  var price = main.formAdElement.querySelector('#price');
+  var selectTypeOffer = utils.nodeFormAd.querySelector('#type');
+  var selectTimeIn = utils.nodeFormAd.querySelector('#timein');
+  var selectTimeOut = utils.nodeFormAd.querySelector('#timeout');
+  var price = utils.nodeFormAd.querySelector('#price');
   /**
    * Генерирует и изменяет значения координат главной метки в поле адреса в форме.
    *
@@ -26,7 +27,7 @@
    * @param {boolean} flag - состояние активности карты
    */
   var generateAddress = function (startPinCoordinate, sizeMainPin, flag) {
-    var address = main.formAdElement.querySelector('#address');
+    var address = utils.nodeFormAd.querySelector('#address');
     if (flag) {
       address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2)));
     } else {
@@ -100,7 +101,7 @@
     });
   };
 
-  main.formAdElement.addEventListener('change', function (evt) {
+  utils.nodeFormAd.addEventListener('change', function (evt) {
     switch (evt.target.id) {
       case 'type':
         var offer = {

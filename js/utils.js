@@ -1,6 +1,18 @@
 'use strict';
 
 (function () {
+  var mainElement = document.querySelector('main');
+
+  var map = mainElement.querySelector('.map');
+  var pinList = map.querySelector('.map__pins');
+  var mainPin = pinList.querySelector('.map__pin--main');
+
+  var filtersContainer = map.querySelector('.map__filters-container');
+  var formMapFilters = filtersContainer.querySelector('.map__filters');
+  var mapFiterFieldset = formMapFilters.querySelector('fieldset');
+  var mapFilters = formMapFilters.querySelectorAll('.map__filter');
+  var formAd = mainElement.querySelector('.ad-form');
+  var formAdFieldsets = formAd.querySelectorAll('fieldset');
 
   /**
    * Получает случайный элемент массива.
@@ -41,6 +53,16 @@
   window.utils = {
     getElementFormArray: getElementFormArray,
     generateRandomNumber: generateRandomNumber,
-    error: onError
+    error: onError,
+    nodeMain: mainElement,
+    nodeMap: map,
+    nodePinList: pinList,
+    nodeMainPin: mainPin,
+    nodeFiltersContainer: filtersContainer,
+    nodeFormMapFilters: formMapFilters,
+    nodeMapFiterFieldset: mapFiterFieldset,
+    nodeMapFilters: mapFilters,
+    nodeFormAd: formAd,
+    nodeFormAdFieldsets: formAdFieldsets
   };
 })();

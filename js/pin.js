@@ -5,71 +5,104 @@
   var data = window.data;
   var main = window.main;
   var form = window.form;
-  var PinsSettings = {
-    WIDTH_PIN: 50,
-    HEIGHT_PIN: 70,
-    MAX_PINS: 5
+  var card = window.card;
+  var Type = {
+    'palace': 'Дворец',
+    'flat': 'Квартира',
+    'house': 'Дом',
+    'bungalo': 'Бунгало'
   };
   var Template = {
     PIN: document.querySelector('#pin').content.querySelector('.map__pin'),
-    ERROR: document.querySelector('#error').content.querySelector('.error')
+    ERROR: document.querySelector('#error').content.querySelector('.error'),
+    CARD: document.querySelector('#card').content.querySelector('.map__card')
   };
-  var pinList = document.querySelector('.map__pins');
-  var mainPin = main.mapElement.querySelector('.map__pin--main');
-  var mainElement = document.querySelector('main');
-
 
   /**
    * Генерирует объект с данными для метки.
    *
    * @param {Object} pinProperties - объект с данными для генерации новой метки.
+   * @param {number} numberProperties - номер объекта с данными метки для формирования id
    * @param {number} widthPin - ширина метки.
    * @param {number} heightPin - высота метки.
    * @return {Object} pinElement - измененный склонированный элемент.
    */
-  var generatePin = function (pinProperties, widthPin, heightPin) {
+  var generatePin = function (pinProperties, numberProperties, widthPin, heightPin) {
     var pinElement = Template.PIN.cloneNode(true);
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinElement.querySelector('img').src = pinProperties.author.avatar;
     pinElement.querySelector('img').alt = 'Метка похожего объявления';
+    pinElement.id = 'pin' + numberProperties;
     return pinElement;
   };
 
   /**
-   * Получает необходимое количество DOM элементов для их рендера.
+   * Обновляет массив до необходимого количство объектов с данными для метки.
    *
-   * @param {Array} dataArray - массив с данными для рендера меток.
+   * @param {Array} dataArray - массив с объектами для генерации меток.
+   * @param {Object} pinsSettings - перечисление параметров меток.
+   * @return {Array} обновленный массив.
+   */
+  var getUpdatedData = function (dataArray, pinsSettings) {
+    return dataArray.slice(0, pinsSettings.MAX_PINS);
+  };
+
+  /**
+   * Генерирует необходимое количество меток и добавляет их в DOM.
+   *
+   * @param {Array} updatedData - массив с данными для рендера меток.
    * @param {Object} pinsSettings - перечисление параметров меток.
    */
-  var getPins = function (dataArray, pinsSettings) {
-    var newData = dataArray.slice(0, pinsSettings.MAX_PINS);
+  var getPins = function (updatedData, pinsSettings) {
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < newData.length; i++) {
-      fragment.appendChild(generatePin(newData[i], pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN));
-    }
-    pinList.appendChild(fragment);
+    updatedData.forEach(function (offer, i) {
+      fragment.appendChild(generatePin(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN));
+    });
+    utils.nodePinList.appendChild(fragment);
   };
 
   /**
    * Отриосвывает метки при успешном получении данных с сервера.
    *
    * @param {Array} loadedData - массив с данными полученный от сервера.
+   * @param {Object} pinsSettings - перечисление параметров меток.
    */
-  var renderPins = function (loadedData) {
-    getPins(loadedData, PinsSettings);
+  var renderPins = function (loadedData, pinsSettings) {
+    var updatedData = getUpdatedData(loadedData, pinsSettings);
+    getPins(updatedData, pinsSettings);
+
     var filterData = function (evt) {
       switch (evt.target.id) {
         case 'housing-type':
           removePins();
-          var updatedData = sortingData(loadedData, evt.target.value);
-          getPins(updatedData, PinsSettings);
+          var filteredData = filteringData(loadedData, evt.target.value);
+          updatedData = getUpdatedData(filteredData, pinsSettings);
+          getPins(updatedData, pinsSettings);
           break;
       }
     };
-    getPins(loadedData, PinsSettings);
-    main.formFilterElement.addEventListener('change', filterData);
-  };
 
+    utils.nodeFormMapFilters.addEventListener('change', filterData);
+
+    /**
+     * Обрабатывает нажатие на метку похожего объявления.
+     *
+     * @param {Object} evt - DOM объект собыитя.
+     */
+    var onPinClick = function (evt) {
+      updatedData.forEach(function (offer, i) {
+        if (evt.target.id === 'pin' + i || evt.target === utils.nodePinList.querySelector('#pin' + i + ' img')) {
+          card.close();
+          card.render(Template, offer, Type);
+          var renderedCard = utils.nodeMap.querySelector('.map__card');
+          var cardClose = renderedCard.querySelector('.popup__close');
+          cardClose.addEventListener('click', card.close);
+          renderedCard.addEventListener('keydown', card.pressEsc);
+        }
+      });
+    };
+    utils.nodePinList.addEventListener('click', onPinClick);
+  };
 
   /**
    * Удаляет метки из DOM дерева.
@@ -79,7 +112,7 @@
     var similarPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
     var pins = Array.from(similarPins);
     pins.forEach(function (pin) {
-      pinList.removeChild(pin);
+      utils.nodePinList.removeChild(pin);
     });
   };
 
@@ -90,7 +123,7 @@
    * @param {String} type - тип предложения
    * @return {Array} отфильтрованный массив
    */
-  var sortingData = function (dataArray, type) {
+  var filteringData = function (dataArray, type) {
     if (type === 'any') {
       return dataArray;
     } else {
@@ -102,7 +135,7 @@
   };
 
   // Взаимодействие с меткой
-  mainPin.addEventListener('mousedown', function (evt) {
+  utils.nodeMainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     if (main.mapDisabled) {
       main.activate(renderPins, utils.error);
@@ -129,8 +162,8 @@
       };
 
       var PinCoords = {
-        X: parseInt(mainPin.style.left, 10),
-        Y: parseInt(mainPin.style.top, 10)
+        X: parseInt(utils.nodeMainPin.style.left, 10),
+        Y: parseInt(utils.nodeMainPin.style.top, 10)
       };
 
       startCoords = {
@@ -138,8 +171,8 @@
         y: moveEvt.clientY
       };
 
-      mainPin.style.top = mainPin.offsetTop - shift.y + 'px';
-      mainPin.style.left = mainPin.offsetLeft - shift.x + 'px';
+      utils.nodeMainPin.style.top = utils.nodeMainPin.offsetTop - shift.y + 'px';
+      utils.nodeMainPin.style.left = utils.nodeMainPin.offsetLeft - shift.x + 'px';
 
       var Limits = {
         MIN_X: data.coordinate.MIN_X,
@@ -148,20 +181,20 @@
         MAX_Y: data.coordinate.MAX_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT
       };
 
-      if (parseInt(mainPin.style.top, 10) < Limits.MIN_Y) {
-        mainPin.style.top = Limits.MIN_Y + 'px';
+      if (parseInt(utils.nodeMainPin.style.top, 10) < Limits.MIN_Y) {
+        utils.nodeMainPin.style.top = Limits.MIN_Y + 'px';
       }
 
-      if (parseInt(mainPin.style.top, 10) > Limits.MAX_Y) {
-        mainPin.style.top = Limits.MAX_Y + 'px';
+      if (parseInt(utils.nodeMainPin.style.top, 10) > Limits.MAX_Y) {
+        utils.nodeMainPin.style.top = Limits.MAX_Y + 'px';
       }
 
-      if (parseInt(mainPin.style.left, 10) < Limits.MIN_X) {
-        mainPin.style.left = Limits.MIN_X + 'px';
+      if (parseInt(utils.nodeMainPin.style.left, 10) < Limits.MIN_X) {
+        utils.nodeMainPin.style.left = Limits.MIN_X + 'px';
       }
 
-      if (parseInt(mainPin.style.left, 10) > Limits.MAX_X) {
-        mainPin.style.left = Limits.MAX_X + 'px';
+      if (parseInt(utils.nodeMainPin.style.left, 10) > Limits.MAX_X) {
+        utils.nodeMainPin.style.left = Limits.MAX_X + 'px';
       }
       form.address(PinCoords, form.sizePin, main.mapDisabled);
     };
@@ -174,20 +207,20 @@
      */
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
-      main.mapElement.removeEventListener('mousemove', onMouseMove);
-      main.mapElement.removeEventListener('mouseup', onMouseUp);
+      utils.nodeMap.removeEventListener('mousemove', onMouseMove);
+      utils.nodeMap.removeEventListener('mouseup', onMouseUp);
       var PinCoords = {
-        X: parseInt(mainPin.style.left, 10),
-        Y: parseInt(mainPin.style.top, 10)
+        X: parseInt(utils.nodeMainPin.style.left, 10),
+        Y: parseInt(utils.nodeMainPin.style.top, 10)
       };
       form.address(PinCoords, form.sizePin, main.mapDisabled);
     };
 
-    main.mapElement.addEventListener('mousemove', onMouseMove);
-    main.mapElement.addEventListener('mouseup', onMouseUp);
+    utils.nodeMap.addEventListener('mousemove', onMouseMove);
+    utils.nodeMap.addEventListener('mouseup', onMouseUp);
   });
+
   window.pin = {
-    template: Template,
-    nodeMain: mainElement
+    template: Template
   };
 })();
