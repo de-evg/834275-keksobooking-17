@@ -15,9 +15,30 @@
     Y: 375
   };
 
+  var Rooms = {
+    '100': {
+      value: ['0'],
+      validateMessage: 'Для этого предложения не предусмотрено размещение гостей'
+    },
+    '1': {
+      value: ['1'],
+      validateMessage: 'Для этого предложения возможно размещение не более 1 гостя'
+    },
+    '2': {
+      value: ['1', '2'],
+      validateMessage: 'Для этого предложения возможно размещение не более 2 гостей'
+    },
+    '3': {
+      value: ['1', '2', '3'],
+      validateMessage: 'Для этого предложения возможно размещение не более 3 гостей'
+    }
+  };
+
   var selectTypeOffer = utils.nodeFormAd.querySelector('#type');
   var selectTimeIn = utils.nodeFormAd.querySelector('#timein');
   var selectTimeOut = utils.nodeFormAd.querySelector('#timeout');
+  var selectRoom = utils.nodeFormAd.querySelector('#room_number');
+  var selectCapacity = utils.nodeFormAd.querySelector('#capacity');
   var price = utils.nodeFormAd.querySelector('#price');
   /**
    * Генерирует и изменяет значения координат главной метки в поле адреса в форме.
@@ -101,22 +122,48 @@
     });
   };
 
+  /**
+   * Устанавливает количество мест в зависимости от выбранного количества комнат
+   *
+   * @param {Object} selectedRoom - выбранное количество комнат
+   * @param {Object} capacity - коллекция option, значение одного из них
+   * должно быть выбрано в зависимости от selectedRoom
+   */
+  var validateCapacity = function (selectedRoom, capacity) {
+    Rooms[selectedRoom.value].value.forEach(function (capacityOptionValue) {
+      if (capacityOptionValue === capacity.value) {
+        capacity.setCustomValidity('');
+      } else {
+        capacity.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
+      }
+    });
+  };
+  validateCapacity(getSelectedOption(selectRoom), selectCapacity);
+
   utils.nodeFormAd.addEventListener('change', function (evt) {
     switch (evt.target.id) {
       case 'type':
         var offer = {
-          selectedOption: getSelectedOption(selectTypeOffer),
+          selectedOption: getSelectedOption(evt.target),
           offersObj: data.offers
         };
         setMinPrice(offer, price);
         break;
       case 'timein':
-        var selectedOption = getSelectedOption(selectTimeIn);
+        var selectedOption = getSelectedOption(evt.target);
         setTime(selectedOption, selectTimeOut);
         break;
       case 'timeout':
-        selectedOption = getSelectedOption(selectTimeOut);
+        selectedOption = getSelectedOption(evt.target);
         setTime(selectedOption, selectTimeIn);
+        break;
+      case 'room_number':
+        selectedOption = getSelectedOption(evt.target);
+        validateCapacity(selectedOption, selectCapacity);
+        break;
+      case 'capacity':
+        var selectedRoom = getSelectedOption(selectRoom);
+        validateCapacity(selectedRoom, evt.target);
         break;
     }
   });
