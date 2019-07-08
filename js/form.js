@@ -4,6 +4,7 @@
   var utils = window.utils;
   var main = window.main;
   var data = window.data;
+
   var SizeMainPin = {
     WIDTH: 65,
     HEIGHT: 65,
@@ -34,12 +35,18 @@
     }
   };
 
+  var DeafultFormValues = {
+    ADDRESS: '602, 462',
+    PRICE: 1000,
+  };
+
   var selectTypeOffer = utils.nodeFormAd.querySelector('#type');
   var selectTimeIn = utils.nodeFormAd.querySelector('#timein');
   var selectTimeOut = utils.nodeFormAd.querySelector('#timeout');
   var selectRoom = utils.nodeFormAd.querySelector('#room_number');
   var selectCapacity = utils.nodeFormAd.querySelector('#capacity');
   var price = utils.nodeFormAd.querySelector('#price');
+  var address = utils.nodeFormAd.querySelector('#address');
   /**
    * Генерирует и изменяет значения координат главной метки в поле адреса в форме.
    *
@@ -48,9 +55,10 @@
    * @param {boolean} flag - состояние активности карты
    */
   var generateAddress = function (startPinCoordinate, sizeMainPin, flag) {
-    var address = utils.nodeFormAd.querySelector('#address');
     if (flag) {
-      address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2)));
+      var x = Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2));
+      var y = Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2));
+      address.value = x + ', ' + y;
     } else {
       address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
     }
@@ -162,15 +170,27 @@
         validateCapacity(selectedOption, selectCapacity);
         break;
       case 'capacity':
-        var selectedRoom = getSelectedOption(selectRoom);
-        validateCapacity(selectedRoom, evt.target);
+        selectedOption = getSelectedOption(selectRoom);
+        validateCapacity(selectedOption, evt.target);
         break;
     }
   });
 
+  /**
+   * Приводит значения полей формы к исходному состоянию
+   *
+   */
+  var resetForm = function () {
+    utils.nodeFormAd.reset();
+    price.placeholder = DeafultFormValues.PRICE;
+    generateAddress(StartUserPinCoordinate, SizeMainPin, main.mapDisabled);
+  };
+
   window.form = {
     sizePin: SizeMainPin,
     address: generateAddress,
-    option: getSelectedOption
+    option: getSelectedOption,
+    pinCoords: StartUserPinCoordinate,
+    reset: resetForm
   };
 })();

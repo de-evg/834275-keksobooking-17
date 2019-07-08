@@ -6,16 +6,13 @@
   var main = window.main;
   var form = window.form;
   var card = window.card;
+  var formResetBtn = utils.nodeFormAd.querySelector('.ad-form__reset');
+
   var Type = {
     'palace': 'Дворец',
     'flat': 'Квартира',
     'house': 'Дом',
     'bungalo': 'Бунгало'
-  };
-  var Template = {
-    PIN: document.querySelector('#pin').content.querySelector('.map__pin'),
-    ERROR: document.querySelector('#error').content.querySelector('.error'),
-    CARD: document.querySelector('#card').content.querySelector('.map__card')
   };
 
   /**
@@ -28,7 +25,7 @@
    * @return {Object} pinElement - измененный склонированный элемент.
    */
   var generatePin = function (pinProperties, numberProperties, widthPin, heightPin) {
-    var pinElement = Template.PIN.cloneNode(true);
+    var pinElement = utils.nodeTemplate.PIN.cloneNode(true);
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinElement.querySelector('img').src = pinProperties.author.avatar;
     pinElement.querySelector('img').alt = 'Метка похожего объявления';
@@ -93,7 +90,7 @@
       updatedData.forEach(function (offer, i) {
         if (evt.target.id === 'pin' + i || evt.target === utils.nodePinList.querySelector('#pin' + i + ' img')) {
           card.close();
-          card.render(Template, offer, Type);
+          card.render(utils.nodeTemplate, offer, Type);
           var renderedCard = utils.nodeMap.querySelector('.map__card');
           var cardClose = renderedCard.querySelector('.popup__close');
           cardClose.addEventListener('click', card.close);
@@ -102,6 +99,12 @@
       });
     };
     utils.nodePinList.addEventListener('click', onPinClick);
+
+    formResetBtn.addEventListener('click', function (evt) {
+      evt.preventDefault();
+      resetPin();
+      form.reset();
+    });
   };
 
   /**
@@ -114,6 +117,31 @@
     pins.forEach(function (pin) {
       utils.nodePinList.removeChild(pin);
     });
+  };
+
+  /**
+   * Возвращает карту с метками в исходное состояние.
+   *
+   */
+  var resetPin = function () {
+    main.mapDisabled = true;
+    utils.nodeMainPin.style.top = form.pinCoords.Y + 'px';
+    utils.nodeMainPin.style.left = form.pinCoords.X + 'px';
+  };
+
+  /**
+   * Возвращает страницу в исходное состояние.
+   *
+   */
+  var clearPage = function () {
+    resetPin();
+    removePins();
+    form.reset();
+    main.disable();
+    var successElement = utils.nodeTemplate.SUCCESS.cloneNode(true);
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(successElement);
+    utils.nodeMain.appendChild(fragment);
   };
 
   /**
@@ -138,7 +166,7 @@
   utils.nodeMainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     if (main.mapDisabled) {
-      main.activate(renderPins, utils.error);
+      main.activate(renderPins, utils.error, 'GET');
     }
     main.mapDisabled = false;
 
@@ -221,6 +249,7 @@
   });
 
   window.pin = {
-    template: Template
+    remove: removePins,
+    clear: clearPage
   };
 })();

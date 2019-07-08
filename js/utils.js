@@ -14,6 +14,13 @@
   var formAd = mainElement.querySelector('.ad-form');
   var formAdFieldsets = formAd.querySelectorAll('fieldset');
 
+  var Template = {
+    PIN: document.querySelector('#pin').content.querySelector('.map__pin'),
+    ERROR: document.querySelector('#error').content.querySelector('.error'),
+    CARD: document.querySelector('#card').content.querySelector('.map__card'),
+    SUCCESS: document.querySelector('#success').content.querySelector('.success')
+  };
+
   /**
    * Получает случайный элемент массива.
    *
@@ -63,6 +70,7 @@
     nodeMapFiterFieldset: mapFiterFieldset,
     nodeMapFilters: mapFilters,
     nodeFormAd: formAd,
-    nodeFormAdFieldsets: formAdFieldsets
+    nodeFormAdFieldsets: formAdFieldsets,
+    nodeTemplate: Template
   };
 })();

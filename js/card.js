@@ -104,6 +104,7 @@
     getCard: generateCard,
     render: renderCard,
     close: closeCard,
-    pressEsc: onCardEscPress
+    pressEsc: onCardEscPress,
+    escCode: ESC_CODE
   };
 })();
