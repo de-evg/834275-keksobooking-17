@@ -23,6 +23,7 @@
       if (utils.nodeMain.querySelector('.success')) {
         utils.nodeMain.removeChild(utils.nodeMain.querySelector('.success'));
         document.removeEventListener('click', removePopup);
+        document.removeEventListener('keydown', onEscPress);
       }
     };
 

@@ -160,7 +160,12 @@
 
             case 'housing-guests':
               newData = newData.filter(function (currentOffer) {
-                return currentOffer.offer.guests === +filtersMap[key];
+                if (currentOffer.offer.guests === 0) {
+                  return currentOffer.offer.guests === +filtersMap[key];
+                } else {
+                  return currentOffer.offer.guests >= +filtersMap[key] && +filtersMap[key] !== 0;
+                }
+
               });
               break;
             case 'filter-' + key.slice('7'):

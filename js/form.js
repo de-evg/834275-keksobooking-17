@@ -132,17 +132,19 @@
    * @param {Object} selectedRoom - выбранное количество комнат
    * @param {Object} capacity - коллекция option, значение одного из них
    * должно быть выбрано в зависимости от selectedRoom
+   * @param {Object} rooms - перечисление комнат и их свойств
    */
-  var validateCapacity = function (selectedRoom, capacity) {
-    Rooms[selectedRoom.value].value.forEach(function (capacityOptionValue) {
-      if (capacityOptionValue === capacity.value) {
-        capacity.setCustomValidity('');
-      } else {
-        capacity.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
-      }
+  var validateCapacity = function (selectedRoom, capacity, rooms) {
+    var maxCapacity = rooms[selectedRoom.value].value.slice().filter(function (capacityPossiblyValue) {
+      return capacityPossiblyValue === capacity.value;
     });
+    if (maxCapacity <= capacity.value && maxCapacity.length > 0) {
+      capacity.setCustomValidity('');
+    } else {
+      capacity.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
+    }
   };
-  validateCapacity(getSelectedOption(selectRoom), selectCapacity);
+  validateCapacity(getSelectedOption(selectRoom), selectCapacity, Rooms);
 
   utils.nodeFormAd.addEventListener('change', function (evt) {
     switch (evt.target.id) {
@@ -163,11 +165,11 @@
         break;
       case 'room_number':
         selectedOption = getSelectedOption(evt.target);
-        validateCapacity(selectedOption, selectCapacity);
+        validateCapacity(selectedOption, selectCapacity, Rooms);
         break;
       case 'capacity':
         selectedOption = getSelectedOption(selectRoom);
-        validateCapacity(selectedOption, evt.target);
+        validateCapacity(selectedOption, evt.target, Rooms);
         break;
     }
   });
