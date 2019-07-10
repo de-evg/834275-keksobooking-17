@@ -10,6 +10,13 @@
     MAX_PINS: 5
   };
 
+  /**
+   * Получает данные с сервера.
+   *
+   * @param {string} url - адрес сервера.
+   * @param {function} onSuccess - обработчик при успешном получения данных
+   * @param {function} onError -  обработчик при ошибке
+   */
   var load = function (url, onSuccess, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
@@ -35,6 +42,14 @@
     xhr.send();
   };
 
+  /**
+   * Отправляет на сервер форму.
+   *
+   * @param {string} url - адрес сервера.
+   * @param {Object} formData - данные формы
+   * @param {function} onSuccess - обработчик при успешном отправлении данных
+   * @param {function} onError -  обработчик при ошибке
+   */
   var save = function (url, formData, onSuccess, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';

@@ -7,12 +7,12 @@
   var form = window.form;
   var card = window.card;
   var formResetBtn = utils.nodeFormAd.querySelector('.ad-form__reset');
-
+  var FiltersMap = {};
   var Type = {
-    'palace': 'Дворец',
-    'flat': 'Квартира',
-    'house': 'Дом',
-    'bungalo': 'Бунгало'
+    'PALACE': 'Дворец',
+    'FLAT': 'Квартира',
+    'HOUSE': 'Дом',
+    'BUNGALO': 'Бунгало'
   };
 
   /**
@@ -59,7 +59,7 @@
   };
 
   /**
-   * Отриосвывает метки при успешном получении данных с сервера.
+   * Отриcовывает метки при успешном получении данных с сервера.
    *
    * @param {Array} loadedData - массив с данными полученный от сервера.
    * @param {Object} pinsSettings - перечисление параметров меток.
@@ -68,18 +68,112 @@
     var updatedData = getUpdatedData(loadedData, pinsSettings);
     getPins(updatedData, pinsSettings);
 
+    /**
+     * Фильтрует массив предложений.
+     *
+     * @param {Object} evt - DOM объект собыитя.
+     */
     var filterData = function (evt) {
-      switch (evt.target.id) {
-        case 'housing-type':
-          removePins();
-          var filteredData = filteringData(loadedData, evt.target.value);
-          updatedData = getUpdatedData(filteredData, pinsSettings);
-          getPins(updatedData, pinsSettings);
+      removePins();
+      createFilterMap(evt.target, FiltersMap);
+      var filteredData = filteringData(loadedData, evt.target, FiltersMap);
+      updatedData = getUpdatedData(filteredData, pinsSettings);
+      window.setTimeout(function () {
+        getPins(updatedData, pinsSettings);
+      }, 500);
+    };
+    utils.nodeFormMapFilters.addEventListener('change', filterData);
+
+    /**
+     * Наполняет перечисление примененных фильтров.
+     *
+     * @param {Object} filterElement - node полученный по событию.
+     * @param {Object} filtersMap - перечисление примененных фильтров
+     */
+    var createFilterMap = function (filterElement, filtersMap) {
+      var key = filterElement.id;
+      var value = filterElement.value;
+      switch (filterElement.tagName) {
+        case 'SELECT':
+          if (value !== 'any') {
+            filtersMap[key] = value;
+          } else {
+            delete filtersMap[key];
+          }
           break;
+        case 'INPUT':
+          if (filtersMap[key]) {
+            delete filtersMap[key];
+          } else {
+            filtersMap[key] = value;
+          }
       }
     };
 
-    utils.nodeFormMapFilters.addEventListener('change', filterData);
+    /**
+     * Фильтрует массив предложений.
+     *
+     * @param {Array} dataArray - массив с предложениями.
+     * @param {Object} changedFilterElement - тип предложения
+     * @param {Object} filtersMap - перечисление примененных фильтров
+     * @return {Array} отфильтрованный массив
+     */
+    var filteringData = function (dataArray, changedFilterElement, filtersMap) {
+      if (filtersMap.length === 0) {
+        return dataArray;
+      } else {
+        var newData = dataArray.slice();
+        var keys = Object.keys(filtersMap);
+        keys.forEach(function (key) {
+          switch (key) {
+            case 'housing-type':
+              newData = newData.filter(function (currentOffer) {
+                return currentOffer.offer.type === filtersMap[key];
+              });
+              break;
+
+            case 'housing-rooms':
+              newData = newData.filter(function (currentOffer) {
+                return currentOffer.offer.rooms === +filtersMap[key];
+              });
+              break;
+
+            case 'housing-price':
+              switch (filtersMap[key]) {
+                case 'low':
+                  newData = newData.filter(function (currentOffer) {
+                    return currentOffer.offer.price < 10000;
+                  });
+                  break;
+                case 'middle':
+                  newData = newData.filter(function (currentOffer) {
+                    return currentOffer.offer.price >= 10000 && currentOffer.offer.price < 50000;
+                  });
+                  break;
+                case 'high':
+                  newData = newData.filter(function (currentOffer) {
+                    return currentOffer.offer.price > 50000;
+                  });
+                  break;
+              }
+              break;
+
+            case 'housing-guests':
+              newData = newData.filter(function (currentOffer) {
+                return currentOffer.offer.guests === +filtersMap[key];
+              });
+              break;
+            case 'filter-' + key.slice('7'):
+              newData = newData.filter(function (currentOffer) {
+                var indexOfFilter = currentOffer.offer.features.indexOf(key.slice('7'));
+                return currentOffer.offer.features[indexOfFilter] === filtersMap[key];
+              });
+              break;
+          }
+        });
+      }
+      return newData;
+    };
 
     /**
      * Обрабатывает нажатие на метку похожего объявления.
@@ -107,6 +201,7 @@
     });
   };
 
+
   /**
    * Удаляет метки из DOM дерева.
    *
@@ -131,35 +226,17 @@
 
   /**
    * Возвращает страницу в исходное состояние.
-   *
    */
   var clearPage = function () {
     resetPin();
     removePins();
     form.reset();
     main.disable();
+    FiltersMap = {};
     var successElement = utils.nodeTemplate.SUCCESS.cloneNode(true);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(successElement);
     utils.nodeMain.appendChild(fragment);
-  };
-
-  /**
-   * Фильтрует массив предложений по значению type.
-   *
-   * @param {Array} dataArray - массив с предложениями.
-   * @param {String} type - тип предложения
-   * @return {Array} отфильтрованный массив
-   */
-  var filteringData = function (dataArray, type) {
-    if (type === 'any') {
-      return dataArray;
-    } else {
-      var newData = dataArray.slice().filter(function (newDataInner) {
-        return newDataInner.offer.type === type;
-      });
-    }
-    return newData;
   };
 
   // Взаимодействие с меткой
@@ -250,6 +327,7 @@
 
   window.pin = {
     remove: removePins,
-    clear: clearPage
+    clear: clearPage,
+    filters: FiltersMap
   };
 })();

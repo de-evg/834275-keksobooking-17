@@ -4,18 +4,15 @@
   var utils = window.utils;
   var main = window.main;
   var data = window.data;
-
   var SizeMainPin = {
     WIDTH: 65,
     HEIGHT: 65,
     POINTER_HEIGHT: 22
   };
-
   var StartUserPinCoordinate = {
     X: 570,
     Y: 375
   };
-
   var Rooms = {
     '100': {
       value: ['0'],
@@ -34,7 +31,6 @@
       validateMessage: 'Для этого предложения возможно размещение не более 3 гостей'
     }
   };
-
   var DeafultFormValues = {
     ADDRESS: '602, 462',
     PRICE: 1000,

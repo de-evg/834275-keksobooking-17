@@ -20,11 +20,11 @@
     cardElement.querySelector('.popup__text--price').textContent = dataForCard.offer.price + '₽/ночь';
 
     // вставка типа жилья на русском языке
-    Object.keys(types).forEach(function (key) {
-      if (key === dataForCard.type) {
-        cardElement.querySelector('.popup__type').textContent = key.value;
-      }
+    var offerType = Object.keys(types).filter(function (key) {
+      return key.toLowerCase() === dataForCard.offer.type;
     });
+    cardElement.querySelector('.popup__type').textContent = types[offerType];
+
     cardElement.querySelector('.popup__text--capacity').textContent = dataForCard.offer.rooms + ' комнаты для ' + dataForCard.offer.guests;
     cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + dataForCard.offer.checkin + ', выезд до ' + dataForCard.offer.checkout;
 
