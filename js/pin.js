@@ -29,6 +29,7 @@
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinElement.querySelector('img').src = pinProperties.author.avatar;
     pinElement.querySelector('img').alt = 'Метка похожего объявления';
+    pinElement.querySelector('img').id = 'img' + numberProperties;
     pinElement.id = 'pin' + numberProperties;
     return pinElement;
   };
@@ -188,17 +189,17 @@
      * @param {Object} evt - DOM объект собыитя.
      */
     var onPinClick = function (evt) {
-      updatedData.forEach(function (offer, i) {
-        if (evt.target.id === 'pin' + i || evt.target === utils.nodePinList.querySelector('#pin' + i + ' img')) {
-          card.close();
-          card.render(utils.nodeTemplate, offer, Type);
-          var renderedCard = utils.nodeMap.querySelector('.map__card');
-          var cardClose = renderedCard.querySelector('.popup__close');
-          cardClose.addEventListener('click', card.close);
-          renderedCard.addEventListener('keydown', card.pressEsc);
-        }
+      var filteredOffer = updatedData.filter(function (offer, i) {
+        return evt.target.id === 'pin' + i || evt.target.id === 'img' + i;
       });
+      card.close();
+      card.render(utils.nodeTemplate, filteredOffer[0], Type);
+      var renderedCard = utils.nodeMap.querySelector('.map__card');
+      var cardClose = renderedCard.querySelector('.popup__close');
+      cardClose.addEventListener('click', card.close);
+      renderedCard.addEventListener('keydown', card.pressEsc);
     };
+
     utils.nodePinList.addEventListener('click', onPinClick);
 
     formResetBtn.addEventListener('click', function (evt) {
@@ -237,6 +238,7 @@
   var clearPage = function () {
     resetPin();
     removePins();
+    card.close();
     form.reset();
     utils.nodeFormMapFilters.reset();
     main.disable();
