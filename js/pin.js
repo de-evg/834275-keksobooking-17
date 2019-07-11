@@ -100,13 +100,15 @@
           } else {
             delete filtersMap[key];
           }
+
           break;
         case 'INPUT':
-          if (filtersMap[key]) {
-            delete filtersMap[key];
-          } else {
+          if (filterElement.checked) {
             filtersMap[key] = value;
+          } else {
+            delete filtersMap[key];
           }
+          break;
       }
     };
 
@@ -119,11 +121,11 @@
      * @return {Array} отфильтрованный массив
      */
     var filteringData = function (dataArray, changedFilterElement, filtersMap) {
-      if (filtersMap.length === 0) {
+      var keys = Object.keys(filtersMap);
+      if (keys.length === 0) {
         return dataArray;
       } else {
         var newData = dataArray.slice();
-        var keys = Object.keys(filtersMap);
         keys.forEach(function (key) {
           switch (key) {
             case 'housing-type':
@@ -238,7 +240,9 @@
     form.reset();
     utils.nodeFormMapFilters.reset();
     main.disable();
-    FiltersMap = {};
+    Object.keys(FiltersMap).forEach(function (key) {
+      delete FiltersMap[key];
+    });
     var successElement = utils.nodeTemplate.SUCCESS.cloneNode(true);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(successElement);
