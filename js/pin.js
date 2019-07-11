@@ -236,6 +236,7 @@
     resetPin();
     removePins();
     form.reset();
+    utils.nodeFormMapFilters.reset();
     main.disable();
     FiltersMap = {};
     var successElement = utils.nodeTemplate.SUCCESS.cloneNode(true);
