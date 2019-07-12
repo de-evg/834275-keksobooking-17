@@ -21,8 +21,6 @@
     SUCCESS: document.querySelector('#success').content.querySelector('.success')
   };
 
-
-
   /**
    * Показывает окно с ошибкой при ошибке загрузки данных с сервера.
    * @param {Object} template - перечисление шаблонов
