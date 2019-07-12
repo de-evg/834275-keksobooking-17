@@ -8,6 +8,7 @@
   var card = window.card;
   var formResetBtn = utils.nodeFormAd.querySelector('.ad-form__reset');
   var FiltersMap = {};
+  var dataForCard = {};
   var Type = {
     'PALACE': 'Дворец',
     'FLAT': 'Квартира',
@@ -31,6 +32,7 @@
     pinElement.querySelector('img').alt = 'Метка похожего объявления';
     pinElement.querySelector('img').id = 'img' + numberProperties;
     pinElement.id = 'pin' + numberProperties;
+    dataForCard[numberProperties] = pinProperties;
     return pinElement;
   };
 
@@ -171,9 +173,9 @@
 
               });
               break;
-            case 'filter-' + key.slice('7'):
+            case 'filter-' + key.slice(7):
               newData = newData.filter(function (currentOffer) {
-                var indexOfFilter = currentOffer.offer.features.indexOf(key.slice('7'));
+                var indexOfFilter = currentOffer.offer.features.indexOf(key.slice(7));
                 return currentOffer.offer.features[indexOfFilter] === filtersMap[key];
               });
               break;
@@ -189,11 +191,8 @@
      * @param {Object} evt - DOM объект собыитя.
      */
     var onPinClick = function (evt) {
-      var filteredOffer = updatedData.filter(function (offer, i) {
-        return evt.target.id === 'pin' + i || evt.target.id === 'img' + i;
-      });
       card.close();
-      card.render(utils.nodeTemplate, filteredOffer[0], Type);
+      card.render(utils.nodeTemplate, dataForCard[evt.target.id.slice(3)], Type);
       var renderedCard = utils.nodeMap.querySelector('.map__card');
       var cardClose = renderedCard.querySelector('.popup__close');
       cardClose.addEventListener('click', card.close);
