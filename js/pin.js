@@ -7,8 +7,6 @@
   var form = window.form;
   var card = window.card;
   var formResetBtn = utils.nodeFormAd.querySelector('.ad-form__reset');
-  var FiltersMap = {};
-  var dataForCard = {};
   var Type = {
     'PALACE': 'Дворец',
     'FLAT': 'Квартира',
@@ -25,14 +23,14 @@
    * @param {number} heightPin - высота метки.
    * @return {Object} pinElement - измененный склонированный элемент.
    */
-  var generatePin = function (pinProperties, numberProperties, widthPin, heightPin) {
+  var generatePin = function (pinProperties, numberProperties, widthPin, heightPin, cardData) {
     var pinElement = utils.nodeTemplate.PIN.cloneNode(true);
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinElement.querySelector('img').src = pinProperties.author.avatar;
     pinElement.querySelector('img').alt = 'Метка похожего объявления';
     pinElement.querySelector('img').id = 'img' + numberProperties;
     pinElement.id = 'pin' + numberProperties;
-    dataForCard[numberProperties] = pinProperties;
+    cardData[numberProperties] = pinProperties;
     return pinElement;
   };
 
@@ -53,10 +51,10 @@
    * @param {Array} updatedData - массив с данными для рендера меток.
    * @param {Object} pinsSettings - перечисление параметров меток.
    */
-  var getPins = function (updatedData, pinsSettings) {
+  var getPins = function (updatedData, pinsSettings, cardData) {
     var fragment = document.createDocumentFragment();
     updatedData.forEach(function (offer, i) {
-      fragment.appendChild(generatePin(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN));
+      fragment.appendChild(generatePin(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN, cardData));
     });
     utils.nodePinList.appendChild(fragment);
   };
@@ -69,7 +67,9 @@
    */
   var renderPins = function (loadedData, pinsSettings) {
     var updatedData = getUpdatedData(loadedData, pinsSettings);
-    getPins(updatedData, pinsSettings);
+    var dataForCard = {};
+    var FiltersMap = {};
+    getPins(updatedData, pinsSettings, dataForCard);
 
     /**
      * Фильтрует массив предложений.
@@ -82,7 +82,7 @@
       var filteredData = filteringData(loadedData, evt.target, FiltersMap);
       updatedData = getUpdatedData(filteredData, pinsSettings);
       window.setTimeout(function () {
-        getPins(updatedData, pinsSettings);
+        getPins(updatedData, pinsSettings, dataForCard);
       }, 500);
     };
     utils.nodeFormMapFilters.addEventListener('change', filterData);
