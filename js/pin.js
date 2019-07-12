@@ -94,24 +94,12 @@
      * @param {Object} filtersMap - перечисление примененных фильтров
      */
     var createFilterMap = function (filterElement, filtersMap) {
-      var key = filterElement.id;
+      var filterName = filterElement.id;
       var value = filterElement.value;
-      switch (filterElement.tagName) {
-        case 'SELECT':
-          if (value !== 'any') {
-            filtersMap[key] = value;
-          } else {
-            delete filtersMap[key];
-          }
-
-          break;
-        case 'INPUT':
-          if (filterElement.checked) {
-            filtersMap[key] = value;
-          } else {
-            delete filtersMap[key];
-          }
-          break;
+      if (value === 'any' || filterElement.checked === false) {
+        delete filtersMap[filterName];
+      } else {
+        filtersMap[filterName] = value;
       }
     };
 
@@ -124,27 +112,27 @@
      * @return {Array} отфильтрованный массив
      */
     var filteringData = function (dataArray, changedFilterElement, filtersMap) {
-      var keys = Object.keys(filtersMap);
-      if (keys.length === 0) {
+      var filterNames = Object.keys(filtersMap);
+      if (filterNames.length === 0) {
         return dataArray;
       } else {
         var newData = dataArray.slice();
-        keys.forEach(function (key) {
-          switch (key) {
+        filterNames.forEach(function (filter) {
+          switch (filter) {
             case 'housing-type':
               newData = newData.filter(function (currentOffer) {
-                return currentOffer.offer.type === filtersMap[key];
+                return currentOffer.offer.type === filtersMap[filter];
               });
               break;
 
             case 'housing-rooms':
               newData = newData.filter(function (currentOffer) {
-                return currentOffer.offer.rooms === +filtersMap[key];
+                return currentOffer.offer.rooms === +filtersMap[filter];
               });
               break;
 
             case 'housing-price':
-              switch (filtersMap[key]) {
+              switch (filtersMap[filter]) {
                 case 'low':
                   newData = newData.filter(function (currentOffer) {
                     return currentOffer.offer.price < 10000;
@@ -166,17 +154,17 @@
             case 'housing-guests':
               newData = newData.filter(function (currentOffer) {
                 if (currentOffer.offer.guests === 0) {
-                  return currentOffer.offer.guests === +filtersMap[key];
+                  return currentOffer.offer.guests === +filtersMap[filter];
                 } else {
-                  return currentOffer.offer.guests >= +filtersMap[key] && +filtersMap[key] !== 0;
+                  return currentOffer.offer.guests >= +filtersMap[filter] && +filtersMap[filter] !== 0;
                 }
 
               });
               break;
-            case 'filter-' + key.slice(7):
+            case 'filter-' + filter.slice(7):
               newData = newData.filter(function (currentOffer) {
-                var indexOfFilter = currentOffer.offer.features.indexOf(key.slice(7));
-                return currentOffer.offer.features[indexOfFilter] === filtersMap[key];
+                var indexOfFilter = currentOffer.offer.features.indexOf(filter.slice(7));
+                return currentOffer.offer.features[indexOfFilter] === filtersMap[filter];
               });
               break;
           }
