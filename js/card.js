@@ -29,31 +29,31 @@
     cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + dataForCard.offer.checkin + ', выезд до ' + dataForCard.offer.checkout;
 
     // удаление из шаблона списка особенностей
-    var features = cardElement.querySelector('.popup__features');
-    while (features.querySelector('.popup__feature')) {
-      features.removeChild(features.querySelector('.popup__feature'));
+    var featuresElement = cardElement.querySelector('.popup__features');
+    while (featuresElement.querySelector('.popup__feature')) {
+      featuresElement.removeChild(featuresElement.querySelector('.popup__feature'));
     }
 
     // вставка актуальных особенностей
     dataForCard.offer.features.forEach(function (feature) {
-      var listItem = document.createElement('li');
-      listItem.classList.add('popup__feature', 'popup__feature--' + feature);
-      features.appendChild(listItem);
+      var listItemElement = document.createElement('li');
+      listItemElement.classList.add('popup__feature', 'popup__feature--' + feature);
+      featuresElement.appendChild(listItemElement);
     });
 
     // вставка описания
     cardElement.querySelector('.popup__description').textContent = dataForCard.offer.description;
 
     // вставка фотографий
-    var photos = cardElement.querySelector('.popup__photos');
-    var img = photos.querySelector('img');
+    var photosElement = cardElement.querySelector('.popup__photos');
+    var imgElement = photosElement.querySelector('img');
 
     dataForCard.offer.photos.forEach(function (addressPhoto) {
-      var newImg = img.cloneNode();
+      var newImg = imgElement.cloneNode();
       newImg.src = addressPhoto;
-      photos.appendChild(newImg);
+      photosElement.appendChild(newImg);
     });
-    photos.removeChild(img);
+    photosElement.removeChild(imgElement);
 
     // вставка аватара
     cardElement.querySelector('.popup__avatar').src = dataForCard.author.avatar;
@@ -80,10 +80,10 @@
    */
   var closeCard = function () {
     if (utils.nodeMap.querySelector('.map__card')) {
-      var renderedCard = utils.nodeMap.querySelector('.map__card');
-      var cardClose = renderedCard.querySelector('.popup__close');
-      cardClose.removeEventListener('click', closeCard);
-      renderedCard.removeEventListener('click', onCardEscPress);
+      var renderedCardElement = utils.nodeMap.querySelector('.map__card');
+      var cardCloseElement = renderedCardElement.querySelector('.popup__close');
+      cardCloseElement.removeEventListener('click', closeCard);
+      renderedCardElement.removeEventListener('click', onCardEscPress);
 
       var currentCard = utils.nodeMap.querySelector('.map__card');
       utils.nodeMap.removeChild(currentCard);

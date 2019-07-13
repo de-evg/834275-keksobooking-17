@@ -7,8 +7,8 @@
   var card = window.card;
   var URL = 'https://js.dump.academy/keksobooking';
 
-  var submit = utils.nodeFormAd.querySelector('.ad-form__submit');
-  submit.addEventListener('click', function (evt) {
+  var submitElement = utils.nodeFormAd.querySelector('.ad-form__submit');
+  submitElement.addEventListener('click', function (evt) {
     var formData = new FormData(utils.nodeFormAd);
     if (utils.nodeFormAd.checkValidity()) {
       evt.preventDefault();

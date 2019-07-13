@@ -6,7 +6,7 @@
   var main = window.main;
   var form = window.form;
   var card = window.card;
-  var formResetBtn = utils.nodeFormAd.querySelector('.ad-form__reset');
+  var formResetElement = utils.nodeFormAd.querySelector('.ad-form__reset');
   var FiltersMap = {};
   var Type = {
     'PALACE': 'Дворец',
@@ -26,7 +26,7 @@
    * @return {Object} pinElement - измененный склонированный элемент.
    */
   var generatePin = function (pinProperties, numberProperties, widthPin, heightPin, cardData) {
-    var pinElement = utils.nodeTemplate.PIN.cloneNode(true);
+    var pinElement = utils.nodesTemplate.PIN.cloneNode(true);
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinElement.querySelector('img').src = pinProperties.author.avatar;
     pinElement.querySelector('img').alt = 'Метка похожего объявления';
@@ -183,17 +183,17 @@
     var onPinClick = function (evt) {
       if (dataForCard[evt.target.id.slice(3)]) {
         card.close();
-        card.render(utils.nodeTemplate, dataForCard[evt.target.id.slice(3)], Type);
-        var renderedCard = utils.nodeMap.querySelector('.map__card');
-        var cardClose = renderedCard.querySelector('.popup__close');
-        cardClose.addEventListener('click', card.close);
-        renderedCard.addEventListener('keydown', card.pressEsc);
+        card.render(utils.nodesTemplate, dataForCard[evt.target.id.slice(3)], Type);
+        var renderedCardElement = utils.nodeMap.querySelector('.map__card');
+        var cardCloseElement = renderedCardElement.querySelector('.popup__close');
+        cardCloseElement.addEventListener('click', card.close);
+        renderedCardElement.addEventListener('keydown', card.pressEsc);
       }
     };
 
     utils.nodePinList.addEventListener('click', onPinClick);
 
-    formResetBtn.addEventListener('click', function (evt) {
+    formResetElement.addEventListener('click', function (evt) {
       evt.preventDefault();
       resetPin();
       form.reset();
@@ -206,8 +206,8 @@
    *
    */
   var removePins = function () {
-    var similarPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    var pins = Array.from(similarPins);
+    var similarPinElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    var pins = Array.from(similarPinElements);
     pins.forEach(function (pin) {
       utils.nodePinList.removeChild(pin);
     });
@@ -236,7 +236,7 @@
     Object.keys(FiltersMap).forEach(function (key) {
       delete FiltersMap[key];
     });
-    var successElement = utils.nodeTemplate.SUCCESS.cloneNode(true);
+    var successElement = utils.nodesTemplate.SUCCESS.cloneNode(true);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(successElement);
     utils.nodeMain.appendChild(fragment);

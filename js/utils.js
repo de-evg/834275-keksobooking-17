@@ -3,16 +3,16 @@
 (function () {
   var mainElement = document.querySelector('main');
 
-  var map = mainElement.querySelector('.map');
-  var pinList = map.querySelector('.map__pins');
-  var mainPin = pinList.querySelector('.map__pin--main');
+  var mapElement = mainElement.querySelector('.map');
+  var mapPinsElement = mapElement.querySelector('.map__pins');
+  var mainPinElement = mapPinsElement.querySelector('.map__pin--main');
 
-  var filtersContainer = map.querySelector('.map__filters-container');
-  var formMapFilters = filtersContainer.querySelector('.map__filters');
-  var mapFiterFieldset = formMapFilters.querySelector('fieldset');
-  var mapFilters = formMapFilters.querySelectorAll('.map__filter');
-  var formAd = mainElement.querySelector('.ad-form');
-  var formAdFieldsets = formAd.querySelectorAll('fieldset');
+  var filtersContainerElement = mapElement.querySelector('.map__filters-container');
+  var mapFiltersElement = filtersContainerElement.querySelector('.map__filters');
+  var mapFiterFieldsetElement = mapFiltersElement.querySelector('fieldset');
+  var mapFiltersCollection = mapFiltersElement.querySelectorAll('.map__filter');
+  var formAdElement = mainElement.querySelector('.ad-form');
+  var formAdFieldsetsElement = formAdElement.querySelectorAll('fieldset');
 
   var Template = {
     PIN: document.querySelector('#pin').content.querySelector('.map__pin'),
@@ -37,15 +37,15 @@
   window.utils = {
     error: onError,
     nodeMain: mainElement,
-    nodeMap: map,
-    nodePinList: pinList,
-    nodeMainPin: mainPin,
-    nodeFiltersContainer: filtersContainer,
-    nodeFormMapFilters: formMapFilters,
-    nodeMapFiterFieldset: mapFiterFieldset,
-    nodeMapFilters: mapFilters,
-    nodeFormAd: formAd,
-    nodeFormAdFieldsets: formAdFieldsets,
-    nodeTemplate: Template
+    nodeMap: mapElement,
+    nodePinList: mapPinsElement,
+    nodeMainPin: mainPinElement,
+    nodeFiltersContainer: filtersContainerElement,
+    nodeFormMapFilters: mapFiltersElement,
+    nodeMapFiterFieldset: mapFiterFieldsetElement,
+    nodeMapFilters: mapFiltersCollection,
+    nodeFormAd: formAdElement,
+    nodeFormAdFieldsets: formAdFieldsetsElement,
+    nodesTemplate: Template
   };
 })();

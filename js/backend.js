@@ -24,16 +24,16 @@
       if (xhr.status === SUCCESS_CODE) {
         onSuccess(xhr.response, PinsSettings);
       } else {
-        onError(utils.nodeTemplate, utils.nodeMain);
+        onError(utils.nodesTemplate, utils.nodeMain);
       }
     });
 
     xhr.addEventListener('error', function () {
-      onError(utils.nodeTemplate, utils.nodeMain);
+      onError(utils.nodesTemplate, utils.nodeMain);
     });
 
     xhr.addEventListener('timeout', function () {
-      onError(utils.nodeTemplate, utils.nodeMain);
+      onError(utils.nodesTemplate, utils.nodeMain);
     });
 
     xhr.timeout = TIMEOUT;
@@ -57,16 +57,16 @@
       if (xhr.status === SUCCESS_CODE) {
         onSuccess();
       } else {
-        onError(utils.nodeTemplate, utils.nodeMain);
+        onError(utils.nodesTemplate, utils.nodeMain);
       }
     });
 
     xhr.addEventListener('error', function () {
-      onError(utils.nodeTemplate, utils.nodeMain);
+      onError(utils.nodesTemplate, utils.nodeMain);
     });
 
     xhr.addEventListener('timeout', function () {
-      onError(utils.nodeTemplate, utils.nodeMain);
+      onError(utils.nodesTemplate, utils.nodeMain);
     });
 
     xhr.timeout = TIMEOUT;

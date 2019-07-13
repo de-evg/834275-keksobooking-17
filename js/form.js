@@ -36,13 +36,13 @@
     PRICE: 1000,
   };
 
-  var selectTypeOffer = utils.nodeFormAd.querySelector('#type');
-  var selectTimeIn = utils.nodeFormAd.querySelector('#timein');
-  var selectTimeOut = utils.nodeFormAd.querySelector('#timeout');
-  var selectRoom = utils.nodeFormAd.querySelector('#room_number');
-  var selectCapacity = utils.nodeFormAd.querySelector('#capacity');
-  var price = utils.nodeFormAd.querySelector('#price');
-  var address = utils.nodeFormAd.querySelector('#address');
+  var selectTypeOfferElement = utils.nodeFormAd.querySelector('#type');
+  var selectTimeInElement = utils.nodeFormAd.querySelector('#timein');
+  var selectTimeOutElement = utils.nodeFormAd.querySelector('#timeout');
+  var selectRoomElement = utils.nodeFormAd.querySelector('#room_number');
+  var selectCapacityElement = utils.nodeFormAd.querySelector('#capacity');
+  var priceElement = utils.nodeFormAd.querySelector('#price');
+  var addressElement = utils.nodeFormAd.querySelector('#address');
   /**
    * Генерирует и изменяет значения координат главной метки в поле адреса в форме.
    *
@@ -54,9 +54,9 @@
     if (flag) {
       var x = Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2));
       var y = Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2));
-      address.value = x + ', ' + y;
+      addressElement.value = x + ', ' + y;
     } else {
-      address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
+      addressElement.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
     }
   };
   generateAddress(StartUserPinCoordinate, SizeMainPin, main.mapDisabled);
@@ -108,7 +108,7 @@
     };
     setMinPrice(offer, inputFieldElement);
   };
-  getDefaultMinPrice(selectTypeOffer, data.offers, price);
+  getDefaultMinPrice(selectTypeOfferElement, data.offers, priceElement);
 
   /**
    * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
@@ -144,7 +144,7 @@
       capacity.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
     }
   };
-  validateCapacity(getSelectedOption(selectRoom), selectCapacity, Rooms);
+  validateCapacity(getSelectedOption(selectRoomElement), selectCapacityElement, Rooms);
 
   utils.nodeFormAd.addEventListener('change', function (evt) {
     switch (evt.target.id) {
@@ -153,22 +153,22 @@
           selectedOption: getSelectedOption(evt.target),
           offersObj: data.offers
         };
-        setMinPrice(offer, price);
+        setMinPrice(offer, priceElement);
         break;
       case 'timein':
         var selectedOption = getSelectedOption(evt.target);
-        setTime(selectedOption, selectTimeOut);
+        setTime(selectedOption, selectTimeOutElement);
         break;
       case 'timeout':
         selectedOption = getSelectedOption(evt.target);
-        setTime(selectedOption, selectTimeIn);
+        setTime(selectedOption, selectTimeInElement);
         break;
       case 'room_number':
         selectedOption = getSelectedOption(evt.target);
-        validateCapacity(selectedOption, selectCapacity, Rooms);
+        validateCapacity(selectedOption, selectCapacityElement, Rooms);
         break;
       case 'capacity':
-        selectedOption = getSelectedOption(selectRoom);
+        selectedOption = getSelectedOption(selectRoomElement);
         validateCapacity(selectedOption, evt.target, Rooms);
         break;
     }
@@ -180,7 +180,7 @@
    */
   var resetForm = function () {
     utils.nodeFormAd.reset();
-    price.placeholder = DeafultFormValues.PRICE;
+    priceElement.placeholder = DeafultFormValues.PRICE;
     generateAddress(StartUserPinCoordinate, SizeMainPin, main.mapDisabled);
   };
 
