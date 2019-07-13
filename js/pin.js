@@ -7,6 +7,7 @@
   var form = window.form;
   var card = window.card;
   var formResetBtn = utils.nodeFormAd.querySelector('.ad-form__reset');
+  var FiltersMap = {};
   var Type = {
     'PALACE': 'Дворец',
     'FLAT': 'Квартира',
@@ -21,6 +22,7 @@
    * @param {number} numberProperties - номер объекта с данными метки для формирования id
    * @param {number} widthPin - ширина метки.
    * @param {number} heightPin - высота метки.
+   * @param {Object} cardData - объект с данными для карточки.
    * @return {Object} pinElement - измененный склонированный элемент.
    */
   var generatePin = function (pinProperties, numberProperties, widthPin, heightPin, cardData) {
@@ -50,6 +52,7 @@
    *
    * @param {Array} updatedData - массив с данными для рендера меток.
    * @param {Object} pinsSettings - перечисление параметров меток.
+   * @param {Object} cardData - объект с данными для карточки.
    */
   var getPins = function (updatedData, pinsSettings, cardData) {
     var fragment = document.createDocumentFragment();
@@ -68,7 +71,6 @@
   var renderPins = function (loadedData, pinsSettings) {
     var updatedData = getUpdatedData(loadedData, pinsSettings);
     var dataForCard = {};
-    var FiltersMap = {};
     getPins(updatedData, pinsSettings, dataForCard);
 
     /**
