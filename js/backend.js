@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  var utils = window.utils;
   var SUCCESS_CODE = 200;
   var TIMEOUT = 10000;
   var PinsSettings = {
@@ -24,16 +23,16 @@
       if (xhr.status === SUCCESS_CODE) {
         onSuccess(xhr.response, PinsSettings);
       } else {
-        onError(utils.nodesTemplate, utils.nodeMain);
+        onError();
       }
     });
 
     xhr.addEventListener('error', function () {
-      onError(utils.nodesTemplate, utils.nodeMain);
+      onError();
     });
 
     xhr.addEventListener('timeout', function () {
-      onError(utils.nodesTemplate, utils.nodeMain);
+      onError();
     });
 
     xhr.timeout = TIMEOUT;
@@ -57,16 +56,16 @@
       if (xhr.status === SUCCESS_CODE) {
         onSuccess();
       } else {
-        onError(utils.nodesTemplate, utils.nodeMain);
+        onError();
       }
     });
 
     xhr.addEventListener('error', function () {
-      onError(utils.nodesTemplate, utils.nodeMain);
+      onError();
     });
 
     xhr.addEventListener('timeout', function () {
-      onError(utils.nodesTemplate, utils.nodeMain);
+      onError();
     });
 
     xhr.timeout = TIMEOUT;

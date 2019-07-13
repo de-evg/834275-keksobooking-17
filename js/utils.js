@@ -26,12 +26,11 @@
    * @param {Object} template - перечисление шаблонов
    * @param {Object} parentElement - DOM элемент, в который добавится склонированный элемент
    */
-  var onError = function (template, parentElement) {
-    var error = template.ERROR.cloneNode(true);
+  var onError = function () {
+    var error = Template.ERROR.cloneNode(true);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(error);
-    parentElement.appendChild(fragment);
-    error.display = 'block';
+    mainElement.appendChild(fragment);
   };
 
   window.utils = {
