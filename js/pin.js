@@ -181,12 +181,14 @@
      * @param {Object} evt - DOM объект собыитя.
      */
     var onPinClick = function (evt) {
-      card.close();
-      card.render(utils.nodeTemplate, dataForCard[evt.target.id.slice(3)], Type);
-      var renderedCard = utils.nodeMap.querySelector('.map__card');
-      var cardClose = renderedCard.querySelector('.popup__close');
-      cardClose.addEventListener('click', card.close);
-      renderedCard.addEventListener('keydown', card.pressEsc);
+      if (dataForCard[evt.target.id.slice(3)]) {
+        card.close();
+        card.render(utils.nodeTemplate, dataForCard[evt.target.id.slice(3)], Type);
+        var renderedCard = utils.nodeMap.querySelector('.map__card');
+        var cardClose = renderedCard.querySelector('.popup__close');
+        cardClose.addEventListener('click', card.close);
+        renderedCard.addEventListener('keydown', card.pressEsc);
+      }
     };
 
     utils.nodePinList.addEventListener('click', onPinClick);
