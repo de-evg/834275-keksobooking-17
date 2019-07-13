@@ -216,7 +216,6 @@
    *
    */
   var resetPin = function () {
-    main.mapDisabled = true;
     utils.nodeMainPin.style.top = form.pinCoords.Y + 'px';
     utils.nodeMainPin.style.left = form.pinCoords.X + 'px';
   };
@@ -226,6 +225,7 @@
    */
   var clearPage = function () {
     resetPin();
+    main.mapDisabled = true;
     removePins();
     card.close();
     form.reset();
