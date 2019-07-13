@@ -10,23 +10,31 @@
   };
 
   /**
-   * Получает данные с сервера.
+   * Настройки запрса на сервера
    *
    * @param {string} url - адрес сервера.
    * @param {function} onSuccess - обработчик при успешном получения данных
-   * @param {function} onError -  обработчик при ошибке
+   * @param {function} onError - обработчик при ошибке
+   * @param {string} method - метод запроса
+   * @return {Object} xhr - объект XMLHttpRequest
    */
-  var load = function (url, onSuccess, onError) {
+  var xhrRequestSetup = function (url, onSuccess, onError, method) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.addEventListener('load', function () {
       if (xhr.status === SUCCESS_CODE) {
-        onSuccess(xhr.response, PinsSettings);
+        switch (method) {
+          case 'GET':
+            onSuccess(xhr.response, PinsSettings);
+            break;
+          case 'POST':
+            onSuccess();
+            break;
+        }
       } else {
         onError();
       }
     });
-
     xhr.addEventListener('error', function () {
       onError();
     });
@@ -36,9 +44,21 @@
     });
 
     xhr.timeout = TIMEOUT;
+    xhr.open(method, url);
+    return xhr;
+  };
 
-    xhr.open('GET', url);
-    xhr.send();
+  /**
+   * Получает данные с сервера.
+   *
+   * @param {string} url - адрес сервера.
+   * @param {function} onSuccess - обработчик при успешном получения данных
+   * @param {function} onError -  обработчик при ошибке
+   */
+  var load = function (url, onSuccess, onError) {
+    var method = 'GET';
+    var requestName = xhrRequestSetup(url, onSuccess, onError, method);
+    requestName.send();
   };
 
   /**
@@ -50,27 +70,9 @@
    * @param {function} onError -  обработчик при ошибке
    */
   var save = function (url, formData, onSuccess, onError) {
-    var xhr = new XMLHttpRequest();
-    xhr.responseType = 'json';
-    xhr.addEventListener('load', function () {
-      if (xhr.status === SUCCESS_CODE) {
-        onSuccess();
-      } else {
-        onError();
-      }
-    });
-
-    xhr.addEventListener('error', function () {
-      onError();
-    });
-
-    xhr.addEventListener('timeout', function () {
-      onError();
-    });
-
-    xhr.timeout = TIMEOUT;
-    xhr.open('POST', url);
-    xhr.send(formData);
+    var method = 'POST';
+    var requestName = xhrRequestSetup(url, onSuccess, onError, method);
+    requestName.send(formData);
   };
 
   window.backend = {

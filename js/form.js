@@ -31,9 +31,10 @@
       validateMessage: 'Для этого предложения возможно размещение не более 3 гостей'
     }
   };
+
   var DeafultFormValues = {
     ADDRESS: '602, 462',
-    PRICE: 1000,
+    PRICE: '1000'
   };
 
   var selectTypeOfferElement = utils.nodeFormAd.querySelector('#type');
@@ -43,21 +44,25 @@
   var selectCapacityElement = utils.nodeFormAd.querySelector('#capacity');
   var priceElement = utils.nodeFormAd.querySelector('#price');
   var addressElement = utils.nodeFormAd.querySelector('#address');
+
   /**
    * Генерирует и изменяет значения координат главной метки в поле адреса в форме.
    *
    * @param {Object} startPinCoordinate - начальные координаты метки.
    * @param {Object} sizeMainPin - перечисление размеров метки
    * @param {boolean} flag - состояние активности карты
+   * @return {string} координаты метки
    */
   var generateAddress = function (startPinCoordinate, sizeMainPin, flag) {
     if (flag) {
       var x = Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2));
       var y = Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2));
-      addressElement.value = x + ', ' + y;
     } else {
-      addressElement.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
+      x = Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2));
+      y = Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT));
     }
+    addressElement.value = x + ', ' + y;
+    return addressElement.value;
   };
   generateAddress(StartUserPinCoordinate, SizeMainPin, main.mapDisabled);
 
@@ -180,9 +185,14 @@
    */
   var resetForm = function () {
     utils.nodeFormAd.reset();
-    priceElement.placeholder = DeafultFormValues.PRICE;
-    generateAddress(StartUserPinCoordinate, SizeMainPin, main.mapDisabled);
+    priceElement.placeholder = DeafultFormValues['PRICE'];
+    addressElement.placeholder = DeafultFormValues['ADDRESS'];
+
   };
+
+  utils.nodeFormAd.addEventListener('reset', function () {
+    resetForm();
+  });
 
   window.form = {
     sizePin: SizeMainPin,

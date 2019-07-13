@@ -5,10 +5,10 @@
   var ESC_CODE = 27;
 
   /**
-   * Генерирует DOM элемент карточки с предложением.
+   * Заполняет склонированный шкаблон popup данными выбранного предложения.
    *
    * @param {Object} template - объект с данными для генерации новой карточки.
-   * @param {Object} dataForCard - номер объекта с данными конкретной метки
+   * @param {Object} dataForCard - объекта с данными выбранного предложения
    * @param {Object} types - словарь типа меток (eng: рус).
    * @return {Object} cardElement - DOM элемент карточки с предложением
    */
@@ -72,6 +72,11 @@
     var fragment = document.createDocumentFragment();
     fragment.appendChild(generateCard(template, dataForCard, types));
     utils.nodeFiltersContainer.before(fragment);
+
+    var renderedCardElement = utils.nodeMap.querySelector('.map__card');
+    var cardCloseElement = renderedCardElement.querySelector('.popup__close');
+    cardCloseElement.addEventListener('click', closeCard);
+    window.addEventListener('keydown', onCardEscPress);
   };
 
   /**
@@ -80,11 +85,6 @@
    */
   var closeCard = function () {
     if (utils.nodeMap.querySelector('.map__card')) {
-      var renderedCardElement = utils.nodeMap.querySelector('.map__card');
-      var cardCloseElement = renderedCardElement.querySelector('.popup__close');
-      cardCloseElement.removeEventListener('click', closeCard);
-      renderedCardElement.removeEventListener('click', onCardEscPress);
-
       var currentCard = utils.nodeMap.querySelector('.map__card');
       utils.nodeMap.removeChild(currentCard);
     }
@@ -104,7 +104,6 @@
     getCard: generateCard,
     render: renderCard,
     close: closeCard,
-    pressEsc: onCardEscPress,
     escCode: ESC_CODE
   };
 })();

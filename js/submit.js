@@ -2,17 +2,25 @@
 
 (function () {
   var utils = window.utils;
+  var form = window.form;
   var pin = window.pin;
   var backend = window.backend;
   var card = window.card;
   var URL = 'https://js.dump.academy/keksobooking';
 
-  var submitElement = utils.nodeFormAd.querySelector('.ad-form__submit');
-  submitElement.addEventListener('click', function (evt) {
+  var resetPage = function () {
+    pin.clear();
+    form.reset();
+    var successElement = utils.nodesTemplate.SUCCESS.cloneNode(true);
+    utils.nodeMain.appendChild(successElement);
+  };
+
+  utils.nodeFormAd.addEventListener('submit', function (evt) {
     var formData = new FormData(utils.nodeFormAd);
     if (utils.nodeFormAd.checkValidity()) {
       evt.preventDefault();
-      backend.publish(URL, formData, pin.clear, utils.error);
+      backend.publish(URL, formData, resetPage, utils.error);
+
     }
 
     /**

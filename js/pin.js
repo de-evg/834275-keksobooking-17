@@ -6,7 +6,6 @@
   var main = window.main;
   var form = window.form;
   var card = window.card;
-  var formResetElement = utils.nodeFormAd.querySelector('.ad-form__reset');
   var FiltersMap = {};
   var Type = {
     'PALACE': 'Дворец',
@@ -184,19 +183,12 @@
       if (dataForCard[evt.target.id.slice(3)]) {
         card.close();
         card.render(utils.nodesTemplate, dataForCard[evt.target.id.slice(3)], Type);
-        var renderedCardElement = utils.nodeMap.querySelector('.map__card');
-        var cardCloseElement = renderedCardElement.querySelector('.popup__close');
-        cardCloseElement.addEventListener('click', card.close);
-        renderedCardElement.addEventListener('keydown', card.pressEsc);
       }
     };
-
     utils.nodePinList.addEventListener('click', onPinClick);
 
-    formResetElement.addEventListener('click', function (evt) {
-      evt.preventDefault();
-      resetPin();
-      form.reset();
+    utils.nodeFormAd.addEventListener('reset', function () {
+      clearPage();
     });
   };
 
@@ -230,16 +222,9 @@
     main.mapDisabled = true;
     removePins();
     card.close();
-    form.reset();
     utils.nodeFormMapFilters.reset();
     main.disable();
-    Object.keys(FiltersMap).forEach(function (key) {
-      delete FiltersMap[key];
-    });
-    var successElement = utils.nodesTemplate.SUCCESS.cloneNode(true);
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(successElement);
-    utils.nodeMain.appendChild(fragment);
+    FiltersMap = {};
   };
 
   // Взаимодействие с меткой
