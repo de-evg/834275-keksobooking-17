@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var utils = window.utils;
   var main = window.main;
   var data = window.data;
   var SizeMainPin = {
@@ -8,16 +9,40 @@
     HEIGHT: 65,
     POINTER_HEIGHT: 22
   };
-
   var StartUserPinCoordinate = {
     X: 570,
     Y: 375
   };
+  var Rooms = {
+    '100': {
+      value: ['0'],
+      validateMessage: 'Для этого предложения не предусмотрено размещение гостей'
+    },
+    '1': {
+      value: ['1'],
+      validateMessage: 'Для этого предложения возможно размещение не более 1 гостя'
+    },
+    '2': {
+      value: ['1', '2'],
+      validateMessage: 'Для этого предложения возможно размещение не более 2 гостей'
+    },
+    '3': {
+      value: ['1', '2', '3'],
+      validateMessage: 'Для этого предложения возможно размещение не более 3 гостей'
+    }
+  };
+  var DeafultFormValues = {
+    ADDRESS: '602, 462',
+    PRICE: 1000,
+  };
 
-  var selectTypeOffer = main.formAdElement.querySelector('#type');
-  var selectTimeIn = main.formAdElement.querySelector('#timein');
-  var selectTimeOut = main.formAdElement.querySelector('#timeout');
-  var price = main.formAdElement.querySelector('#price');
+  var selectTypeOfferElement = utils.nodeFormAd.querySelector('#type');
+  var selectTimeInElement = utils.nodeFormAd.querySelector('#timein');
+  var selectTimeOutElement = utils.nodeFormAd.querySelector('#timeout');
+  var selectRoomElement = utils.nodeFormAd.querySelector('#room_number');
+  var selectCapacityElement = utils.nodeFormAd.querySelector('#capacity');
+  var priceElement = utils.nodeFormAd.querySelector('#price');
+  var addressElement = utils.nodeFormAd.querySelector('#address');
   /**
    * Генерирует и изменяет значения координат главной метки в поле адреса в форме.
    *
@@ -26,11 +51,12 @@
    * @param {boolean} flag - состояние активности карты
    */
   var generateAddress = function (startPinCoordinate, sizeMainPin, flag) {
-    var address = main.formAdElement.querySelector('#address');
     if (flag) {
-      address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2)));
+      var x = Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2));
+      var y = Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT / 2));
+      addressElement.value = x + ', ' + y;
     } else {
-      address.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
+      addressElement.value = (Math.floor((startPinCoordinate.X + sizeMainPin.WIDTH / 2)) + ', ' + Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT)));
     }
   };
   generateAddress(StartUserPinCoordinate, SizeMainPin, main.mapDisabled);
@@ -82,7 +108,7 @@
     };
     setMinPrice(offer, inputFieldElement);
   };
-  getDefaultMinPrice(selectTypeOffer, data.offers, price);
+  getDefaultMinPrice(selectTypeOfferElement, data.offers, priceElement);
 
   /**
    * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
@@ -100,29 +126,69 @@
     });
   };
 
-  main.formAdElement.addEventListener('change', function (evt) {
+  /**
+   * Устанавливает количество мест в зависимости от выбранного количества комнат
+   *
+   * @param {Object} selectedRoom - выбранное количество комнат
+   * @param {Object} capacity - коллекция option, значение одного из них
+   * должно быть выбрано в зависимости от selectedRoom
+   * @param {Object} rooms - перечисление комнат и их свойств
+   */
+  var validateCapacity = function (selectedRoom, capacity, rooms) {
+    var maxCapacity = rooms[selectedRoom.value].value.slice().filter(function (capacityPossiblyValue) {
+      return capacityPossiblyValue === capacity.value;
+    });
+    if (maxCapacity <= capacity.value && maxCapacity.length > 0) {
+      capacity.setCustomValidity('');
+    } else {
+      capacity.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
+    }
+  };
+  validateCapacity(getSelectedOption(selectRoomElement), selectCapacityElement, Rooms);
+
+  utils.nodeFormAd.addEventListener('change', function (evt) {
     switch (evt.target.id) {
       case 'type':
         var offer = {
-          selectedOption: getSelectedOption(selectTypeOffer),
+          selectedOption: getSelectedOption(evt.target),
           offersObj: data.offers
         };
-        setMinPrice(offer, price);
+        setMinPrice(offer, priceElement);
         break;
       case 'timein':
-        var selectedOption = getSelectedOption(selectTimeIn);
-        setTime(selectedOption, selectTimeOut);
+        var selectedOption = getSelectedOption(evt.target);
+        setTime(selectedOption, selectTimeOutElement);
         break;
       case 'timeout':
-        selectedOption = getSelectedOption(selectTimeOut);
-        setTime(selectedOption, selectTimeIn);
+        selectedOption = getSelectedOption(evt.target);
+        setTime(selectedOption, selectTimeInElement);
+        break;
+      case 'room_number':
+        selectedOption = getSelectedOption(evt.target);
+        validateCapacity(selectedOption, selectCapacityElement, Rooms);
+        break;
+      case 'capacity':
+        selectedOption = getSelectedOption(selectRoomElement);
+        validateCapacity(selectedOption, evt.target, Rooms);
         break;
     }
   });
 
+  /**
+   * Приводит значения полей формы к исходному состоянию
+   *
+   */
+  var resetForm = function () {
+    utils.nodeFormAd.reset();
+    priceElement.placeholder = DeafultFormValues.PRICE;
+    generateAddress(StartUserPinCoordinate, SizeMainPin, main.mapDisabled);
+  };
+
   window.form = {
     sizePin: SizeMainPin,
     address: generateAddress,
-    option: getSelectedOption
+    option: getSelectedOption,
+    pinCoords: StartUserPinCoordinate,
+    reset: resetForm
   };
 })();
