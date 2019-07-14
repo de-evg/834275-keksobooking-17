@@ -47,6 +47,12 @@
     X: 570,
     Y: 375
   };
+
+  var DeafultFormValues = {
+    ADDRESS: '602, 462',
+    PRICE: '1000'
+  };
+
   var Rooms = {
     '100': {
       value: ['0'],
@@ -65,53 +71,20 @@
       validateMessage: 'Для этого предложения возможно размещение не более 3 гостей'
     }
   };
-
-  var DeafultFormValues = {
-    ADDRESS: '602, 462',
-    PRICE: '1000'
-  };
-
-  var Selector = {
-    TYPE: {
-      setMinPrice: function (targetElement, offersType, inputFieldElement) {
-        var attribute = offersType[targetElement.value.toUpperCase()].MIN_PRICE;
-        inputFieldElement.min = attribute;
-        inputFieldElement.placeholder = attribute;
-      }
-    },
-    TIMEIN: {
-      setTime: function (evtChangeTime, timeMap) {
-        timeMap[evtChangeTime.target.id.toUpperCase()].value = evtChangeTime.target.value;
-      }
-    },
-    TIMEOUT: {
-      setTime: function (evtChangeTime, timeMap) {
-        timeMap[evtChangeTime.target.id.toUpperCase()].value = evtChangeTime.target.value;
-      }
-    },
-    ROOM_NUMBER: {
-      validateCapacity: function (rooms, selectedRoom, selectedCapacity) {
-        var maxCapacity = rooms[selectedRoom.value].value.slice().filter(function (capacityPossiblyValue) {
-          return capacityPossiblyValue === selectedCapacity.value;
-        });
-        if (maxCapacity <= selectedCapacity.value && maxCapacity.length > 0) {
-          selectCapacityElement.setCustomValidity('');
-        } else {
-          selectCapacityElement.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
-        }
-      }
-    },
-    CAPACITY: {
-      validateCapacity: function (rooms, selectedRoom, selectedCapacity) {
-        var maxCapacity = rooms[selectedRoom.value].value.slice().filter(function (capacityPossiblyValue) {
-          return capacityPossiblyValue === selectedCapacity.value;
-        });
-        if (maxCapacity <= selectedCapacity.value && maxCapacity.length > 0) {
-          selectCapacityElement.setCustomValidity('');
-        } else {
-          selectCapacityElement.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
-        }
-      }
+  /**
+   * Проверяет соответствует ли количество комнат количеству гостей.
+   *
+   */
+  var validateCapacity = function () {
+    var selectedRoom = getSelectedOption(selectRoomElement);
+    var selectedCapacity = getSelectedOption(selectCapacityElement);
+    var maxCapacity = Rooms[selectedRoom.value].value.slice().filter(function (capacityPossiblyValue) {
+      return capacityPossiblyValue === selectedCapacity.value;
+    });
+    if (maxCapacity <= selectedCapacity.value && maxCapacity.length > 0) {
+      selectCapacityElement.setCustomValidity('');
+    } else {
+      selectCapacityElement.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
     }
   };
 
@@ -154,8 +127,34 @@
     return selectedOption;
   };
 
+  var Selector = {
+    TYPE: {
+      setMinPrice: function (targetElement, offersType, inputFieldElement) {
+        var attribute = offersType[targetElement.value.toUpperCase()].MIN_PRICE;
+        inputFieldElement.min = attribute;
+        inputFieldElement.placeholder = attribute;
+      }
+    },
+    TIMEIN: {
+      setTime: function (evtChangeTime, timeMap) {
+        timeMap[evtChangeTime.target.id.toUpperCase()].value = evtChangeTime.target.value;
+      }
+    },
+    TIMEOUT: {
+      setTime: function (evtChangeTime, timeMap) {
+        timeMap[evtChangeTime.target.id.toUpperCase()].value = evtChangeTime.target.value;
+      }
+    },
+    ROOM_NUMBER: {
+      validate: validateCapacity
+    },
+    CAPACITY: {
+      validate: validateCapacity
+    }
+  };
+
   Selector.TYPE.setMinPrice(selectTypeOfferElement, OfferMinPriceMap, priceElement);
-  Selector.CAPACITY.validateCapacity(Rooms, getSelectedOption(selectRoomElement), getSelectedOption(selectCapacityElement), selectCapacityElement);
+  Selector.CAPACITY.validate();
 
   utils.nodeFormAd.addEventListener('change', function (evt) {
     switch (evt.target.id) {
@@ -169,10 +168,10 @@
         Selector[evt.target.id.toUpperCase()].setTime(evt, TimeMap);
         break;
       case 'room_number':
-        Selector[evt.target.id.toUpperCase()].validateCapacity(Rooms, evt.target, getSelectedOption(selectCapacityElement), selectCapacityElement);
+        Selector[evt.target.id.toUpperCase()].validate();
         break;
       case 'capacity':
-        Selector[evt.target.id.toUpperCase()].validateCapacity(Rooms, getSelectedOption(selectRoomElement), evt.target, selectCapacityElement);
+        Selector[evt.target.id.toUpperCase()].validate();
         break;
     }
   });
