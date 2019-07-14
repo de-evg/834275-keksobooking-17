@@ -69,8 +69,9 @@
    * @param {Object} types - словарь типа меток (eng: рус).
    */
   var renderCard = function (template, dataForCard, types) {
+    var generatedCardElement = generateCard(template, dataForCard, types);
     var fragment = document.createDocumentFragment();
-    fragment.appendChild(generateCard(template, dataForCard, types));
+    fragment.appendChild(generatedCardElement);
     utils.nodeFiltersContainer.before(fragment);
 
     var renderedCardElement = utils.nodeMap.querySelector('.map__card');
