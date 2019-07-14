@@ -3,16 +3,21 @@
 (function () {
   var utils = window.utils;
   var debounce = window.debounce;
-  var data = window.data;
   var main = window.main;
   var form = window.form;
   var card = window.card;
   var FiltersMap = {};
   var Type = {
-    'PALACE': 'Дворец',
-    'FLAT': 'Квартира',
-    'HOUSE': 'Дом',
-    'BUNGALO': 'Бунгало'
+    PALACE: 'Дворец',
+    FLAT: 'Квартира',
+    HOUSE: 'Дом',
+    BUNGALO: 'Бунгало'
+  };
+  var CoordinateMaps = {
+    MIN_X: 0,
+    MAX_X: 1200,
+    MIN_Y: 130,
+    MAX_Y: 630
   };
 
   /**
@@ -270,10 +275,10 @@
       utils.nodeMainPin.style.left = utils.nodeMainPin.offsetLeft - shift.x + 'px';
 
       var Limits = {
-        MIN_X: data.coordinate.MIN_X,
-        MAX_X: data.coordinate.MAX_X - form.sizePin.WIDTH,
-        MIN_Y: data.coordinate.MIN_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT,
-        MAX_Y: data.coordinate.MAX_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT
+        MIN_X: CoordinateMaps.MIN_X,
+        MAX_X: CoordinateMaps.MAX_X - form.sizePin.WIDTH,
+        MIN_Y: CoordinateMaps.MIN_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT,
+        MAX_Y: CoordinateMaps.MAX_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT
       };
 
       if (parseInt(utils.nodeMainPin.style.top, 10) < Limits.MIN_Y) {

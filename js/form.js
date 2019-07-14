@@ -3,7 +3,24 @@
 (function () {
   var utils = window.utils;
   var main = window.main;
-  var data = window.data;
+  var OfferMinPriceMap = {
+    PALACE: {
+      TYPE: 'Дворец',
+      MIN_PRICE: 10000
+    },
+    FLAT: {
+      TYPE: 'Квартира',
+      MIN_PRICE: 1000
+    },
+    HOUSE: {
+      TYPE: 'Дом',
+      MIN_PRICE: 5000
+    },
+    BUNGALO: {
+      TYPE: 'Бунгало',
+      MIN_PRICE: 0
+    }
+  };
   var SizeMainPin = {
     WIDTH: 65,
     HEIGHT: 65,
@@ -113,7 +130,7 @@
     };
     setMinPrice(offer, inputFieldElement);
   };
-  getDefaultMinPrice(selectTypeOfferElement, data.offers, priceElement);
+  getDefaultMinPrice(selectTypeOfferElement, OfferMinPriceMap, priceElement);
 
   /**
    * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
@@ -156,7 +173,7 @@
       case 'type':
         var offer = {
           selectedOption: getSelectedOption(evt.target),
-          offersObj: data.offers
+          offersObj: OfferMinPriceMap
         };
         setMinPrice(offer, priceElement);
         break;
