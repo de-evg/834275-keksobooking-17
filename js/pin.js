@@ -2,6 +2,7 @@
 
 (function () {
   var utils = window.utils;
+  var debounce = window.debounce;
   var data = window.data;
   var main = window.main;
   var form = window.form;
@@ -38,24 +39,24 @@
   /**
    * Обновляет массив до необходимого количство объектов с данными для метки.
    *
-   * @param {Array} dataArray - массив с объектами для генерации меток.
+   * @param {Array} filteredData - массив с объектами для генерации меток.
    * @param {Object} pinsSettings - перечисление параметров меток.
    * @return {Array} обновленный массив.
    */
-  var getUpdatedData = function (dataArray, pinsSettings) {
-    return dataArray.slice(0, pinsSettings.MAX_PINS);
+  var sliceToRequriedOffers = function (filteredData, pinsSettings) {
+    return filteredData.slice(0, pinsSettings.MAX_PINS);
   };
 
   /**
    * Генерирует необходимое количество меток и добавляет их в DOM.
    *
-   * @param {Array} updatedData - массив с данными для рендера меток.
+   * @param {Array} requriedOffers - массив с данными для рендера меток.
    * @param {Object} pinsSettings - перечисление параметров меток.
    * @param {Object} cardData - объект с данными для карточки.
    */
-  var getPins = function (updatedData, pinsSettings, cardData) {
+  var getPins = function (requriedOffers, pinsSettings, cardData) {
     var fragment = document.createDocumentFragment();
-    updatedData.forEach(function (offer, i) {
+    requriedOffers.forEach(function (offer, i) {
       fragment.appendChild(generatePin(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN, cardData));
     });
     utils.nodePinList.appendChild(fragment);
@@ -68,33 +69,34 @@
    * @param {Object} pinsSettings - перечисление параметров меток.
    */
   var renderPins = function (loadedData, pinsSettings) {
-    var updatedData = getUpdatedData(loadedData, pinsSettings);
+    var requriedOffers = sliceToRequriedOffers(loadedData, pinsSettings);
     var dataForCard = {};
-    getPins(updatedData, pinsSettings, dataForCard);
+    getPins(requriedOffers, pinsSettings, dataForCard);
 
     /**
-     * Фильтрует массив предложений.
+     * Обрабатывает изменение фильтра.
      *
      * @param {Object} evt - DOM объект собыитя.
      */
-    var filterData = function (evt) {
-      removePins();
-      createFilterMap(evt.target, FiltersMap);
-      var filteredData = filteringData(loadedData, evt.target, FiltersMap);
-      updatedData = getUpdatedData(filteredData, pinsSettings);
-      window.setTimeout(function () {
-        getPins(updatedData, pinsSettings, dataForCard);
-      }, 500);
+    var onFilterChange = function (evt) {
+      updateFiltersMap(evt.target, FiltersMap);
+      debounce.set(function () {
+        card.close();
+        removePins();
+        var filteredData = filteringData(loadedData, evt.target, FiltersMap);
+        requriedOffers = sliceToRequriedOffers(filteredData, pinsSettings);
+        getPins(requriedOffers, pinsSettings, dataForCard);
+      });
     };
-    utils.nodeFormMapFilters.addEventListener('change', filterData);
+    utils.nodeFormMapFilters.addEventListener('change', onFilterChange);
 
     /**
-     * Наполняет перечисление примененных фильтров.
+     * Перечисляет примененные фильтры.
      *
-     * @param {Object} filterElement - node полученный по событию.
+     * @param {Object} filterElement - измененный фильтр.
      * @param {Object} filtersMap - перечисление примененных фильтров
      */
-    var createFilterMap = function (filterElement, filtersMap) {
+    var updateFiltersMap = function (filterElement, filtersMap) {
       var filterName = filterElement.id;
       var value = filterElement.value;
       if (value === 'any' || filterElement.checked === false) {
@@ -188,7 +190,7 @@
     utils.nodePinList.addEventListener('click', onPinClick);
 
     utils.nodeFormAd.addEventListener('reset', function () {
-      clearPage();
+      clearMap();
     });
   };
 
@@ -217,7 +219,7 @@
   /**
    * Возвращает страницу в исходное состояние.
    */
-  var clearPage = function () {
+  var clearMap = function () {
     resetPin();
     main.mapDisabled = true;
     removePins();
@@ -315,7 +317,7 @@
 
   window.pin = {
     remove: removePins,
-    clear: clearPage,
+    clear: clearMap,
     filters: FiltersMap
   };
 })();
