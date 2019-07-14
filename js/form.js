@@ -3,6 +3,23 @@
 (function () {
   var utils = window.utils;
   var main = window.main;
+  var selectTypeOfferElement = utils.nodeFormAd.querySelector('#type');
+  var selectTimeInElement = utils.nodeFormAd.querySelector('#timein');
+  var selectTimeOutElement = utils.nodeFormAd.querySelector('#timeout');
+  var selectRoomElement = utils.nodeFormAd.querySelector('#room_number');
+  var selectCapacityElement = utils.nodeFormAd.querySelector('#capacity');
+  var priceElement = utils.nodeFormAd.querySelector('#price');
+  var addressElement = utils.nodeFormAd.querySelector('#address');
+
+  var TimeMap = {
+    TYPE: selectTypeOfferElement,
+    TIMEIN: selectTimeOutElement,
+    TIMEOUT: selectTimeInElement,
+    ROOM: selectRoomElement,
+    CAPACITY: selectCapacityElement,
+    PRICE: priceElement
+  };
+
   var OfferMinPriceMap = {
     PALACE: {
       TYPE: 'Дворец',
@@ -54,13 +71,49 @@
     PRICE: '1000'
   };
 
-  var selectTypeOfferElement = utils.nodeFormAd.querySelector('#type');
-  var selectTimeInElement = utils.nodeFormAd.querySelector('#timein');
-  var selectTimeOutElement = utils.nodeFormAd.querySelector('#timeout');
-  var selectRoomElement = utils.nodeFormAd.querySelector('#room_number');
-  var selectCapacityElement = utils.nodeFormAd.querySelector('#capacity');
-  var priceElement = utils.nodeFormAd.querySelector('#price');
-  var addressElement = utils.nodeFormAd.querySelector('#address');
+  var Selector = {
+    TYPE: {
+      setMinPrice: function (targetElement, offersType, inputFieldElement) {
+        var attribute = offersType[targetElement.value.toUpperCase()].MIN_PRICE;
+        inputFieldElement.min = attribute;
+        inputFieldElement.placeholder = attribute;
+      }
+    },
+    TIMEIN: {
+      setTime: function (evtChangeTime, timeMap) {
+        timeMap[evtChangeTime.target.id.toUpperCase()].value = evtChangeTime.target.value;
+      }
+    },
+    TIMEOUT: {
+      setTime: function (evtChangeTime, timeMap) {
+        timeMap[evtChangeTime.target.id.toUpperCase()].value = evtChangeTime.target.value;
+      }
+    },
+    ROOM_NUMBER: {
+      validateCapacity: function (rooms, selectedRoom, selectedCapacity) {
+        var maxCapacity = rooms[selectedRoom.value].value.slice().filter(function (capacityPossiblyValue) {
+          return capacityPossiblyValue === selectedCapacity.value;
+        });
+        if (maxCapacity <= selectedCapacity.value && maxCapacity.length > 0) {
+          selectCapacityElement.setCustomValidity('');
+        } else {
+          selectCapacityElement.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
+        }
+      }
+    },
+    CAPACITY: {
+      validateCapacity: function (rooms, selectedRoom, selectedCapacity) {
+        var maxCapacity = rooms[selectedRoom.value].value.slice().filter(function (capacityPossiblyValue) {
+          return capacityPossiblyValue === selectedCapacity.value;
+        });
+        if (maxCapacity <= selectedCapacity.value && maxCapacity.length > 0) {
+          selectCapacityElement.setCustomValidity('');
+        } else {
+          selectCapacityElement.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
+        }
+      }
+    }
+  };
 
   /**
    * Генерирует и изменяет значения координат главной метки в поле адреса в форме.
@@ -84,20 +137,6 @@
   generateAddress(StartUserPinCoordinate, SizeMainPin, main.mapDisabled);
 
   /**
-   * Устанавливает плейсхолдер и минимальное значение для цены
-   * в зависимости от типа предолжения
-   *
-   * @param {Object} offer - объект с параметрами выбранного типа.
-   * @param {Object} inputFieldElement - DOM элемент для которго устанавилваются атрибуты
-   */
-  var setMinPrice = function (offer, inputFieldElement) {
-    var typeOffer = offer.selectedOption.value.toUpperCase();
-    var attribute = offer.offersObj[typeOffer].MIN_PRICE;
-    inputFieldElement.min = attribute;
-    inputFieldElement.placeholder = attribute;
-  };
-
-  /**
    * Получает объект option в состоянии selected
    *
    * @param {Collection} select - коллекция option
@@ -115,83 +154,25 @@
     return selectedOption;
   };
 
-  /**
-   * Устанавливает плейсхолдер и минимальное значение цены
-   * для option в состоянии selected по-умолчанию
-   *
-   * @param {Collection} select - коллекция option
-   * @param {Object} offers - перечисление типов предложений
-   * @param {Object} inputFieldElement - DOM элемент для которго устанавилваются атрибуты
-   */
-  var getDefaultMinPrice = function (select, offers, inputFieldElement) {
-    var offer = {
-      selectedOption: getSelectedOption(select),
-      offersObj: offers
-    };
-    setMinPrice(offer, inputFieldElement);
-  };
-  getDefaultMinPrice(selectTypeOfferElement, OfferMinPriceMap, priceElement);
-
-  /**
-   * Устанавливает время выселения в зависимости от выбранного времени заселения и наоборот
-   *
-   * @param {Object} selectedTime - выбранный option
-   * @param {Collection} syncTimes - коллекция option, значение одного из них
-   * должно быть аналогично selectedTime и выбрано как selected
-   */
-  var setTime = function (selectedTime, syncTimes) {
-    var syncTimesOptions = Array.from(syncTimes);
-    syncTimesOptions.forEach(function (option) {
-      if (option.value === selectedTime.value) {
-        option.selected = true;
-      }
-    });
-  };
-
-  /**
-   * Устанавливает количество мест в зависимости от выбранного количества комнат
-   *
-   * @param {Object} selectedRoom - выбранное количество комнат
-   * @param {Object} capacity - коллекция option, значение одного из них
-   * должно быть выбрано в зависимости от selectedRoom
-   * @param {Object} rooms - перечисление комнат и их свойств
-   */
-  var validateCapacity = function (selectedRoom, capacity, rooms) {
-    var maxCapacity = rooms[selectedRoom.value].value.slice().filter(function (capacityPossiblyValue) {
-      return capacityPossiblyValue === capacity.value;
-    });
-    if (maxCapacity <= capacity.value && maxCapacity.length > 0) {
-      capacity.setCustomValidity('');
-    } else {
-      capacity.setCustomValidity(Rooms[selectedRoom.value].validateMessage);
-    }
-  };
-  validateCapacity(getSelectedOption(selectRoomElement), selectCapacityElement, Rooms);
+  Selector.TYPE.setMinPrice(selectTypeOfferElement, OfferMinPriceMap, priceElement);
+  Selector.CAPACITY.validateCapacity(Rooms, getSelectedOption(selectRoomElement), getSelectedOption(selectCapacityElement), selectCapacityElement);
 
   utils.nodeFormAd.addEventListener('change', function (evt) {
     switch (evt.target.id) {
       case 'type':
-        var offer = {
-          selectedOption: getSelectedOption(evt.target),
-          offersObj: OfferMinPriceMap
-        };
-        setMinPrice(offer, priceElement);
+        Selector[evt.target.id.toUpperCase()].setMinPrice(evt.target, OfferMinPriceMap, priceElement);
         break;
       case 'timein':
-        var selectedOption = getSelectedOption(evt.target);
-        setTime(selectedOption, selectTimeOutElement);
+        Selector[evt.target.id.toUpperCase()].setTime(evt, TimeMap);
         break;
       case 'timeout':
-        selectedOption = getSelectedOption(evt.target);
-        setTime(selectedOption, selectTimeInElement);
+        Selector[evt.target.id.toUpperCase()].setTime(evt, TimeMap);
         break;
       case 'room_number':
-        selectedOption = getSelectedOption(evt.target);
-        validateCapacity(selectedOption, selectCapacityElement, Rooms);
+        Selector[evt.target.id.toUpperCase()].validateCapacity(Rooms, evt.target, getSelectedOption(selectCapacityElement), selectCapacityElement);
         break;
       case 'capacity':
-        selectedOption = getSelectedOption(selectRoomElement);
-        validateCapacity(selectedOption, evt.target, Rooms);
+        Selector[evt.target.id.toUpperCase()].validateCapacity(Rooms, getSelectedOption(selectRoomElement), evt.target, selectCapacityElement);
         break;
     }
   });
@@ -204,7 +185,6 @@
     utils.nodeFormAd.reset();
     priceElement.placeholder = DeafultFormValues['PRICE'];
     addressElement.placeholder = DeafultFormValues['ADDRESS'];
-
   };
 
   utils.nodeFormAd.addEventListener('reset', function () {

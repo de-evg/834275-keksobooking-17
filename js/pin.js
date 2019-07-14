@@ -6,6 +6,10 @@
   var main = window.main;
   var form = window.form;
   var card = window.card;
+  var StartIndexForSlice = {
+    FILTER_NAME: 7,
+    TARGET_ID: 3
+  };
   var FiltersMap = {};
   var Type = {
     PALACE: 'Дворец',
@@ -18,6 +22,11 @@
     MAX_X: 1200,
     MIN_Y: 130,
     MAX_Y: 630
+  };
+  var FilterPriceValue = {
+    LOW: [10000],
+    MIDDLE: [10000, 50000],
+    HIGH: [50000]
   };
 
   /**
@@ -114,71 +123,71 @@
     /**
      * Фильтрует массив предложений.
      *
-     * @param {Array} dataArray - массив с предложениями.
+     * @param {Array} dataOffers - массив с предложениями.
      * @param {Object} changedFilterElement - тип предложения
      * @param {Object} filtersMap - перечисление примененных фильтров
      * @return {Array} отфильтрованный массив
      */
-    var filteringData = function (dataArray, changedFilterElement, filtersMap) {
+    var filteringData = function (dataOffers, changedFilterElement, filtersMap) {
       var filterNames = Object.keys(filtersMap);
       if (filterNames.length === 0) {
-        return dataArray;
+        return dataOffers;
       } else {
-        var newData = dataArray.slice();
-        filterNames.forEach(function (filter) {
-          switch (filter) {
+        var newDataOffers = dataOffers.slice();
+        filterNames.forEach(function (filterName) {
+          switch (filterName) {
             case 'housing-type':
-              newData = newData.filter(function (currentOffer) {
-                return currentOffer.offer.type === filtersMap[filter];
+              newDataOffers = newDataOffers.filter(function (currentOffer) {
+                return currentOffer.offer.type === filtersMap[filterName];
               });
               break;
 
             case 'housing-rooms':
-              newData = newData.filter(function (currentOffer) {
-                return currentOffer.offer.rooms === +filtersMap[filter];
+              newDataOffers = newDataOffers.filter(function (currentOffer) {
+                return currentOffer.offer.rooms === +filtersMap[filterName];
               });
               break;
 
             case 'housing-price':
-              switch (filtersMap[filter]) {
+              switch (filtersMap[filterName]) {
                 case 'low':
-                  newData = newData.filter(function (currentOffer) {
-                    return currentOffer.offer.price < 10000;
+                  newDataOffers = newDataOffers.filter(function (currentOffer) {
+                    return currentOffer.offer.price < FilterPriceValue.LOW[0];
                   });
                   break;
                 case 'middle':
-                  newData = newData.filter(function (currentOffer) {
-                    return currentOffer.offer.price >= 10000 && currentOffer.offer.price < 50000;
+                  newDataOffers = newDataOffers.filter(function (currentOffer) {
+                    return currentOffer.offer.price >= FilterPriceValue.MIDDLE[0] && currentOffer.offer.price < FilterPriceValue.MIDDLE[1];
                   });
                   break;
                 case 'high':
-                  newData = newData.filter(function (currentOffer) {
-                    return currentOffer.offer.price > 50000;
+                  newDataOffers = newDataOffers.filter(function (currentOffer) {
+                    return currentOffer.offer.price > FilterPriceValue.HIGH[0];
                   });
                   break;
               }
               break;
 
             case 'housing-guests':
-              newData = newData.filter(function (currentOffer) {
-                if (currentOffer.offer.guests === 0) {
-                  return currentOffer.offer.guests === +filtersMap[filter];
+              newDataOffers = newDataOffers.filter(function (currentOffer) {
+                if (!currentOffer.offer.guests) {
+                  return currentOffer.offer.guests === +filtersMap[filterName];
                 } else {
-                  return currentOffer.offer.guests >= +filtersMap[filter] && +filtersMap[filter] !== 0;
+                  return currentOffer.offer.guests >= +filtersMap[filterName] && !!(+filtersMap[filterName]);
                 }
 
               });
               break;
-            case 'filter-' + filter.slice(7):
-              newData = newData.filter(function (currentOffer) {
-                var indexOfFilter = currentOffer.offer.features.indexOf(filter.slice(7));
-                return currentOffer.offer.features[indexOfFilter] === filtersMap[filter];
+            case 'filter-' + filterName.slice(StartIndexForSlice.FILTER_NAME):
+              newDataOffers = newDataOffers.filter(function (currentOffer) {
+                var indexOfFilter = currentOffer.offer.features.indexOf(filterName.slice(StartIndexForSlice.FILTER_NAME));
+                return currentOffer.offer.features[indexOfFilter] === filtersMap[filterName];
               });
               break;
           }
         });
       }
-      return newData;
+      return newDataOffers;
     };
 
     /**
@@ -187,9 +196,9 @@
      * @param {Object} evt - DOM объект собыитя.
      */
     var onPinClick = function (evt) {
-      if (dataForCard[evt.target.id.slice(3)]) {
+      if (dataForCard[evt.target.id.slice(StartIndexForSlice.TARAGET_ID)]) {
         card.close();
-        card.render(utils.nodesTemplate, dataForCard[evt.target.id.slice(3)], Type);
+        card.render(utils.nodesTemplate, dataForCard[evt.target.id.slice(StartIndexForSlice.TARAGET_ID)], Type);
       }
     };
     utils.nodePinList.addEventListener('click', onPinClick);
