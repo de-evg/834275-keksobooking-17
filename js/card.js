@@ -12,7 +12,7 @@
    * @param {Object} types - словарь типа меток (eng: рус).
    * @return {Object} cardElement - DOM элемент карточки с предложением
    */
-  var generateCard = function (template, dataForCard, types) {
+  var generateCardElement = function (template, dataForCard, types) {
     var cardElement = template.CARD.cloneNode(true);
     cardElement.querySelector('img').src = dataForCard.author.avatar;
     cardElement.querySelector('.popup__title').textContent = dataForCard.offer.title;
@@ -69,14 +69,14 @@
    * @param {Object} types - словарь типа меток (eng: рус).
    */
   var renderCard = function (template, dataForCard, types) {
-    var generatedCardElement = generateCard(template, dataForCard, types);
+    var generatedCardElement = generateCardElement(template, dataForCard, types);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(generatedCardElement);
     utils.nodeFiltersContainer.before(fragment);
 
     var renderedCardElement = utils.nodeMap.querySelector('.map__card');
     var cardCloseElement = renderedCardElement.querySelector('.popup__close');
-    cardCloseElement.addEventListener('click', closeCard);
+    cardCloseElement.addEventListener('click', onButtonCloseClick);
     window.addEventListener('keydown', onCardEscPress);
   };
 
@@ -84,7 +84,7 @@
    * Закрывает карту.
    *
    */
-  var closeCard = function () {
+  var onButtonCloseClick = function () {
     if (utils.nodeMap.querySelector('.map__card')) {
       var currentCard = utils.nodeMap.querySelector('.map__card');
       utils.nodeMap.removeChild(currentCard);
@@ -97,14 +97,14 @@
    */
   var onCardEscPress = function (evt) {
     if (evt.keyCode === ESC_CODE) {
-      closeCard();
+      onButtonCloseClick();
     }
   };
 
   window.card = {
-    getCard: generateCard,
+    getCard: generateCardElement,
     render: renderCard,
-    close: closeCard,
+    close: onButtonCloseClick,
     escCode: ESC_CODE
   };
 })();

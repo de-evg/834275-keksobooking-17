@@ -11,6 +11,7 @@
     TARGET_ID: 3
   };
   var FiltersMap = {};
+  var dataForCard = {};
   var Type = {
     PALACE: 'Дворец',
     FLAT: 'Квартира',
@@ -39,15 +40,15 @@
    * @param {Object} cardData - объект с данными для карточки.
    * @return {Object} pinElement - измененный склонированный элемент.
    */
-  var generatePin = function (pinProperties, numberProperties, widthPin, heightPin, cardData) {
+  var generatePin = function (pinProperties, numberProperties, widthPin, heightPin) {
     var pinElement = utils.nodesTemplate.PIN.cloneNode(true);
     var pinImg = pinElement.querySelector('img');
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
     pinImg.src = pinProperties.author.avatar;
     pinImg.alt = 'Метка похожего объявления';
     pinImg.id = 'img' + numberProperties;
-    pinElement.id = numberProperties;
-    cardData[numberProperties] = pinProperties;
+    pinElement.id = 'pin' + numberProperties;
+    dataForCard[numberProperties] = pinProperties;
     return pinElement;
   };
 
@@ -69,10 +70,10 @@
    * @param {Object} pinsSettings - перечисление параметров меток.
    * @param {Object} cardData - объект с данными для карточки.
    */
-  var getPins = function (requriedOffers, pinsSettings, cardData) {
+  var getPins = function (requriedOffers, pinsSettings) {
     var fragment = document.createDocumentFragment();
     requriedOffers.forEach(function (offer, i) {
-      var generatedPin = generatePin(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN, cardData);
+      var generatedPin = generatePin(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN);
       fragment.appendChild(generatedPin);
     });
     utils.nodePinList.appendChild(fragment);
@@ -86,8 +87,7 @@
    */
   var renderPins = function (loadedData, pinsSettings) {
     var requriedOffers = sliceToRequriedOffers(loadedData, pinsSettings);
-    var dataForCard = {};
-    getPins(requriedOffers, pinsSettings, dataForCard);
+    getPins(requriedOffers, pinsSettings);
 
     /**
      * Обрабатывает изменение фильтра.
@@ -101,7 +101,7 @@
         removePins();
         var filteredData = filteringData(loadedData, evt.target, FiltersMap);
         requriedOffers = sliceToRequriedOffers(filteredData, pinsSettings);
-        getPins(requriedOffers, pinsSettings, dataForCard);
+        getPins(requriedOffers, pinsSettings);
       });
     };
     utils.nodeFormMapFilters.addEventListener('change', onFilterChange);
