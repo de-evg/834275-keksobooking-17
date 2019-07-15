@@ -38,6 +38,7 @@
       MIN_PRICE: 0
     }
   };
+
   var SizeMainPin = {
     WIDTH: 65,
     HEIGHT: 65,
@@ -127,53 +128,40 @@
     return selectedOption;
   };
 
+  var setMinPrice = function () {
+    var selectedOption = getSelectedOption(selectTypeOfferElement);
+    var attribute = OfferMinPriceMap[selectedOption.value.toUpperCase()].MIN_PRICE;
+    priceElement.min = attribute;
+    priceElement.placeholder = attribute;
+  };
+
+  var setTime = function (evtChange) {
+    TimeMap[evtChange.target.id.toUpperCase()].value = evtChange.target.value;
+  };
+
   var Selector = {
     TYPE: {
-      setMinPrice: function (targetElement, offersType, inputFieldElement) {
-        var attribute = offersType[targetElement.value.toUpperCase()].MIN_PRICE;
-        inputFieldElement.min = attribute;
-        inputFieldElement.placeholder = attribute;
-      }
+      updateForm: setMinPrice
     },
     TIMEIN: {
-      setTime: function (evtChangeTime, timeMap) {
-        timeMap[evtChangeTime.target.id.toUpperCase()].value = evtChangeTime.target.value;
-      }
+      updateForm: setTime
     },
     TIMEOUT: {
-      setTime: function (evtChangeTime, timeMap) {
-        timeMap[evtChangeTime.target.id.toUpperCase()].value = evtChangeTime.target.value;
-      }
+      updateForm: setTime
     },
     ROOM_NUMBER: {
-      validate: validateCapacity
+      updateForm: validateCapacity
     },
     CAPACITY: {
-      validate: validateCapacity
+      updateForm: validateCapacity
     }
   };
 
-  Selector.TYPE.setMinPrice(selectTypeOfferElement, OfferMinPriceMap, priceElement);
-  Selector.CAPACITY.validate();
+  Selector.TYPE.updateForm();
+  Selector.CAPACITY.updateForm();
 
   utils.nodeFormAd.addEventListener('change', function (evt) {
-    switch (evt.target.id) {
-      case 'type':
-        Selector[evt.target.id.toUpperCase()].setMinPrice(evt.target, OfferMinPriceMap, priceElement);
-        break;
-      case 'timein':
-        Selector[evt.target.id.toUpperCase()].setTime(evt, TimeMap);
-        break;
-      case 'timeout':
-        Selector[evt.target.id.toUpperCase()].setTime(evt, TimeMap);
-        break;
-      case 'room_number':
-        Selector[evt.target.id.toUpperCase()].validate();
-        break;
-      case 'capacity':
-        Selector[evt.target.id.toUpperCase()].validate();
-        break;
-    }
+    Selector[evt.target.id.toUpperCase()].updateForm(evt);
   });
 
   /**
