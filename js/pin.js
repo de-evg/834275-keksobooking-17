@@ -41,11 +41,12 @@
    */
   var generatePin = function (pinProperties, numberProperties, widthPin, heightPin, cardData) {
     var pinElement = utils.nodesTemplate.PIN.cloneNode(true);
+    var pinImg = pinElement.querySelector('img');
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
-    pinElement.querySelector('img').src = pinProperties.author.avatar;
-    pinElement.querySelector('img').alt = 'Метка похожего объявления';
-    pinElement.querySelector('img').id = 'img' + numberProperties;
-    pinElement.id = 'pin' + numberProperties;
+    pinImg.src = pinProperties.author.avatar;
+    pinImg.alt = 'Метка похожего объявления';
+    pinImg.id = 'img' + numberProperties;
+    pinElement.id = numberProperties;
     cardData[numberProperties] = pinProperties;
     return pinElement;
   };
@@ -71,7 +72,8 @@
   var getPins = function (requriedOffers, pinsSettings, cardData) {
     var fragment = document.createDocumentFragment();
     requriedOffers.forEach(function (offer, i) {
-      fragment.appendChild(generatePin(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN, cardData));
+      var generatedPin = generatePin(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN, cardData);
+      fragment.appendChild(generatedPin);
     });
     utils.nodePinList.appendChild(fragment);
   };
@@ -196,9 +198,9 @@
      * @param {Object} evt - DOM объект собыитя.
      */
     var onPinClick = function (evt) {
-      if (dataForCard[evt.target.id.slice(StartIndexForSlice.TARAGET_ID)]) {
+      if (dataForCard[evt.target.id.slice(StartIndexForSlice.TARGET_ID)]) {
         card.close();
-        card.render(utils.nodesTemplate, dataForCard[evt.target.id.slice(StartIndexForSlice.TARAGET_ID)], Type);
+        card.render(utils.nodesTemplate, dataForCard[evt.target.id.slice(StartIndexForSlice.TARGET_ID)], Type);
       }
     };
     utils.nodePinList.addEventListener('click', onPinClick);
