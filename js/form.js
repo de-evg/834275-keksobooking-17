@@ -128,6 +128,10 @@
     return selectedOption;
   };
 
+  /**
+   * Устанавливает минимальную цену в зависимости от типа жилья
+   *
+   */
   var setMinPrice = function () {
     var selectedOption = getSelectedOption(selectTypeOfferElement);
     var attribute = OfferMinPriceMap[selectedOption.value.toUpperCase()].MIN_PRICE;
@@ -135,6 +139,11 @@
     priceElement.placeholder = attribute;
   };
 
+  /**
+   * Устанавливает минимальную цену в зависимости от типа жилья
+   *
+   * @param {Object} evtChange - событие изменения элмента формы
+   */
   var setTime = function (evtChange) {
     TimeMap[evtChange.target.id.toUpperCase()].value = evtChange.target.value;
   };
