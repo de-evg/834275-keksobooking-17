@@ -50,7 +50,7 @@
   };
 
   var DeafultFormValues = {
-    ADDRESS: '602, 462',
+    ADDRESS: '602, 407',
     PRICE: '1000'
   };
 
@@ -168,7 +168,9 @@
   Selector.CAPACITY.updateForm();
 
   utils.nodeFormAd.addEventListener('change', function (evt) {
-    Selector[evt.target.id.toUpperCase()].updateForm(evt);
+    if (evt.target.tagName === 'SELECT') {
+      Selector[evt.target.id.toUpperCase()].updateForm(evt);
+    }
   });
 
   /**

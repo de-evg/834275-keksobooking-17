@@ -20,40 +20,42 @@
   };
 
   /**
-   * Добавляет popup в DOM при успешной отправке формы.
-   *
-   */
-  var showPopup = function () {
-    var successElement = utils.nodesTemplate.SUCCESS.cloneNode(true);
-    utils.nodeMain.appendChild(successElement);
-
-    window.addEventListener('click', removePopup);
-    window.addEventListener('keydown', onEscPress);
-  };
-
-  /**
    * Удаляет popup из DOM.
    *
    */
-  var removePopup = function () {
-    if (utils.nodeMain.querySelector('.success')) {
-      var successMessageElement = utils.nodeMain.querySelector('.success');
-      utils.nodeMain.removeChild(successMessageElement);
+  var onPopupClick = function () {
+    var successMessageElement = utils.nodeMain.querySelector('.success');
+    utils.nodeMain.removeChild(successMessageElement);
 
-      window.removeEventListener('click', removePopup);
-      window.removeEventListener('keydown', onEscPress);
-    }
+    window.removeEventListener('click', onPopupClick);
+    window.removeEventListener('keydown', onEscPress, true);
   };
 
   /**
    * Удаляет popup из DOM нажатием клаваиши ESC.
    *
-   * @param {Object} evtKeyPress - объект события DOM
+   * @param {Object} evt - объект события DOM
    */
-  var onEscPress = function (evtKeyPress) {
-    if (evtKeyPress.keyCode === card.escCode) {
-      removePopup();
+  var onEscPress = function (evt) {
+    if (evt.keyCode === card.escCode) {
+      onPopupClick();
     }
+  };
+
+  /**
+   * Добавляет popup в DOM при успешной отправке формы.
+   *
+   */
+  var showPopup = function () {
+    var successElement = utils.nodesTemplate.SUCCESS.cloneNode(true);
+    successElement.tabIndex = 1;
+    var fragment = document.createDocumentFragment(successElement);
+    fragment.appendChild(successElement);
+    utils.nodeMain.appendChild(fragment);
+    utils.nodeMain.querySelector('.success').focus();
+
+    window.addEventListener('click', onPopupClick);
+    window.addEventListener('keydown', onEscPress, true);
   };
 
   utils.nodeFormAd.addEventListener('submit', function (evt) {
