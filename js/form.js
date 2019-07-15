@@ -190,7 +190,6 @@
   window.form = {
     sizePin: SizeMainPin,
     address: generateAddress,
-    option: getSelectedOption,
     pinCoords: StartUserPinCoordinate,
     reset: resetForm
   };

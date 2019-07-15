@@ -395,8 +395,6 @@
   });
 
   window.pin = {
-    remove: removePins,
-    clear: clearMap,
-    filters: FiltersMap
+    clear: clearMap
   };
 })();

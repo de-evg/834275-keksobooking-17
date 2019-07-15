@@ -102,7 +102,6 @@
   };
 
   window.card = {
-    getCard: generateCardElement,
     render: renderCard,
     close: onButtonCloseClick,
     escCode: ESC_CODE

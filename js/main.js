@@ -65,7 +65,6 @@
   window.main = {
     mapDisabled: isMapDisabled,
     activate: activateMap,
-    disable: disableMap,
-    url: window.URL
+    disable: disableMap
   };
 })();
