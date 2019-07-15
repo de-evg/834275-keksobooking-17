@@ -95,7 +95,6 @@
    * @param {Object} startPinCoordinate - начальные координаты метки.
    * @param {Object} sizeMainPin - перечисление размеров метки
    * @param {boolean} flag - состояние активности карты
-   * @return {string} координаты метки
    */
   var generateAddress = function (startPinCoordinate, sizeMainPin, flag) {
     if (flag) {
@@ -106,7 +105,6 @@
       y = Math.floor((startPinCoordinate.Y + sizeMainPin.HEIGHT + sizeMainPin.POINTER_HEIGHT));
     }
     addressElement.value = x + ', ' + y;
-    return addressElement.value;
   };
   generateAddress(StartUserPinCoordinate, SizeMainPin, main.mapDisabled);
 
