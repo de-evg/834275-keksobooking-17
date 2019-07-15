@@ -25,9 +25,9 @@
     MAX_Y: 630
   };
   var FilterPriceValue = {
-    LOW: [10000],
+    LOW: [-Infinity, 10000],
     MIDDLE: [10000, 50000],
-    HIGH: [50000]
+    HIGH: [50000, Infinity]
   };
 
   /**
@@ -90,6 +90,117 @@
     getPins(requriedOffers, pinsSettings);
 
     /**
+     * Фильтрует данные по типу предложения.
+     *
+     * @param {Array} dataOffers - фильтруемые данные.
+     * @param {String} filterName - название примененного фильтра
+     * @param {Array} filtersMap - перечисление примененных фильтров
+     * @return {Array} dataOffers - отфильтрованные данные
+     */
+    var filteringType = function (dataOffers, filterName, filtersMap) {
+      dataOffers = dataOffers.filter(function (currentOffer) {
+        return currentOffer.offer.type === filtersMap[filterName];
+      });
+      return dataOffers;
+    };
+
+    /**
+     * Фильтрует данные по Количеству комнат.
+     *
+     * @param {Array} dataOffers - фильтруемые данные.
+     * @param {String} filterName - название примененного фильтра
+     * @param {Array} filtersMap - перечисление примененных фильтров
+     * @return {Array} dataOffers - отфильтрованные данные
+     */
+    var filteringRooms = function (dataOffers, filterName, filtersMap) {
+      dataOffers = dataOffers.filter(function (currentOffer) {
+        return currentOffer.offer.rooms === +filtersMap[filterName];
+      });
+      return dataOffers;
+    };
+
+    /**
+     * Фильтрует данные по цене.
+     *
+     * @param {Array} dataOffers - фильтруемые данные.
+     * @param {String} filterName - название примененного фильтра
+     * @param {Array} filtersMap - перечисление примененных фильтров
+     * @param {Object} filterPriceValues - перечисление значений цены с диапазоном цены
+     * @return {Array} dataOffers - отфильтрованные данные
+     */
+    var filteringPrice = function (dataOffers, filterName, filtersMap, filterPriceValues) {
+      var range = filterPriceValues[filtersMap[filterName].toUpperCase()];
+      dataOffers = dataOffers.filter(function (currentOffer) {
+        return currentOffer.offer.price >= range[0] && currentOffer.offer.price < range[1];
+      });
+      return dataOffers;
+    };
+
+    /**
+     * Фильтрует данные по количеству гостей.
+     *
+     * @param {Array} dataOffers - фильтруемые данные.
+     * @param {String} filterName - название примененного фильтра
+     * @param {Array} filtersMap - перечисление примененных фильтров
+     * @return {Array} dataOffers - отфильтрованные данные
+     */
+    var filteringGuests = function (dataOffers, filterName, filtersMap) {
+      dataOffers = dataOffers.filter(function (currentOffer) {
+        return !currentOffer.offer.guests ? currentOffer.offer.guests === +filtersMap[filterName] : currentOffer.offer.guests >= +filtersMap[filterName] && !!(+filtersMap[filterName]);
+      });
+      return dataOffers;
+    };
+
+    /**
+     * Фильтрует данные по наличию какой-либо особенности.
+     *
+     * @param {Array} dataOffers - фильтруемые данные.
+     * @param {String} filterName - название примененного фильтра
+     * @param {Array} filtersMap - перечисление примененных фильтров
+     * @return {Array} dataOffers - отфильтрованные данные
+     */
+    var filteringFeatures = function (dataOffers, filterName, filtersMap) {
+      dataOffers = dataOffers.filter(function (currentOffer) {
+        var indexOfFilter = currentOffer.offer.features.indexOf(filterName.slice(StartIndexForSlice.FILTER_NAME));
+        return currentOffer.offer.features[indexOfFilter] === filtersMap[filterName];
+      });
+      return dataOffers;
+    };
+
+    var Filter = {
+      'HOUSING-TYPE': {
+        employ: filteringType
+      },
+      'HOUSING-ROOMS': {
+        employ: filteringRooms
+      },
+      'HOUSING-PRICE': {
+        employ: filteringPrice
+      },
+      'HOUSING-GUESTS': {
+        employ: filteringGuests
+      },
+      'FILTER-WIFI': {
+        employ: filteringFeatures
+      },
+      'FILTER-DISHWASHER': {
+        employ: filteringFeatures
+      },
+      'FILTER-PARKING': {
+        employ: filteringFeatures
+      },
+      'FILTER-WASHER': {
+        employ: filteringFeatures
+      },
+      'FILTER-ELEVATOR': {
+        employ: filteringFeatures
+      },
+      'FILTER-CONDITIONER': {
+        employ: filteringFeatures
+      }
+    };
+
+    /**
      * Обрабатывает изменение фильтра.
      *
      * @param {Object} evt - DOM объект собыитя.
@@ -99,7 +210,7 @@
       debounce.set(function () {
         card.close();
         removePins();
-        var filteredData = filteringData(loadedData, evt.target, FiltersMap);
+        var filteredData = filteringData(loadedData, FiltersMap, Filter, FilterPriceValue);
         requriedOffers = sliceToRequriedOffers(filteredData, pinsSettings);
         getPins(requriedOffers, pinsSettings);
       });
@@ -126,67 +237,19 @@
      * Фильтрует массив предложений.
      *
      * @param {Array} dataOffers - массив с предложениями.
-     * @param {Object} changedFilterElement - тип предложения
      * @param {Object} filtersMap - перечисление примененных фильтров
+     * @param {Object} filters - перечисление всех фильтров
+     * @param {Object} filterPriceValues - перечисление значений цены с диапазоном цены.
      * @return {Array} отфильтрованный массив
      */
-    var filteringData = function (dataOffers, changedFilterElement, filtersMap) {
+    var filteringData = function (dataOffers, filtersMap, filters, filterPriceValues) {
       var filterNames = Object.keys(filtersMap);
       if (filterNames.length === 0) {
         return dataOffers;
       } else {
         var newDataOffers = dataOffers.slice();
         filterNames.forEach(function (filterName) {
-          switch (filterName) {
-            case 'housing-type':
-              newDataOffers = newDataOffers.filter(function (currentOffer) {
-                return currentOffer.offer.type === filtersMap[filterName];
-              });
-              break;
-
-            case 'housing-rooms':
-              newDataOffers = newDataOffers.filter(function (currentOffer) {
-                return currentOffer.offer.rooms === +filtersMap[filterName];
-              });
-              break;
-
-            case 'housing-price':
-              switch (filtersMap[filterName]) {
-                case 'low':
-                  newDataOffers = newDataOffers.filter(function (currentOffer) {
-                    return currentOffer.offer.price < FilterPriceValue.LOW[0];
-                  });
-                  break;
-                case 'middle':
-                  newDataOffers = newDataOffers.filter(function (currentOffer) {
-                    return currentOffer.offer.price >= FilterPriceValue.MIDDLE[0] && currentOffer.offer.price < FilterPriceValue.MIDDLE[1];
-                  });
-                  break;
-                case 'high':
-                  newDataOffers = newDataOffers.filter(function (currentOffer) {
-                    return currentOffer.offer.price > FilterPriceValue.HIGH[0];
-                  });
-                  break;
-              }
-              break;
-
-            case 'housing-guests':
-              newDataOffers = newDataOffers.filter(function (currentOffer) {
-                if (!currentOffer.offer.guests) {
-                  return currentOffer.offer.guests === +filtersMap[filterName];
-                } else {
-                  return currentOffer.offer.guests >= +filtersMap[filterName] && !!(+filtersMap[filterName]);
-                }
-
-              });
-              break;
-            case 'filter-' + filterName.slice(StartIndexForSlice.FILTER_NAME):
-              newDataOffers = newDataOffers.filter(function (currentOffer) {
-                var indexOfFilter = currentOffer.offer.features.indexOf(filterName.slice(StartIndexForSlice.FILTER_NAME));
-                return currentOffer.offer.features[indexOfFilter] === filtersMap[filterName];
-              });
-              break;
-          }
+          newDataOffers = filters[filterName.toUpperCase()].employ(newDataOffers, filterName, filtersMap, filterPriceValues);
         });
       }
       return newDataOffers;
