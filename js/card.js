@@ -5,15 +5,15 @@
   var ESC_CODE = 27;
 
   /**
-   * Заполняет склонированный шкаблон popup данными выбранного предложения.
+   * Заполняет склонированный HTML элемент данными выбранного предложения.
    *
+   * @param {Object} cardElement - склонированный HTML элемент
    * @param {Object} template - объект с данными для генерации новой карточки.
    * @param {Object} dataForCard - объекта с данными выбранного предложения
    * @param {Object} types - словарь типа меток (eng: рус).
    * @return {Object} cardElement - DOM элемент карточки с предложением
    */
-  var generateCardElement = function (template, dataForCard, types) {
-    var cardElement = template.CARD.cloneNode(true);
+  var generateCardElement = function (cardElement, template, dataForCard, types) {
     cardElement.querySelector('img').src = dataForCard.author.avatar;
     cardElement.querySelector('.popup__title').textContent = dataForCard.offer.title;
     cardElement.querySelector('.popup__text--address').textContent = dataForCard.offer.address;
@@ -65,11 +65,12 @@
    * Добавляет в DOM карту с предложением.
    *
    * @param {Object} template - объект с данными для генерации новой карточки.
-   * @param {Object} dataForCard - номер объекта с данными конкретной метки
+   * @param {Object} dataForCard - объект с данными конкретной метки
    * @param {Object} types - словарь типа меток (eng: рус).
    */
   var renderCard = function (template, dataForCard, types) {
-    var generatedCardElement = generateCardElement(template, dataForCard, types);
+    var cardElement = template.CARD.cloneNode(true);
+    var generatedCardElement = generateCardElement(cardElement, template, dataForCard, types);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(generatedCardElement);
     utils.nodeFiltersContainer.before(fragment);
@@ -88,6 +89,7 @@
     if (utils.nodeMap.querySelector('.map__card')) {
       var currentCard = utils.nodeMap.querySelector('.map__card');
       utils.nodeMap.removeChild(currentCard);
+      window.removeEventListener('keydown', onCardEscPress);
     }
   };
 

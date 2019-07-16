@@ -11,7 +11,6 @@
     TARGET_ID: 3
   };
   var FiltersMap = {};
-  var dataForCard = {};
   var Type = {
     PALACE: 'Дворец',
     FLAT: 'Квартира',
@@ -31,7 +30,7 @@
   };
 
   /**
-   * Генерирует объект с данными для метки.
+   * Генерирует HTML элемент для вставки в DOM.
    *
    * @param {Object} pinProperties - объект с данными для генерации новой метки.
    * @param {number} numberProperties - номер объекта с данными метки для формирования id
@@ -40,20 +39,18 @@
    * @param {Object} cardData - объект с данными для карточки.
    * @return {Object} pinElement - измененный склонированный элемент.
    */
-  var generatePin = function (pinProperties, numberProperties, widthPin, heightPin) {
+  var generatePinElement = function (pinProperties, numberProperties, widthPin, heightPin) {
     var pinElement = utils.nodesTemplate.PIN.cloneNode(true);
-    var pinImg = pinElement.querySelector('img');
+    var pinImgElement = pinElement.querySelector('img');
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
-    pinImg.src = pinProperties.author.avatar;
-    pinImg.alt = 'Метка похожего объявления';
-    pinImg.id = 'img' + numberProperties;
-    pinElement.id = 'pin' + numberProperties;
-    dataForCard[numberProperties] = pinProperties;
+    pinImgElement.src = pinProperties.author.avatar;
+    pinImgElement.alt = 'Метка похожего объявления';
+    pinElement.id = pinProperties.index;
     return pinElement;
   };
 
   /**
-   * Обновляет массив до необходимого количство объектов с данными для метки.
+   * Обрезает массив до необходимого количство объектов.
    *
    * @param {Array} filteredData - массив с объектами для генерации меток.
    * @param {Object} pinsSettings - перечисление параметров меток.
@@ -73,8 +70,8 @@
   var getPins = function (requriedOffers, pinsSettings) {
     var fragment = document.createDocumentFragment();
     requriedOffers.forEach(function (offer, i) {
-      var generatedPin = generatePin(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN);
-      fragment.appendChild(generatedPin);
+      var generatedPinElement = generatePinElement(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN);
+      fragment.appendChild(generatedPinElement);
     });
     utils.nodePinList.appendChild(fragment);
   };
@@ -86,6 +83,9 @@
    * @param {Object} pinsSettings - перечисление параметров меток.
    */
   var renderPins = function (loadedData, pinsSettings) {
+    loadedData.forEach(function (offer, i) {
+      offer.index = i;
+    });
     var requriedOffers = sliceToRequriedOffers(loadedData, pinsSettings);
     getPins(requriedOffers, pinsSettings);
 
@@ -261,9 +261,12 @@
      * @param {Object} evt - DOM объект собыитя.
      */
     var onPinClick = function (evt) {
-      if (dataForCard[evt.target.id.slice(StartIndexForSlice.TARGET_ID)]) {
+      if (evt.target.tagName === 'BUTTON' || (evt.target.parentElement.tagName === 'BUTTON' && !evt.target.parentElement.classList.contains('map__pin--main'))) {
         card.close();
-        card.render(utils.nodesTemplate, dataForCard[evt.target.id.slice(StartIndexForSlice.TARGET_ID)], Type);
+        var dataForCard = loadedData.filter(function (offer) {
+          return (offer.index + '') === evt.target.id || (offer.index + '') === evt.target.parentElement.id;
+        });
+        card.render(utils.nodesTemplate, dataForCard[0], Type);
       }
     };
     utils.nodePinList.addEventListener('click', onPinClick);
@@ -272,7 +275,6 @@
       clearMap();
     });
   };
-
 
   /**
    * Удаляет метки из DOM дерева.

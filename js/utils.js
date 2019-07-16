@@ -23,14 +23,10 @@
 
   /**
    * Показывает окно с ошибкой при ошибке загрузки данных с сервера.
-   * @param {Object} template - перечисление шаблонов
-   * @param {Object} parentElement - DOM элемент, в который добавится склонированный элемент
    */
   var onError = function () {
     var error = Template.ERROR.cloneNode(true);
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(error);
-    mainElement.appendChild(fragment);
+    mainElement.appendChild(error);
   };
 
   window.utils = {
