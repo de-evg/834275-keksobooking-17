@@ -75,8 +75,7 @@
     fragment.appendChild(generatedCardElement);
     utils.nodeFiltersContainer.before(fragment);
 
-    var renderedCardElement = utils.nodeMap.querySelector('.map__card');
-    var cardCloseElement = renderedCardElement.querySelector('.popup__close');
+    var cardCloseElement = utils.nodeMap.querySelector('.map__card .popup__close');
     cardCloseElement.addEventListener('click', onButtonCloseClick);
     window.addEventListener('keydown', onCardEscPress);
   };

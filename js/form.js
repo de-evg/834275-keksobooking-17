@@ -86,6 +86,12 @@
       validateMessage: 'Для этого предложения возможно размещение не более 3 гостей'
     }
   };
+
+  var ImageRoomSize = {
+    WIDTH: 70,
+    HEIGHT: 70
+  };
+
   /**
    * Проверяет соответствует ли количество комнат количеству гостей.
    *
@@ -184,8 +190,8 @@
   var insertRoomImage = function (changedElement, image) {
     var photos = utils.nodeFormAd.querySelector('.ad-form__photo');
     var img = image.cloneNode(true);
-    img.width = 70;
-    img.height = 70;
+    img.width = ImageRoomSize.WIDTH;
+    img.height = ImageRoomSize.HEIGHT;
     insertUserImage(changedElement, img);
     var fragment = document.createDocumentFragment();
     if (photos.querySelector('img')) {
