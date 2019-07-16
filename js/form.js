@@ -10,6 +10,8 @@
   var selectCapacityElement = utils.nodeFormAd.querySelector('#capacity');
   var priceElement = utils.nodeFormAd.querySelector('#price');
   var addressElement = utils.nodeFormAd.querySelector('#address');
+  var userAvatar = utils.nodeFormAd.querySelector('.ad-form-header__preview img');
+  var photoContainer = utils.nodeFormAd.querySelector('.ad-form__photo-container');
 
   var TimeMap = {
     TYPE: selectTypeOfferElement,
@@ -51,7 +53,8 @@
 
   var DeafultFormValues = {
     ADDRESS: '602, 407',
-    PRICE: '1000'
+    PRICE: '1000',
+    AVATAR: 'img/muffin-grey.svg'
   };
 
   var Rooms = {
@@ -138,6 +141,61 @@
   };
 
   /**
+   * Устанавилвает адрес для изображения из вставленного в input файла
+   *
+   * @param {Object} changedElement - измененный элемент формы (input)
+   * @param {Object} image - обновляемый html объект изображения
+   */
+  var insertUserImage = function (changedElement, image) {
+    var file = changedElement.files[0];
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      image.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  /**
+   * Добавляет изображения в DOM
+   *
+   * @param {Object} changedElement - измененный элемент формы (input)
+   * @param {Object} image - обновляемый DOM объект изображения
+   */
+  var insertRoomImage = function (changedElement, image) {
+    var photos = utils.nodeFormAd.querySelector('.ad-form__photo');
+    var img = image.cloneNode(true);
+    img.width = 70;
+    img.height = 70;
+    insertUserImage(changedElement, img);
+    var fragment = document.createDocumentFragment();
+    if (photos.querySelector('img')) {
+      var photosTemplate = photos.cloneNode(false);
+      photosTemplate.appendChild(img);
+      fragment.appendChild(photosTemplate);
+      photoContainer.appendChild(fragment);
+    } else {
+      fragment.appendChild(img);
+      photos.appendChild(fragment);
+    }
+  };
+
+  var resetUserAvatar = function (defaultValues) {
+    userAvatar.src = defaultValues.AVATAR;
+  };
+
+  var resetRoomImages = function () {
+    var photos = utils.nodeFormAd.querySelector('.ad-form__photo');
+    var photosTemplate = photos.cloneNode(false);
+    var allPhotos = utils.nodeFormAd.querySelectorAll('.ad-form__photo');
+    allPhotos.forEach(function (photo) {
+      photoContainer.removeChild(photo);
+    });
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(photosTemplate);
+    photoContainer.appendChild(fragment);
+  };
+
+  /**
    * Устанавливает минимальную цену в зависимости от типа жилья
    *
    * @param {Object} evtChange - событие изменения элмента формы
@@ -164,12 +222,30 @@
     }
   };
 
+  var UserImage = {
+    AVATAR: {
+      insert: insertUserImage,
+      reset: resetUserAvatar
+    },
+    IMAGES: {
+      insert: insertRoomImage,
+      reset: resetRoomImages
+    }
+  };
+
   Selector.TYPE.updateForm();
   Selector.CAPACITY.updateForm();
 
   utils.nodeFormAd.addEventListener('change', function (evt) {
-    if (evt.target.tagName === 'SELECT') {
-      Selector[evt.target.id.toUpperCase()].updateForm(evt);
+    switch (evt.target.tagName) {
+      case 'SELECT':
+        Selector[evt.target.id.toUpperCase()].updateForm(evt);
+        break;
+      case 'INPUT':
+        if (evt.target.type === 'file') {
+          UserImage[evt.target.name.toUpperCase()].insert(evt.target, userAvatar);
+        }
+        break;
     }
   });
 
@@ -181,6 +257,8 @@
     utils.nodeFormAd.reset();
     priceElement.placeholder = DeafultFormValues['PRICE'];
     addressElement.placeholder = DeafultFormValues['ADDRESS'];
+    UserImage.AVATAR.reset(DeafultFormValues);
+    UserImage.IMAGES.reset();
   };
 
   utils.nodeFormAd.addEventListener('reset', function () {
