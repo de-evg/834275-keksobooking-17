@@ -8,17 +8,6 @@
   var card = window.card;
   var URL = 'https://js.dump.academy/keksobooking';
 
-
-  /**
-   * Сбрасывает страницу в исходное состояние и показывает сообщение после отправки формы.
-   *
-   */
-  var resetPage = function () {
-    pin.clear();
-    form.reset();
-    showPopup();
-  };
-
   /**
    * Удаляет popup из DOM.
    *
@@ -28,7 +17,7 @@
     utils.nodeMain.removeChild(successMessageElement);
 
     window.removeEventListener('click', onPopupClick);
-    window.removeEventListener('keydown', onEscPress, true);
+    window.removeEventListener('keydown', onEscPress);
   };
 
   /**
@@ -55,7 +44,17 @@
     utils.nodeMain.querySelector('.success').focus();
 
     window.addEventListener('click', onPopupClick);
-    window.addEventListener('keydown', onEscPress, true);
+    window.addEventListener('keydown', onEscPress);
+  };
+
+  /**
+   * Сбрасывает страницу в исходное состояние и показывает сообщение после отправки формы.
+   *
+   */
+  var resetPage = function () {
+    pin.clear();
+    form.reset();
+    showPopup();
   };
 
   utils.nodeFormAd.addEventListener('submit', function (evt) {

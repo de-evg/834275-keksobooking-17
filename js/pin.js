@@ -23,7 +23,7 @@
     MIN_Y: 130,
     MAX_Y: 630
   };
-  var FilterPriceValue = {
+  var PriceFilterValue = {
     LOW: [-Infinity, 10000],
     MIDDLE: [10000, 50000],
     HIGH: [50000, Infinity]
@@ -33,13 +33,12 @@
    * Генерирует HTML элемент для вставки в DOM.
    *
    * @param {Object} pinProperties - объект с данными для генерации новой метки.
-   * @param {number} numberProperties - номер объекта с данными метки для формирования id
    * @param {number} widthPin - ширина метки.
    * @param {number} heightPin - высота метки.
    * @param {Object} cardData - объект с данными для карточки.
    * @return {Object} pinElement - измененный склонированный элемент.
    */
-  var generatePinElement = function (pinProperties, numberProperties, widthPin, heightPin) {
+  var generatePinElement = function (pinProperties, widthPin, heightPin) {
     var pinElement = utils.nodesTemplate.PIN.cloneNode(true);
     var pinImgElement = pinElement.querySelector('img');
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
@@ -69,11 +68,11 @@
    */
   var getPins = function (requriedOffers, pinsSettings) {
     var fragment = document.createDocumentFragment();
-    requriedOffers.forEach(function (offer, i) {
-      var generatedPinElement = generatePinElement(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN);
+    requriedOffers.forEach(function (offer) {
+      var generatedPinElement = generatePinElement(offer, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN);
       fragment.appendChild(generatedPinElement);
     });
-    utils.nodePinList.appendChild(fragment);
+    utils.nodeMapPins.appendChild(fragment);
   };
 
   /**
@@ -94,7 +93,7 @@
      *
      * @param {Array} dataOffers - фильтруемые данные.
      * @param {String} filterName - название примененного фильтра
-     * @param {Array} filtersMap - перечисление примененных фильтров
+     * @param {Object} filtersMap - перечисление примененных фильтров
      * @return {Array} dataOffers - отфильтрованные данные
      */
     var filteringType = function (dataOffers, filterName, filtersMap) {
@@ -109,7 +108,7 @@
      *
      * @param {Array} dataOffers - фильтруемые данные.
      * @param {String} filterName - название примененного фильтра
-     * @param {Array} filtersMap - перечисление примененных фильтров
+     * @param {Object} filtersMap - перечисление примененных фильтров
      * @return {Array} dataOffers - отфильтрованные данные
      */
     var filteringRooms = function (dataOffers, filterName, filtersMap) {
@@ -124,12 +123,12 @@
      *
      * @param {Array} dataOffers - фильтруемые данные.
      * @param {String} filterName - название примененного фильтра
-     * @param {Array} filtersMap - перечисление примененных фильтров
-     * @param {Object} filterPriceValues - перечисление значений цены с диапазоном цены
+     * @param {Object} filtersMap - перечисление примененных фильтров
+     * @param {Object} priceFilterValues - перечисление значений цены с диапазоном цены
      * @return {Array} dataOffers - отфильтрованные данные
      */
-    var filteringPrice = function (dataOffers, filterName, filtersMap, filterPriceValues) {
-      var range = filterPriceValues[filtersMap[filterName].toUpperCase()];
+    var filteringPrice = function (dataOffers, filterName, filtersMap, priceFilterValues) {
+      var range = priceFilterValues[filtersMap[filterName].toUpperCase()];
       dataOffers = dataOffers.filter(function (currentOffer) {
         return currentOffer.offer.price >= range[0] && currentOffer.offer.price < range[1];
       });
@@ -141,7 +140,7 @@
      *
      * @param {Array} dataOffers - фильтруемые данные.
      * @param {String} filterName - название примененного фильтра
-     * @param {Array} filtersMap - перечисление примененных фильтров
+     * @param {Object} filtersMap - перечисление примененных фильтров
      * @return {Array} dataOffers - отфильтрованные данные
      */
     var filteringGuests = function (dataOffers, filterName, filtersMap) {
@@ -156,7 +155,7 @@
      *
      * @param {Array} dataOffers - фильтруемые данные.
      * @param {String} filterName - название примененного фильтра
-     * @param {Array} filtersMap - перечисление примененных фильтров
+     * @param {Object} filtersMap - перечисление примененных фильтров
      * @return {Array} dataOffers - отфильтрованные данные
      */
     var filteringFeatures = function (dataOffers, filterName, filtersMap) {
@@ -205,17 +204,17 @@
      *
      * @param {Object} evt - DOM объект собыитя.
      */
-    var onFilterChange = function (evt) {
+    var onMapFiltersChange = function (evt) {
       updateFiltersMap(evt.target, FiltersMap);
       debounce.set(function () {
         card.close();
         removePins();
-        var filteredData = filteringData(loadedData, FiltersMap, Filter, FilterPriceValue);
+        var filteredData = filteringData(loadedData, FiltersMap, Filter, PriceFilterValue);
         requriedOffers = sliceToRequriedOffers(filteredData, pinsSettings);
         getPins(requriedOffers, pinsSettings);
       });
     };
-    utils.nodeFormMapFilters.addEventListener('change', onFilterChange);
+    utils.nodeFormMapFilters.addEventListener('change', onMapFiltersChange);
 
     /**
      * Перечисляет примененные фильтры.
@@ -239,17 +238,17 @@
      * @param {Array} dataOffers - массив с предложениями.
      * @param {Object} filtersMap - перечисление примененных фильтров
      * @param {Object} filters - перечисление всех фильтров
-     * @param {Object} filterPriceValues - перечисление значений цены с диапазоном цены.
+     * @param {Object} priceFilterValue - перечисление значений цены с диапазоном цены.
      * @return {Array} отфильтрованный массив
      */
-    var filteringData = function (dataOffers, filtersMap, filters, filterPriceValues) {
+    var filteringData = function (dataOffers, filtersMap, filters, priceFilterValue) {
       var filterNames = Object.keys(filtersMap);
       if (filterNames.length === 0) {
         return dataOffers;
       } else {
         var newDataOffers = dataOffers.slice();
         filterNames.forEach(function (filterName) {
-          newDataOffers = filters[filterName.toUpperCase()].employ(newDataOffers, filterName, filtersMap, filterPriceValues);
+          newDataOffers = filters[filterName.toUpperCase()].employ(newDataOffers, filterName, filtersMap, priceFilterValue);
         });
       }
       return newDataOffers;
@@ -269,7 +268,7 @@
         card.render(utils.nodesTemplate, dataForCard[0], Type);
       }
     };
-    utils.nodePinList.addEventListener('click', onPinClick);
+    utils.nodeMapPins.addEventListener('click', onPinClick);
 
     utils.nodeFormAd.addEventListener('reset', function () {
       clearMap();
@@ -282,9 +281,8 @@
    */
   var removePins = function () {
     var similarPinElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    var pins = Array.from(similarPinElements);
-    pins.forEach(function (pin) {
-      utils.nodePinList.removeChild(pin);
+    similarPinElements.forEach(function (pin) {
+      utils.nodeMapPins.removeChild(pin);
     });
   };
 

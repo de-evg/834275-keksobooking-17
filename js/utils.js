@@ -33,7 +33,7 @@
     error: onError,
     nodeMain: mainElement,
     nodeMap: mapElement,
-    nodePinList: mapPinsElement,
+    nodeMapPins: mapPinsElement,
     nodeMainPin: mainPinElement,
     nodeFiltersContainer: filtersContainerElement,
     nodeFormMapFilters: mapFiltersElement,

@@ -3,6 +3,7 @@
 (function () {
   var utils = window.utils;
   var main = window.main;
+  var inputTitleElement = utils.nodeFormAd.querySelector('#title');
   var selectTypeOfferElement = utils.nodeFormAd.querySelector('#type');
   var selectTimeInElement = utils.nodeFormAd.querySelector('#timein');
   var selectTimeOutElement = utils.nodeFormAd.querySelector('#timeout');
@@ -10,6 +11,8 @@
   var selectCapacityElement = utils.nodeFormAd.querySelector('#capacity');
   var priceElement = utils.nodeFormAd.querySelector('#price');
   var addressElement = utils.nodeFormAd.querySelector('#address');
+  var textDescriptionElement = utils.nodeFormAd.querySelector('#description');
+  var featureElements = utils.nodeFormAd.querySelectorAll('[name=features]');
   var userAvatar = utils.nodeFormAd.querySelector('.ad-form-header__preview img');
   var photoContainer = utils.nodeFormAd.querySelector('.ad-form__photo-container');
 
@@ -52,8 +55,16 @@
   };
 
   var DeafultFormValues = {
+    TITLE: '',
     ADDRESS: '602, 407',
-    PRICE: '1000',
+    TYPE: 'flat',
+    PRICE: ['', '1000'],
+    TIMEIN: '12:00',
+    TIMEOUT: '12:00',
+    ROOM: '1',
+    CAPACITY: '3',
+    FEATURE: false,
+    DESCRIPTION: '',
     AVATAR: 'img/muffin-grey.svg'
   };
 
@@ -132,6 +143,15 @@
   /**
    * Устанавливает минимальную цену в зависимости от типа жилья
    *
+   * @param {Object} evtChange - событие изменения элмента формы
+   */
+  var setTime = function (evtChange) {
+    TimeMap[evtChange.target.id.toUpperCase()].value = evtChange.target.value;
+  };
+
+  /**
+   * Устанавливает минимальную цену в зависимости от типа жилья
+   *
    */
   var setMinPrice = function () {
     var selectedOption = getSelectedOption(selectTypeOfferElement);
@@ -204,15 +224,6 @@
     photoContainer.appendChild(fragment);
   };
 
-  /**
-   * Устанавливает минимальную цену в зависимости от типа жилья
-   *
-   * @param {Object} evtChange - событие изменения элмента формы
-   */
-  var setTime = function (evtChange) {
-    TimeMap[evtChange.target.id.toUpperCase()].value = evtChange.target.value;
-  };
-
   var Selector = {
     TYPE: {
       updateForm: setMinPrice
@@ -263,14 +274,25 @@
    *
    */
   var resetForm = function () {
-    utils.nodeFormAd.reset();
-    priceElement.placeholder = DeafultFormValues['PRICE'];
-    addressElement.placeholder = DeafultFormValues['ADDRESS'];
+    inputTitleElement.value = DeafultFormValues.TITLE;
+    addressElement.value = DeafultFormValues.ADDRESS;
+    selectTypeOfferElement.value = DeafultFormValues.TYPE;
+    priceElement.value = DeafultFormValues.PRICE[0];
+    priceElement.placeholder = DeafultFormValues.PRICE[1];
+    selectTimeInElement.value = DeafultFormValues.TIMEIN;
+    selectTimeOutElement.value = DeafultFormValues.TIMEOUT;
+    selectRoomElement.value = DeafultFormValues.ROOM;
+    selectCapacityElement.value = DeafultFormValues.CAPACITY;
+    textDescriptionElement.value = DeafultFormValues.DESCRIPTION;
+    featureElements.forEach(function (feature) {
+      feature.checked = DeafultFormValues.FEATURE;
+    });
     UserImage.AVATAR.reset(DeafultFormValues);
     UserImage.IMAGES.reset();
   };
 
-  utils.nodeFormAd.addEventListener('reset', function () {
+  utils.nodeFormAd.addEventListener('reset', function (evt) {
+    evt.preventDefault();
     resetForm();
   });
 
