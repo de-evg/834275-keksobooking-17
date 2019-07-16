@@ -179,10 +179,19 @@
     }
   };
 
+  /**
+   * Возвращает значение поля в состояние по-умолчанию
+   *
+   * @param {Object} defaultValues - перечисление полей формы по-умолчанию
+   */
   var resetUserAvatar = function (defaultValues) {
     userAvatar.src = defaultValues.AVATAR;
   };
 
+  /**
+   * Возвращает значение поля в состояние по-умолчанию
+   *
+   */
   var resetRoomImages = function () {
     var photos = utils.nodeFormAd.querySelector('.ad-form__photo');
     var photosTemplate = photos.cloneNode(false);
