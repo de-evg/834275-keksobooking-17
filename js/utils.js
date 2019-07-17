@@ -3,7 +3,7 @@
 (function () {
   var KeyCode = {
     ESC: 27,
-    SPACE: 32
+    ENTER: 13
   };
 
   var mainElement = document.querySelector('main');

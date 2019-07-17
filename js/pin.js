@@ -410,7 +410,7 @@
    * @param {Object} evt - объект события DOM
    */
   var onEnterPress = function (evt) {
-    if (evt.keyCode === utils.key.SPACE) {
+    if (evt.keyCode === utils.key.ENTER) {
       onMainPinActivate(evt);
     }
   };
