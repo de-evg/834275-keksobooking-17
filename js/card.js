@@ -2,7 +2,6 @@
 
 (function () {
   var utils = window.utils;
-  var pin = window.pin;
 
   /**
    * Заполняет склонированный HTML элемент данными выбранного предложения.
