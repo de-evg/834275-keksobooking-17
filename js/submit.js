@@ -21,7 +21,7 @@
    * @param {Object} evt - объект события DOM
    */
   var onEscPress = function (evt) {
-    if (evt.keyCode === pin.escCode) {
+    if (evt.keyCode === utils.key.ESC) {
       closeSuccessPopup();
     }
   };

@@ -6,7 +6,7 @@
   var main = window.main;
   var form = window.form;
   var card = window.card;
-  var ESC_CODE = 27;
+
   var StartIndexForSlice = {
     FILTER_NAME: 7,
     TARGET_ID: 3
@@ -319,7 +319,7 @@
   };
 
   // Взаимодействие с меткой
-  utils.nodeMainPin.addEventListener('mousedown', function (evt) {
+  var onMainPinActivate = function (evt) {
     evt.preventDefault();
     if (main.mapDisabled) {
       main.activate(renderPins, onError, 'GET');
@@ -399,10 +399,24 @@
       };
       form.address(PinCoords, form.sizePin, main.mapDisabled);
     };
-
+    utils.nodeMainPin.removeEventListener('keydown', onEnterPress);
     utils.nodeMap.addEventListener('mousemove', onMouseMove);
     utils.nodeMap.addEventListener('mouseup', onMouseUp);
-  });
+  };
+
+  /**
+   * Обработчик нажатия клаваиши ENTER.
+   *
+   * @param {Object} evt - объект события DOM
+   */
+  var onEnterPress = function (evt) {
+    if (evt.keyCode === utils.key.SPACE) {
+      onMainPinActivate(evt);
+    }
+  };
+
+  utils.nodeMainPin.addEventListener('mousedown', onMainPinActivate);
+  utils.nodeMainPin.addEventListener('keydown', onEnterPress);
 
   /**
    * Показывает окно с ошибкой при ошибке загрузки данных меток с сервера.
@@ -430,7 +444,7 @@
      * @param {Object} evt - объект события DOM
      */
     var onEscPress = function (evt) {
-      if (evt.keyCode === ESC_CODE) {
+      if (evt.keyCode === utils.key.ESC) {
         closePopup();
       }
     };
@@ -450,7 +464,6 @@
   };
 
   window.pin = {
-    escCode: ESC_CODE,
     error: onError,
     clear: clearMap
   };

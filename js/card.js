@@ -2,6 +2,7 @@
 
 (function () {
   var utils = window.utils;
+  var pin = window.pin;
 
   /**
    * Заполняет склонированный HTML элемент данными выбранного предложения.
@@ -180,7 +181,7 @@
    * @param {Object} evt - DOM объект события
    */
   var onCardEscPress = function (evt) {
-    if (evt.keyCode === utils.EscCode) {
+    if (evt.keyCode === utils.key.ESC) {
       onButtonCloseClick();
     }
   };

@@ -1,6 +1,10 @@
 'use strict';
 
 (function () {
+  var KeyCode = {
+    ESC: 27,
+    SPACE: 32
+  };
 
   var mainElement = document.querySelector('main');
 
@@ -23,6 +27,7 @@
   };
 
   window.utils = {
+    key: KeyCode,
     nodeMain: mainElement,
     nodeMap: mapElement,
     nodeMapPins: mapPinsElement,
