@@ -5,45 +5,53 @@
   var form = window.form;
   var pin = window.pin;
   var backend = window.backend;
-  var card = window.card;
   var URL = 'https://js.dump.academy/keksobooking';
+
+  /**
+   * Обработчик клика по popup.
+   *
+   */
+  var onPopupClick = function () {
+    closeSuccessPopup();
+  };
+
+  /**
+   * Обработчик нажатия клаваиши ESC.
+   *
+   * @param {Object} evt - объект события DOM
+   */
+  var onEscPress = function (evt) {
+    if (evt.keyCode === utils.escCode) {
+      closeSuccessPopup();
+    }
+  };
 
   /**
    * Удаляет popup из DOM.
    *
    */
-  var onPopupClick = function () {
+  var closeSuccessPopup = function () {
     var successMessageElement = utils.nodeMain.querySelector('.success');
     utils.nodeMain.removeChild(successMessageElement);
 
-    window.removeEventListener('click', onPopupClick);
     window.removeEventListener('keydown', onEscPress);
-  };
-
-  /**
-   * Удаляет popup из DOM нажатием клаваиши ESC.
-   *
-   * @param {Object} evt - объект события DOM
-   */
-  var onEscPress = function (evt) {
-    if (evt.keyCode === card.escCode) {
-      onPopupClick();
-    }
   };
 
   /**
    * Добавляет popup в DOM при успешной отправке формы.
    *
    */
-  var showPopup = function () {
+  var showSuccessPopup = function () {
     var successElement = utils.nodesTemplate.SUCCESS.cloneNode(true);
     successElement.tabIndex = 1;
     var fragment = document.createDocumentFragment(successElement);
     fragment.appendChild(successElement);
     utils.nodeMain.appendChild(fragment);
-    utils.nodeMain.querySelector('.success').focus();
+    var successPopupElement = utils.nodeMain.querySelector('.success');
+    successPopupElement.focus();
 
-    window.addEventListener('click', onPopupClick);
+
+    successPopupElement.addEventListener('click', onPopupClick);
     window.addEventListener('keydown', onEscPress);
   };
 
@@ -54,7 +62,7 @@
   var resetPage = function () {
     pin.clear();
     form.reset();
-    showPopup();
+    showSuccessPopup();
   };
 
   utils.nodeFormAd.addEventListener('submit', function (evt) {

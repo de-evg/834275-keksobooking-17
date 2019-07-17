@@ -69,8 +69,15 @@
   var getPins = function (requriedOffers, pinsSettings) {
     var fragment = document.createDocumentFragment();
     requriedOffers.forEach(function (offer) {
-      var generatedPinElement = generatePinElement(offer, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN);
-      fragment.appendChild(generatedPinElement);
+      try {
+        if (!offer.offer) {
+          throw new SyntaxError('Данные некорректны');
+        }
+        var generatedPinElement = generatePinElement(offer, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN);
+        fragment.appendChild(generatedPinElement);
+      } catch (err) {
+        return;
+      }
     });
     utils.nodeMapPins.appendChild(fragment);
   };

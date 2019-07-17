@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var ESC_CODE = 27;
   var mainElement = document.querySelector('main');
 
   var mapElement = mainElement.querySelector('.map');
@@ -27,9 +28,48 @@
   var onError = function () {
     var error = Template.ERROR.cloneNode(true);
     mainElement.appendChild(error);
+
+    var errorMessage = mainElement.querySelector('.error');
+    var btnCloseError = error.querySelector('.error .error__button');
+
+    /**
+     * Обработчик клика по popup.
+     *
+     * @param {Object} evt - объект события DOM
+     */
+    var onPopupClick = function (evt) {
+      if (evt.target === btnCloseError || evt.target === errorMessage) {
+        closePopup();
+      }
+    };
+
+    /**
+     * Обработчик нажатия клаваиши ESC.
+     *
+     * @param {Object} evt - объект события DOM
+     */
+    var onEscPress = function (evt) {
+      if (evt.keyCode === ESC_CODE) {
+        closePopup();
+      }
+    };
+
+    /**
+     * Удаляет popup из DOM.
+     *
+     */
+    var closePopup = function () {
+      mainElement.removeChild(errorMessage);
+      window.removeEventListener('keydown', onEscPress);
+      window.removeEventListener('click', onPopupClick);
+    };
+
+    window.addEventListener('click', onPopupClick);
+    window.addEventListener('keydown', onEscPress);
   };
 
   window.utils = {
+    escCode: ESC_CODE,
     error: onError,
     nodeMain: mainElement,
     nodeMap: mapElement,
