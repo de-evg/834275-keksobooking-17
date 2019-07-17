@@ -6,6 +6,7 @@
   var main = window.main;
   var form = window.form;
   var card = window.card;
+  var ESC_CODE = 27;
   var StartIndexForSlice = {
     FILTER_NAME: 7,
     TARGET_ID: 3
@@ -94,6 +95,7 @@
     });
     var requriedOffers = sliceToRequriedOffers(loadedData, pinsSettings);
     getPins(requriedOffers, pinsSettings);
+    main.filter(false);
 
     /**
      * Фильтрует данные по типу предложения.
@@ -267,7 +269,8 @@
      * @param {Object} evt - DOM объект собыитя.
      */
     var onPinClick = function (evt) {
-      if (evt.target.tagName === 'BUTTON' || (evt.target.parentElement.tagName === 'BUTTON' && !evt.target.parentElement.classList.contains('map__pin--main'))) {
+      if (evt.target.tagName === 'BUTTON' && !evt.target.classList.contains('map__pin--main') ||
+      evt.target.parentElement.tagName === 'BUTTON' && !evt.target.parentElement.classList.contains('map__pin--main')) {
         card.close();
         var dataForCard = loadedData.filter(function (offer) {
           return (offer.index + '') === evt.target.id || (offer.index + '') === evt.target.parentElement.id;
@@ -319,7 +322,7 @@
   utils.nodeMainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     if (main.mapDisabled) {
-      main.activate(renderPins, utils.error, 'GET');
+      main.activate(renderPins, onError, 'GET');
     }
     main.mapDisabled = false;
 
@@ -401,7 +404,54 @@
     utils.nodeMap.addEventListener('mouseup', onMouseUp);
   });
 
+  /**
+   * Показывает окно с ошибкой при ошибке загрузки данных меток с сервера.
+   */
+  var onError = function () {
+    var error = utils.nodesTemplate.ERROR.cloneNode(true);
+    utils.nodeMain.appendChild(error);
+    var errorMessage = utils.nodeMain.querySelector('.error');
+    var btnCloseError = error.querySelector('.error .error__button');
+
+    /**
+     * Обработчик клика по popup.
+     *
+     * @param {Object} evt - объект события DOM
+     */
+    var onPopupClick = function (evt) {
+      if (evt.target === btnCloseError || evt.target === errorMessage) {
+        closePopup();
+      }
+    };
+
+    /**
+     * Обработчик нажатия клаваиши ESC.
+     *
+     * @param {Object} evt - объект события DOM
+     */
+    var onEscPress = function (evt) {
+      if (evt.keyCode === ESC_CODE) {
+        closePopup();
+      }
+    };
+
+    /**
+     * Удаляет popup из DOM.
+     *
+     */
+    var closePopup = function () {
+      utils.nodeMain.removeChild(errorMessage);
+      window.removeEventListener('keydown', onEscPress);
+      window.removeEventListener('click', onPopupClick);
+    };
+
+    window.addEventListener('click', onPopupClick);
+    window.addEventListener('keydown', onEscPress);
+  };
+
   window.pin = {
+    escCode: ESC_CODE,
+    error: onError,
     clear: clearMap
   };
 })();

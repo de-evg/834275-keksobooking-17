@@ -21,7 +21,7 @@
    * @param {Object} evt - объект события DOM
    */
   var onEscPress = function (evt) {
-    if (evt.keyCode === utils.escCode) {
+    if (evt.keyCode === pin.escCode) {
       closeSuccessPopup();
     }
   };
@@ -69,7 +69,7 @@
     var formData = new FormData(utils.nodeFormAd);
     if (utils.nodeFormAd.checkValidity()) {
       evt.preventDefault();
-      backend.publish(URL, formData, resetPage, utils.error);
+      backend.publish(URL, formData, resetPage, pin.error);
     }
   });
 })();
