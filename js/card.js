@@ -163,12 +163,10 @@
     window.addEventListener('keydown', onCardEscPress);
   };
 
-  /**
-   * Закрывает карту.
-   *
-   */
-  var onButtonCloseClick = function () {
+  var closeCard = function () {
     if (utils.nodeMap.querySelector('.map__card')) {
+      var activatedPin = utils.nodeMapPins.querySelector('.map__pin--active');
+      activatedPin.classList.remove('map__pin--active');
       var currentCard = utils.nodeMap.querySelector('.map__card');
       utils.nodeMap.removeChild(currentCard);
       window.removeEventListener('keydown', onCardEscPress);
@@ -176,12 +174,20 @@
   };
 
   /**
-   * Закрывает карту при нажатии наа ESC.
+   * Обработчик нажатия на кнопку закрытия карточки.
+   *
+   */
+  var onButtonCloseClick = function () {
+    closeCard();
+  };
+
+  /**
+   * Обработчик нажатия на калвишу ESC при открытой карточке.
    * @param {Object} evt - DOM объект события
    */
   var onCardEscPress = function (evt) {
     if (evt.keyCode === utils.key.ESC) {
-      onButtonCloseClick();
+      closeCard();
     }
   };
 

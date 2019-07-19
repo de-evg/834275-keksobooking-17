@@ -269,11 +269,16 @@
      * @param {Object} evt - DOM объект собыитя.
      */
     var onPinClick = function (evt) {
-      if (evt.target.tagName === 'BUTTON' && !evt.target.classList.contains('map__pin--main') ||
-      evt.target.parentElement.tagName === 'BUTTON' && !evt.target.parentElement.classList.contains('map__pin--main')) {
+      if (evt.target.tagName === 'BUTTON') {
+        var clickedPin = evt.target;
+      } else if (evt.target.parentElement.tagName === 'BUTTON') {
+        clickedPin = evt.target.parentElement;
+      }
+      if (!clickedPin.classList.contains('map__pin--main')) {
         card.close();
+        clickedPin.classList.add('map__pin--active');
         var dataForCard = loadedData.filter(function (offer) {
-          return (offer.index + '') === evt.target.id || (offer.index + '') === evt.target.parentElement.id;
+          return (offer.index + '') === clickedPin.id;
         });
         card.render(utils.nodesTemplate, dataForCard[0], Type);
       }
