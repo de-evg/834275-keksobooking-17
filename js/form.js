@@ -15,6 +15,8 @@
   var featureElements = utils.nodeFormAd.querySelectorAll('[name=features]');
   var userAvatar = utils.nodeFormAd.querySelector('.ad-form-header__preview img');
   var photoContainer = utils.nodeFormAd.querySelector('.ad-form__photo-container');
+  var avatarDropZone = utils.nodeFormAd.querySelector('.ad-form__field');
+  var roomImgDropZone = utils.nodeFormAd.querySelector('.ad-form__upload');
 
   var TimeMap = {
     TYPE: selectTypeOfferElement,
@@ -204,6 +206,27 @@
       photos.appendChild(fragment);
     }
   };
+
+  ['dragover', 'drop'].forEach(function (dragEvt) {
+    window.addEventListener(dragEvt, function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+    });
+    avatarDropZone.addEventListener(dragEvt, function (evt) {
+      evt.preventDefault();
+      if (dragEvt === 'drop') {
+        var data = evt.dataTransfer;
+        insertUserImage(data, userAvatar);
+      }
+    });
+    roomImgDropZone.addEventListener(dragEvt, function (evt) {
+      evt.preventDefault();
+      if (dragEvt === 'drop') {
+        var data = evt.dataTransfer;
+        insertRoomImage(data, userAvatar);
+      }
+    });
+  });
 
   /**
    * Возвращает значение поля в состояние по-умолчанию
