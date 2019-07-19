@@ -166,7 +166,9 @@
   var closeCard = function () {
     if (utils.nodeMap.querySelector('.map__card')) {
       var activatedPin = utils.nodeMapPins.querySelector('.map__pin--active');
-      activatedPin.classList.remove('map__pin--active');
+      if (activatedPin) {
+        activatedPin.classList.remove('map__pin--active');
+      }
       var currentCard = utils.nodeMap.querySelector('.map__card');
       utils.nodeMap.removeChild(currentCard);
       window.removeEventListener('keydown', onCardEscPress);
