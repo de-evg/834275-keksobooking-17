@@ -207,6 +207,7 @@
     }
   };
 
+  // перетаскивание файлов из ОС в dropZone
   ['dragover', 'drop'].forEach(function (dragEvt) {
     window.addEventListener(dragEvt, function (evt) {
       evt.preventDefault();
