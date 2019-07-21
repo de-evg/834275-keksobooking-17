@@ -17,7 +17,6 @@
   var photoContainer = utils.nodeFormAd.querySelector('.ad-form__photo-container');
   var avatarDropZone = utils.nodeFormAd.querySelector('.ad-form__field');
   var roomImgDropZone = utils.nodeFormAd.querySelector('.ad-form__upload');
-
   var TimeMap = {
     TYPE: selectTypeOfferElement,
     TIMEIN: selectTimeOutElement,
@@ -90,8 +89,8 @@
   };
 
   var ImageRoomSize = {
-    WIDTH: 70,
-    HEIGHT: 70
+    WIDTH: 40,
+    HEIGHT: 44
   };
 
   /**
@@ -190,6 +189,9 @@
    */
   var insertRoomImage = function (changedElement) {
     var photos = utils.nodeFormAd.querySelector('.ad-form__photo');
+    photos.style.display = 'flex';
+    photos.style.alignItems = 'center';
+    photos.style.justifyContent = 'center';
     var img = document.createElement('Img');
     img.width = ImageRoomSize.WIDTH;
     img.height = ImageRoomSize.HEIGHT;
