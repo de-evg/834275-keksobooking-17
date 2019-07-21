@@ -3,7 +3,6 @@
 (function () {
   var utils = window.utils;
   var backend = window.backend;
-  var URL = 'https://js.dump.academy/keksobooking/data';
   var isMapDisabled = true;
 
   /**
@@ -42,7 +41,7 @@
    * @param {function} onError - функция обработки ошибки при запросе/получении данных
    */
   var activateMap = function (onSuccess, onError) {
-    backend.loading(URL, onSuccess, onError);
+    backend.loading(onSuccess, onError);
     utils.nodeMap.classList.remove('map--faded');
     isMapDisabled = false;
     isAdFormDisabled(false);

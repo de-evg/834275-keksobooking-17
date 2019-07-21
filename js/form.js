@@ -17,7 +17,6 @@
   var photoContainer = utils.nodeFormAd.querySelector('.ad-form__photo-container');
   var avatarDropZone = utils.nodeFormAd.querySelector('.ad-form__field');
   var roomImgDropZone = utils.nodeFormAd.querySelector('.ad-form__upload');
-
   var TimeMap = {
     TYPE: selectTypeOfferElement,
     TIMEIN: selectTimeOutElement,
@@ -90,8 +89,8 @@
   };
 
   var ImageRoomSize = {
-    WIDTH: 70,
-    HEIGHT: 70
+    WIDTH: 40,
+    HEIGHT: 44
   };
 
   /**
@@ -187,23 +186,22 @@
    * Добавляет изображения в DOM
    *
    * @param {Object} changedElement - измененный элемент формы (input)
-   * @param {Object} image - обновляемый DOM объект изображения
    */
-  var insertRoomImage = function (changedElement, image) {
+  var insertRoomImage = function (changedElement) {
     var photos = utils.nodeFormAd.querySelector('.ad-form__photo');
-    var img = image.cloneNode(true);
+    photos.style.display = 'flex';
+    photos.style.alignItems = 'center';
+    photos.style.justifyContent = 'center';
+    var img = document.createElement('Img');
     img.width = ImageRoomSize.WIDTH;
     img.height = ImageRoomSize.HEIGHT;
     insertUserImage(changedElement, img);
-    var fragment = document.createDocumentFragment();
     if (photos.querySelector('img')) {
       var photosTemplate = photos.cloneNode(false);
       photosTemplate.appendChild(img);
-      fragment.appendChild(photosTemplate);
-      photoContainer.appendChild(fragment);
+      photoContainer.appendChild(photosTemplate);
     } else {
-      fragment.appendChild(img);
-      photos.appendChild(fragment);
+      photos.appendChild(img);
     }
   };
 
@@ -224,7 +222,7 @@
       evt.preventDefault();
       if (dragEvt === 'drop') {
         var data = evt.dataTransfer;
-        insertRoomImage(data, userAvatar);
+        insertRoomImage(data);
       }
     });
   });

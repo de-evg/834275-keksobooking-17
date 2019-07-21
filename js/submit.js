@@ -5,7 +5,6 @@
   var form = window.form;
   var pin = window.pin;
   var backend = window.backend;
-  var URL = 'https://js.dump.academy/keksobooking';
 
   /**
    * Обработчик клика по popup.
@@ -69,7 +68,7 @@
     var formData = new FormData(utils.nodeFormAd);
     if (utils.nodeFormAd.checkValidity()) {
       evt.preventDefault();
-      backend.publish(URL, formData, resetPage, utils.error);
+      backend.publish(resetPage, utils.error, formData);
     }
   });
 })();
