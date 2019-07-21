@@ -12,6 +12,8 @@
   var priceElement = utils.nodeFormAd.querySelector('#price');
   var addressElement = utils.nodeFormAd.querySelector('#address');
   var textDescriptionElement = utils.nodeFormAd.querySelector('#description');
+  var inputAvatarImg = utils.nodeFormAd.querySelector('#avatar');
+  var inputRoomImg = utils.nodeFormAd.querySelector('#images');
   var featureElements = utils.nodeFormAd.querySelectorAll('[name=features]');
   var userAvatar = utils.nodeFormAd.querySelector('.ad-form-header__preview img');
   var photoContainer = utils.nodeFormAd.querySelector('.ad-form__photo-container');
@@ -233,6 +235,7 @@
    * @param {Object} defaultValues - перечисление полей формы по-умолчанию
    */
   var resetUserAvatar = function (defaultValues) {
+    inputAvatarImg.value = '';
     userAvatar.src = defaultValues.AVATAR;
   };
 
@@ -241,6 +244,7 @@
    *
    */
   var resetRoomImages = function () {
+    inputRoomImg.value = '';
     var photos = utils.nodeFormAd.querySelector('.ad-form__photo');
     var photosTemplate = photos.cloneNode(false);
     var allPhotos = utils.nodeFormAd.querySelectorAll('.ad-form__photo');
