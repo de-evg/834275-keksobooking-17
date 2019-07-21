@@ -327,7 +327,7 @@
   var onMainPinActivate = function (evt) {
     evt.preventDefault();
     if (main.mapDisabled) {
-      main.activate(renderPins, onError, 'GET');
+      main.activate(renderPins, showError, 'GET');
     }
     main.mapDisabled = false;
 
@@ -426,7 +426,7 @@
   /**
    * Показывает окно с ошибкой при ошибке загрузки данных меток с сервера.
    */
-  var onError = function () {
+  var showError = function () {
     var error = utils.nodesTemplate.ERROR.cloneNode(true);
     utils.nodeMain.appendChild(error);
     var errorMessage = utils.nodeMain.querySelector('.error');
@@ -437,9 +437,9 @@
      *
      * @param {Object} evt - объект события DOM
      */
-    var onPopupClick = function (evt) {
+    var onErrorPopupClick = function (evt) {
       if (evt.target === btnCloseError || evt.target === errorMessage) {
-        closePopup();
+        closeErrorPopup();
       }
     };
 
@@ -450,7 +450,7 @@
      */
     var onEscPress = function (evt) {
       if (evt.keyCode === utils.key.ESC) {
-        closePopup();
+        closeErrorPopup();
       }
     };
 
@@ -458,18 +458,18 @@
      * Удаляет popup из DOM.
      *
      */
-    var closePopup = function () {
+    var closeErrorPopup = function () {
       utils.nodeMain.removeChild(errorMessage);
       window.removeEventListener('keydown', onEscPress);
-      window.removeEventListener('click', onPopupClick);
+      window.removeEventListener('click', onErrorPopupClick);
     };
 
-    window.addEventListener('click', onPopupClick);
+    window.addEventListener('click', onErrorPopupClick);
     window.addEventListener('keydown', onEscPress);
   };
 
   window.pin = {
-    error: onError,
+    error: showError,
     clear: clearMap
   };
 })();

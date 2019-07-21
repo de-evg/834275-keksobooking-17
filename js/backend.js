@@ -56,7 +56,7 @@
    * Получает данные с сервера.
    *
    * @param {string} url - адрес сервера.
-   * @param {function} onSuccess - обработчик при успешном получения данных
+   * @param {function} onSuccess - обработчик при успешном получении данных
    * @param {function} onError -  обработчик при ошибке
    */
   var load = function (url, onSuccess, onError) {
