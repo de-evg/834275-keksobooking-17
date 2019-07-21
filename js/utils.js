@@ -27,7 +27,7 @@
   };
 
   /**
-   * Показывает окно с ошибкой при ошибке загрузки данных меток с сервера.
+   * Показывает окно с ошибкой при ошибке загрузки данных с сервера.
    */
   var onRequestErrorShowPopup = function () {
     var error = Template.ERROR.cloneNode(true);
