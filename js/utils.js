@@ -14,7 +14,7 @@
 
   var filtersContainerElement = mapElement.querySelector('.map__filters-container');
   var mapFiltersElement = filtersContainerElement.querySelector('.map__filters');
-  var mapFiterFieldsetElement = mapFiltersElement.querySelector('fieldset');
+  var mapFilterFieldsetElement = mapFiltersElement.querySelector('fieldset');
   var mapFiltersCollection = mapFiltersElement.querySelectorAll('.map__filter');
   var formAdElement = mainElement.querySelector('.ad-form');
   var formAdFieldsetsElement = formAdElement.querySelectorAll('fieldset');
@@ -80,7 +80,7 @@
     nodeMainPin: mainPinElement,
     nodeFiltersContainer: filtersContainerElement,
     nodeFormMapFilters: mapFiltersElement,
-    nodeMapFiterFieldset: mapFiterFieldsetElement,
+    nodeMapFiterFieldset: mapFilterFieldsetElement,
     nodeMapFilters: mapFiltersCollection,
     nodeFormAd: formAdElement,
     nodeFormAdFieldsets: formAdFieldsetsElement,

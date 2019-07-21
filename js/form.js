@@ -57,7 +57,7 @@
     Y: 375
   };
 
-  var DeafultFormValues = {
+  var DefaultFormValues = {
     TITLE: '',
     ADDRESS: '602, 407',
     TYPE: 'flat',
@@ -306,20 +306,20 @@
    *
    */
   var resetForm = function () {
-    inputTitleElement.value = DeafultFormValues.TITLE;
-    addressElement.value = DeafultFormValues.ADDRESS;
-    selectTypeOfferElement.value = DeafultFormValues.TYPE;
-    priceElement.value = DeafultFormValues.PRICE[0];
-    priceElement.placeholder = DeafultFormValues.PRICE[1];
-    selectTimeInElement.value = DeafultFormValues.TIMEIN;
-    selectTimeOutElement.value = DeafultFormValues.TIMEOUT;
-    selectRoomElement.value = DeafultFormValues.ROOM;
-    selectCapacityElement.value = DeafultFormValues.CAPACITY;
-    textDescriptionElement.value = DeafultFormValues.DESCRIPTION;
+    inputTitleElement.value = DefaultFormValues.TITLE;
+    addressElement.value = DefaultFormValues.ADDRESS;
+    selectTypeOfferElement.value = DefaultFormValues.TYPE;
+    priceElement.value = DefaultFormValues.PRICE[0];
+    priceElement.placeholder = DefaultFormValues.PRICE[1];
+    selectTimeInElement.value = DefaultFormValues.TIMEIN;
+    selectTimeOutElement.value = DefaultFormValues.TIMEOUT;
+    selectRoomElement.value = DefaultFormValues.ROOM;
+    selectCapacityElement.value = DefaultFormValues.CAPACITY;
+    textDescriptionElement.value = DefaultFormValues.DESCRIPTION;
     featureElements.forEach(function (feature) {
-      feature.checked = DeafultFormValues.FEATURE;
+      feature.checked = DefaultFormValues.FEATURE;
     });
-    UserImage.AVATAR.reset(DeafultFormValues);
+    UserImage.AVATAR.reset(DefaultFormValues);
     UserImage.IMAGES.reset();
   };
 
