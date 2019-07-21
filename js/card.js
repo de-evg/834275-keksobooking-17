@@ -8,72 +8,72 @@
    *
    * @param {Object} cardElement - склонированный HTML элемент
    * @param {Object} template - объект с данными для генерации новой карточки.
-   * @param {Object} dataForCard - объекта с данными выбранного предложения
+   * @param {Object} dataForCard - объект с данными выбранного предложения
    * @param {Object} types - словарь типа меток (eng: рус).
    * @return {Object} cardElement - DOM элемент карточки с предложением
    */
   var generateCardElement = function (cardElement, template, dataForCard, types) {
-    // вставка аватара
-    try {
-      var userAvatar = cardElement.querySelector('.popup__avatar');
-      if (!dataForCard.author.avatar) {
-        throw new SyntaxError('Данные некорректны');
+
+    /**
+     * Проверяет полученные данные на наличие и целостность.
+     *
+     * @param {Object} someData - проверяемые данные
+     * @param {Object} cardInnerElement - обновляемый элемент карточки.
+     * @param {function} onSuccessCheck - обработчик при успешной проверке
+     */
+    var checkData = function (someData, cardInnerElement, onSuccessCheck) {
+      try {
+        if (!someData) {
+          throw new SyntaxError('Данные некорректны');
+        }
+        onSuccessCheck();
+      } catch (err) {
+        cardInnerElement.style.display = 'none';
       }
+    };
+
+    // вставка аватара
+    var userAvatar = cardElement.querySelector('.popup__avatar');
+    checkData(dataForCard.author.avatar, userAvatar, function () {
       userAvatar.src = dataForCard.author.avatar;
-    } catch (err) {
-      userAvatar.style.display = 'none';
-    }
+    });
 
     // вставка заголовка
-    try {
-      var offerTitle = cardElement.querySelector('.popup__title');
-      if (!dataForCard.offer.title) {
-        throw new SyntaxError('Данные некорректны');
-      }
+    var offerTitle = cardElement.querySelector('.popup__title');
+    checkData(dataForCard.offer.title, offerTitle, function () {
       offerTitle.textContent = dataForCard.offer.title;
-    } catch (err) {
-      offerTitle.style.display = 'none';
-    }
+    });
 
     // вставка адреса
-    try {
-      var offerAddress = cardElement.querySelector('.popup__text--address');
-      if (!dataForCard.offer.address) {
-        throw new SyntaxError('Данные некорректны');
-      }
+    var offerAddress = cardElement.querySelector('.popup__text--address');
+    checkData(dataForCard.offer.address, offerAddress, function () {
       offerAddress.textContent = dataForCard.offer.address;
-    } catch (err) {
-      offerAddress.style.display = 'none';
-    }
+    });
 
     // вставка цены
-    try {
-      var offerPrice = cardElement.querySelector('.popup__text--price');
-      if (!dataForCard.offer.price) {
-        throw new SyntaxError('Данные некорректны');
-      }
+    var offerPrice = cardElement.querySelector('.popup__text--price');
+    checkData(dataForCard.offer.price, offerPrice, function () {
       offerPrice.textContent = dataForCard.offer.price + '₽/ночь';
-    } catch (err) {
-      offerPrice.style.display = 'none';
-    }
+    });
 
     // вставка типа жилья на русском языке
-    try {
-      var typeHousing = cardElement.querySelector('.popup__type');
-      if (!dataForCard.offer.type) {
-        throw new SyntaxError('Данные некорректны');
-      }
+    var typeHousing = cardElement.querySelector('.popup__type');
+    checkData(dataForCard.offer.type, typeHousing, function () {
       var offerType = Object.keys(types).filter(function (key) {
         return key.toLowerCase() === dataForCard.offer.type;
       });
       typeHousing.textContent = types[offerType];
-    } catch (err) {
-      typeHousing.style.display = 'none';
-    }
+    });
+
+    // вставка описания
+    var offerDescription = cardElement.querySelector('.popup__description');
+    checkData(dataForCard.offer.description, offerDescription, function () {
+      offerDescription.textContent = dataForCard.offer.description;
+    });
 
     // вставка строки с количеством комнат и количеством гостей
+    var offerCapacity = cardElement.querySelector('.popup__text--capacity');
     try {
-      var offerCapacity = cardElement.querySelector('.popup__text--capacity');
       if (!dataForCard.offer.rooms || !dataForCard.offer.guests) {
         throw new SyntaxError('Данные некорректны');
       }
@@ -82,8 +82,8 @@
       offerCapacity.style.display = 'none';
     }
 
+    var offerTime = cardElement.querySelector('.popup__text--time');
     try {
-      var offerTime = cardElement.querySelector('.popup__text--time');
       if (!dataForCard.offer.checkin || !dataForCard.offer.checkout) {
         throw new SyntaxError('Данные некорректны');
       }
@@ -93,8 +93,8 @@
     }
 
     // вставка особенностей
+    var featuresElement = cardElement.querySelector('.popup__features');
     try {
-      var featuresElement = cardElement.querySelector('.popup__features');
       if (dataForCard.offer.features.length === 0 || !dataForCard.offer.features) {
         throw new SyntaxError('Данные некорректны');
       }
@@ -111,17 +111,6 @@
       });
     } catch (err) {
       featuresElement.style.display = 'none';
-    }
-
-    // вставка описания
-    try {
-      var offerDescription = cardElement.querySelector('.popup__description');
-      if (!dataForCard.offer.description) {
-        throw new SyntaxError('Данные некорректны');
-      }
-      offerDescription.textContent = dataForCard.offer.description;
-    } catch (err) {
-      offerDescription.style.display = 'none';
     }
 
     // вставка фотографий

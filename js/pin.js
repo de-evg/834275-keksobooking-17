@@ -274,7 +274,7 @@
       } else if (evt.target.parentElement.tagName === 'BUTTON') {
         clickedPin = evt.target.parentElement;
       }
-      if (!clickedPin.classList.contains('map__pin--main')) {
+      if (clickedPin && !clickedPin.classList.contains('map__pin--main')) {
         card.close();
         clickedPin.classList.add('map__pin--active');
         var dataForCard = loadedData.filter(function (offer) {

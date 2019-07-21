@@ -9,72 +9,79 @@
     MAX_PINS: 5
   };
   var Method = {
-    LOAD: 'GET',
-    SAVE: 'POST'
+    GET: ['GET', 'https://js.dump.academy/keksobooking/data'],
+    POST: ['POST', 'https://js.dump.academy/keksobooking']
   };
 
   /**
-   * Настройки запрса на сервера
+   * Настройки запрса на сервер
    *
-   * @param {string} url - адрес сервера.
-   * @param {function} onSuccess - обработчик при успешном получения данных
-   * @param {function} onError - обработчик при ошибке
-   * @param {string} method - метод запроса
-   * @return {Object} xhr - объект XMLHttpRequest
+   * @param {Object} settings -параметры для данного метода запроса
    */
-  var xhrRequestSetup = function (url, onSuccess, onError, method) {
+  var xhrRequest = function (settings) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.addEventListener('load', function () {
       if (xhr.status === SUCCESS_CODE) {
-        switch (method) {
-          case 'GET':
-            onSuccess(xhr.response, PinsSettings);
-            break;
-          case 'POST':
-            onSuccess();
-            break;
-        }
+        settings.success(xhr.response, PinsSettings);
       } else {
-        onError();
+        settings.error();
       }
     });
     xhr.addEventListener('error', function () {
-      onError();
+      settings.error();
     });
 
     xhr.addEventListener('timeout', function () {
-      onError();
+      settings.error();
     });
 
     xhr.timeout = TIMEOUT;
-    xhr.open(method, url);
-    return xhr;
+    xhr.open(settings.METHOD, settings.URL);
+    xhr.send(settings.BODY);
+  };
+
+  /**
+   * Генерирует объект с настройками запроса.
+   *
+   * @param {Array} method - используемый метод и url сервера
+   * @param {function} onSuccess - обработчик при успешном получении данных
+   * @param {function} onError -  обработчик при ошибке
+   * @param {Object} formData - данные формы отправляемые в теле запроса
+   * @return {Object} Settings - объект с настройками запроса
+   */
+  var getSettings = function (method, onSuccess, onError, formData) {
+    var Settings = {
+      METHOD: method[0],
+      URL: method[1],
+      BODY: formData,
+      success: onSuccess,
+      error: onError
+    };
+    return Settings;
   };
 
   /**
    * Получает данные с сервера.
    *
-   * @param {string} url - адрес сервера.
    * @param {function} onSuccess - обработчик при успешном получении данных
    * @param {function} onError -  обработчик при ошибке
    */
-  var load = function (url, onSuccess, onError) {
-    var requestName = xhrRequestSetup(url, onSuccess, onError, Method.LOAD);
-    requestName.send();
+  var load = function (onSuccess, onError) {
+    var MethodSettings = getSettings(Method.GET, onSuccess, onError);
+    xhrRequest(MethodSettings);
   };
 
   /**
    * Отправляет на сервер форму.
    *
-   * @param {string} url - адрес сервера.
-   * @param {Object} formData - данные формы
    * @param {function} onSuccess - обработчик при успешном отправлении данных
    * @param {function} onError -  обработчик при ошибке
+   * @param {Object} formData - данные формы
    */
-  var save = function (url, formData, onSuccess, onError) {
-    var requestName = xhrRequestSetup(url, onSuccess, onError, Method.SAVE);
-    requestName.send(formData);
+  var save = function (onSuccess, onError, formData) {
+    var MethodSettings = getSettings(Method.POST, onSuccess, onError, formData);
+    xhrRequest(MethodSettings);
   };
 
   window.backend = {
