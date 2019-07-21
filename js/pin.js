@@ -139,7 +139,7 @@
     var filteringPrice = function (dataOffers, filterName, filtersMap, priceFilterValues) {
       var range = priceFilterValues[filtersMap[filterName].toUpperCase()];
       dataOffers = dataOffers.filter(function (currentOffer) {
-        return currentOffer.offer.price >= range[0] && currentOffer.offer.price < range[1];
+        return currentOffer.offer.price >= range[0] && currentOffer.offer.price <= range[1];
       });
       return dataOffers;
     };
