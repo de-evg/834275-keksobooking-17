@@ -2,12 +2,12 @@
 
 (function () {
   var utils = window.utils;
-  var inputAvatarImg = utils.nodeFormAd.querySelector('#avatar');
-  var inputRoomImg = utils.nodeFormAd.querySelector('#images');
-  var photoContainer = utils.nodeFormAd.querySelector('.ad-form__photo-container');
-  var avatarDropZone = utils.nodeFormAd.querySelector('.ad-form__field');
-  var roomImgDropZone = utils.nodeFormAd.querySelector('.ad-form__upload');
-  var userAvatar = utils.nodeFormAd.querySelector('.ad-form-header__preview img');
+  var inputAvatarImgElement = utils.nodeFormAd.querySelector('#avatar');
+  var inputRoomImgElement = utils.nodeFormAd.querySelector('#images');
+  var photoContainerElement = utils.nodeFormAd.querySelector('.ad-form__photo-container');
+  var avatarDropZoneElement = utils.nodeFormAd.querySelector('.ad-form__field');
+  var roomImgDropZoneElement = utils.nodeFormAd.querySelector('.ad-form__upload');
+  var userImgAvatarElement = utils.nodeFormAd.querySelector('.ad-form-header__preview img');
   var ImageRoomSize = {
     WIDTH: 40,
     HEIGHT: 44
@@ -45,7 +45,7 @@
     if (photos.querySelector('img')) {
       var photosTemplate = photos.cloneNode(false);
       photosTemplate.appendChild(img);
-      photoContainer.appendChild(photosTemplate);
+      photoContainerElement.appendChild(photosTemplate);
     } else {
       photos.appendChild(img);
     }
@@ -57,14 +57,14 @@
       evt.preventDefault();
       evt.stopPropagation();
     });
-    avatarDropZone.addEventListener(dragEvt, function (evt) {
+    avatarDropZoneElement.addEventListener(dragEvt, function (evt) {
       evt.preventDefault();
       if (dragEvt === 'drop') {
         var data = evt.dataTransfer;
-        insertUserImage(data, userAvatar);
+        insertUserImage(data, userImgAvatarElement);
       }
     });
-    roomImgDropZone.addEventListener(dragEvt, function (evt) {
+    roomImgDropZoneElement.addEventListener(dragEvt, function (evt) {
       evt.preventDefault();
       if (dragEvt === 'drop') {
         var data = evt.dataTransfer;
@@ -79,8 +79,8 @@
    * @param {Object} defaultValues - перечисление полей формы по-умолчанию
    */
   var resetUserAvatar = function (defaultValues) {
-    inputAvatarImg.value = '';
-    userAvatar.src = defaultValues.AVATAR;
+    inputAvatarImgElement.value = '';
+    userImgAvatarElement.src = defaultValues.AVATAR;
   };
 
     /**
@@ -88,16 +88,16 @@
      *
      */
   var resetRoomImages = function () {
-    inputRoomImg.value = '';
+    inputRoomImgElement.value = '';
     var photos = utils.nodeFormAd.querySelector('.ad-form__photo');
     var photosTemplate = photos.cloneNode(false);
     var allPhotos = utils.nodeFormAd.querySelectorAll('.ad-form__photo');
     allPhotos.forEach(function (photo) {
-      photoContainer.removeChild(photo);
+      photoContainerElement.removeChild(photo);
     });
     var fragment = document.createDocumentFragment();
     fragment.appendChild(photosTemplate);
-    photoContainer.appendChild(fragment);
+    photoContainerElement.appendChild(fragment);
   };
 
   var UserImage = {
@@ -112,7 +112,7 @@
   };
 
   window.avatar = {
-    user: userAvatar,
+    user: userImgAvatarElement,
     image: UserImage
   };
 })();
