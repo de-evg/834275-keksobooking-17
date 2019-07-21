@@ -327,7 +327,7 @@
   var onMainPinActivate = function (evt) {
     evt.preventDefault();
     if (main.mapDisabled) {
-      main.activate(renderPins, showError, 'GET');
+      main.activate(renderPins, onRequestErrorShowPopup, 'GET');
     }
     main.mapDisabled = false;
 
@@ -426,7 +426,7 @@
   /**
    * Показывает окно с ошибкой при ошибке загрузки данных меток с сервера.
    */
-  var showError = function () {
+  var onRequestErrorShowPopup = function () {
     var error = utils.nodesTemplate.ERROR.cloneNode(true);
     utils.nodeMain.appendChild(error);
     var errorMessage = utils.nodeMain.querySelector('.error');
@@ -469,7 +469,7 @@
   };
 
   window.pin = {
-    error: showError,
+    error: onRequestErrorShowPopup,
     clear: clearMap
   };
 })();
