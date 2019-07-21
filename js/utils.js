@@ -1,6 +1,11 @@
 'use strict';
 
 (function () {
+  var KeyCode = {
+    ESC: 27,
+    ENTER: 13
+  };
+
   var mainElement = document.querySelector('main');
 
   var mapElement = mainElement.querySelector('.map');
@@ -23,22 +28,55 @@
 
   /**
    * Показывает окно с ошибкой при ошибке загрузки данных с сервера.
-   * @param {Object} template - перечисление шаблонов
-   * @param {Object} parentElement - DOM элемент, в который добавится склонированный элемент
    */
-  var onError = function (template, parentElement) {
-    var error = template.ERROR.cloneNode(true);
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(error);
-    parentElement.appendChild(fragment);
-    error.display = 'block';
+  var onRequestErrorShowPopup = function () {
+    var error = Template.ERROR.cloneNode(true);
+    mainElement.appendChild(error);
+    var errorMessage = mainElement.querySelector('.error');
+    var btnCloseError = errorMessage.querySelector('.error__button');
+
+    /**
+     * Обработчик клика по popup.
+     *
+     * @param {Object} evt - объект события DOM
+     */
+    var onErrorPopupClick = function (evt) {
+      if (evt.target === btnCloseError || evt.target === errorMessage) {
+        closeErrorPopup();
+      }
+    };
+
+    /**
+     * Обработчик нажатия клаваиши ESC.
+     *
+     * @param {Object} evt - объект события DOM
+     */
+    var onEscPress = function (evt) {
+      if (evt.keyCode === KeyCode.ESC) {
+        closeErrorPopup();
+      }
+    };
+
+    /**
+     * Удаляет popup из DOM.
+     *
+     */
+    var closeErrorPopup = function () {
+      mainElement.removeChild(errorMessage);
+      window.removeEventListener('keydown', onEscPress);
+      window.removeEventListener('click', onErrorPopupClick);
+    };
+
+    window.addEventListener('click', onErrorPopupClick);
+    window.addEventListener('keydown', onEscPress);
   };
 
   window.utils = {
-    error: onError,
+    key: KeyCode,
+    error: onRequestErrorShowPopup,
     nodeMain: mainElement,
     nodeMap: mapElement,
-    nodePinList: mapPinsElement,
+    nodeMapPins: mapPinsElement,
     nodeMainPin: mainPinElement,
     nodeFiltersContainer: filtersContainerElement,
     nodeFormMapFilters: mapFiltersElement,

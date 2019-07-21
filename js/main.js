@@ -45,7 +45,6 @@
     backend.loading(URL, onSuccess, onError);
     utils.nodeMap.classList.remove('map--faded');
     isMapDisabled = false;
-    isFilterDisabled(false);
     isAdFormDisabled(false);
   };
 
@@ -66,6 +65,6 @@
     mapDisabled: isMapDisabled,
     activate: activateMap,
     disable: disableMap,
-    url: window.URL
+    filter: isFilterDisabled
   };
 })();

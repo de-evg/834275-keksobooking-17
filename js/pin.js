@@ -2,64 +2,85 @@
 
 (function () {
   var utils = window.utils;
-  var data = window.data;
+  var debounce = window.debounce;
   var main = window.main;
   var form = window.form;
   var card = window.card;
-  var formResetElement = utils.nodeFormAd.querySelector('.ad-form__reset');
+
+  var StartIndexForSlice = {
+    FILTER_NAME: 7,
+    TARGET_ID: 3
+  };
   var FiltersMap = {};
   var Type = {
-    'PALACE': 'Дворец',
-    'FLAT': 'Квартира',
-    'HOUSE': 'Дом',
-    'BUNGALO': 'Бунгало'
+    PALACE: 'Дворец',
+    FLAT: 'Квартира',
+    HOUSE: 'Дом',
+    BUNGALO: 'Бунгало'
+  };
+  var CoordinateMaps = {
+    MIN_X: 0,
+    MAX_X: 1200,
+    MIN_Y: 130,
+    MAX_Y: 630
+  };
+  var PriceFilterValue = {
+    LOW: [-Infinity, 10000],
+    MIDDLE: [10000, 50000],
+    HIGH: [50000, Infinity]
   };
 
   /**
-   * Генерирует объект с данными для метки.
+   * Генерирует HTML элемент для вставки в DOM.
    *
    * @param {Object} pinProperties - объект с данными для генерации новой метки.
-   * @param {number} numberProperties - номер объекта с данными метки для формирования id
    * @param {number} widthPin - ширина метки.
    * @param {number} heightPin - высота метки.
    * @param {Object} cardData - объект с данными для карточки.
    * @return {Object} pinElement - измененный склонированный элемент.
    */
-  var generatePin = function (pinProperties, numberProperties, widthPin, heightPin, cardData) {
+  var generatePinElement = function (pinProperties, widthPin, heightPin) {
     var pinElement = utils.nodesTemplate.PIN.cloneNode(true);
+    var pinImgElement = pinElement.querySelector('img');
     pinElement.style.cssText = 'left: ' + (pinProperties.location.x - widthPin / 2) + 'px; top: ' + (pinProperties.location.y - heightPin) + 'px;';
-    pinElement.querySelector('img').src = pinProperties.author.avatar;
-    pinElement.querySelector('img').alt = 'Метка похожего объявления';
-    pinElement.querySelector('img').id = 'img' + numberProperties;
-    pinElement.id = 'pin' + numberProperties;
-    cardData[numberProperties] = pinProperties;
+    pinImgElement.src = pinProperties.author.avatar;
+    pinImgElement.alt = 'Метка похожего объявления';
+    pinElement.id = pinProperties.index;
     return pinElement;
   };
 
   /**
-   * Обновляет массив до необходимого количство объектов с данными для метки.
+   * Обрезает массив до необходимого количство объектов.
    *
-   * @param {Array} dataArray - массив с объектами для генерации меток.
+   * @param {Array} filteredData - массив с объектами для генерации меток.
    * @param {Object} pinsSettings - перечисление параметров меток.
    * @return {Array} обновленный массив.
    */
-  var getUpdatedData = function (dataArray, pinsSettings) {
-    return dataArray.slice(0, pinsSettings.MAX_PINS);
+  var sliceToRequriedOffers = function (filteredData, pinsSettings) {
+    return filteredData.slice(0, pinsSettings.MAX_PINS);
   };
 
   /**
    * Генерирует необходимое количество меток и добавляет их в DOM.
    *
-   * @param {Array} updatedData - массив с данными для рендера меток.
+   * @param {Array} requriedOffers - массив с данными для рендера меток.
    * @param {Object} pinsSettings - перечисление параметров меток.
    * @param {Object} cardData - объект с данными для карточки.
    */
-  var getPins = function (updatedData, pinsSettings, cardData) {
+  var getPins = function (requriedOffers, pinsSettings) {
     var fragment = document.createDocumentFragment();
-    updatedData.forEach(function (offer, i) {
-      fragment.appendChild(generatePin(offer, i, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN, cardData));
+    requriedOffers.forEach(function (offer) {
+      try {
+        if (!offer.offer) {
+          throw new SyntaxError('Данные некорректны');
+        }
+        var generatedPinElement = generatePinElement(offer, pinsSettings.WIDTH_PIN, pinsSettings.HEIGHT_PIN);
+        fragment.appendChild(generatedPinElement);
+      } catch (err) {
+        return;
+      }
     });
-    utils.nodePinList.appendChild(fragment);
+    utils.nodeMapPins.appendChild(fragment);
   };
 
   /**
@@ -69,33 +90,148 @@
    * @param {Object} pinsSettings - перечисление параметров меток.
    */
   var renderPins = function (loadedData, pinsSettings) {
-    var updatedData = getUpdatedData(loadedData, pinsSettings);
-    var dataForCard = {};
-    getPins(updatedData, pinsSettings, dataForCard);
+    loadedData.forEach(function (offer, i) {
+      offer.index = i;
+    });
+    var requriedOffers = sliceToRequriedOffers(loadedData, pinsSettings);
+    getPins(requriedOffers, pinsSettings);
+    main.filter(false);
 
     /**
-     * Фильтрует массив предложений.
+     * Фильтрует данные по типу предложения.
+     *
+     * @param {Array} dataOffers - фильтруемые данные.
+     * @param {String} filterName - название примененного фильтра
+     * @param {Object} filtersMap - перечисление примененных фильтров
+     * @return {Array} dataOffers - отфильтрованные данные
+     */
+    var filteringType = function (dataOffers, filterName, filtersMap) {
+      dataOffers = dataOffers.filter(function (currentOffer) {
+        return currentOffer.offer.type === filtersMap[filterName];
+      });
+      return dataOffers;
+    };
+
+    /**
+     * Фильтрует данные по Количеству комнат.
+     *
+     * @param {Array} dataOffers - фильтруемые данные.
+     * @param {String} filterName - название примененного фильтра
+     * @param {Object} filtersMap - перечисление примененных фильтров
+     * @return {Array} dataOffers - отфильтрованные данные
+     */
+    var filteringRooms = function (dataOffers, filterName, filtersMap) {
+      dataOffers = dataOffers.filter(function (currentOffer) {
+        return currentOffer.offer.rooms === +filtersMap[filterName];
+      });
+      return dataOffers;
+    };
+
+    /**
+     * Фильтрует данные по цене.
+     *
+     * @param {Array} dataOffers - фильтруемые данные.
+     * @param {String} filterName - название примененного фильтра
+     * @param {Object} filtersMap - перечисление примененных фильтров
+     * @param {Object} priceFilterValues - перечисление значений цены с диапазоном цены
+     * @return {Array} dataOffers - отфильтрованные данные
+     */
+    var filteringPrice = function (dataOffers, filterName, filtersMap, priceFilterValues) {
+      var range = priceFilterValues[filtersMap[filterName].toUpperCase()];
+      dataOffers = dataOffers.filter(function (currentOffer) {
+        return currentOffer.offer.price >= range[0] && currentOffer.offer.price <= range[1];
+      });
+      return dataOffers;
+    };
+
+    /**
+     * Фильтрует данные по количеству гостей.
+     *
+     * @param {Array} dataOffers - фильтруемые данные.
+     * @param {String} filterName - название примененного фильтра
+     * @param {Object} filtersMap - перечисление примененных фильтров
+     * @return {Array} dataOffers - отфильтрованные данные
+     */
+    var filteringGuests = function (dataOffers, filterName, filtersMap) {
+      dataOffers = dataOffers.filter(function (currentOffer) {
+        return !currentOffer.offer.guests ? currentOffer.offer.guests === +filtersMap[filterName] : currentOffer.offer.guests >= +filtersMap[filterName] && !!(+filtersMap[filterName]);
+      });
+      return dataOffers;
+    };
+
+    /**
+     * Фильтрует данные по наличию какой-либо особенности.
+     *
+     * @param {Array} dataOffers - фильтруемые данные.
+     * @param {String} filterName - название примененного фильтра
+     * @param {Object} filtersMap - перечисление примененных фильтров
+     * @return {Array} dataOffers - отфильтрованные данные
+     */
+    var filteringFeatures = function (dataOffers, filterName, filtersMap) {
+      dataOffers = dataOffers.filter(function (currentOffer) {
+        var indexOfFilter = currentOffer.offer.features.indexOf(filterName.slice(StartIndexForSlice.FILTER_NAME));
+        return currentOffer.offer.features[indexOfFilter] === filtersMap[filterName];
+      });
+      return dataOffers;
+    };
+
+    var Filter = {
+      'HOUSING-TYPE': {
+        employ: filteringType
+      },
+      'HOUSING-ROOMS': {
+        employ: filteringRooms
+      },
+      'HOUSING-PRICE': {
+        employ: filteringPrice
+      },
+      'HOUSING-GUESTS': {
+        employ: filteringGuests
+      },
+      'FILTER-WIFI': {
+        employ: filteringFeatures
+      },
+      'FILTER-DISHWASHER': {
+        employ: filteringFeatures
+      },
+      'FILTER-PARKING': {
+        employ: filteringFeatures
+      },
+      'FILTER-WASHER': {
+        employ: filteringFeatures
+      },
+      'FILTER-ELEVATOR': {
+        employ: filteringFeatures
+      },
+      'FILTER-CONDITIONER': {
+        employ: filteringFeatures
+      }
+    };
+
+    /**
+     * Обрабатывает изменение фильтра.
      *
      * @param {Object} evt - DOM объект собыитя.
      */
-    var filterData = function (evt) {
-      removePins();
-      createFilterMap(evt.target, FiltersMap);
-      var filteredData = filteringData(loadedData, evt.target, FiltersMap);
-      updatedData = getUpdatedData(filteredData, pinsSettings);
-      window.setTimeout(function () {
-        getPins(updatedData, pinsSettings, dataForCard);
-      }, 500);
+    var onMapFiltersChange = function (evt) {
+      updateFiltersMap(evt.target, FiltersMap);
+      debounce.set(function () {
+        card.close();
+        removePins();
+        var filteredData = filteringData(loadedData, FiltersMap, Filter, PriceFilterValue);
+        requriedOffers = sliceToRequriedOffers(filteredData, pinsSettings);
+        getPins(requriedOffers, pinsSettings);
+      });
     };
-    utils.nodeFormMapFilters.addEventListener('change', filterData);
+    utils.nodeFormMapFilters.addEventListener('change', onMapFiltersChange);
 
     /**
-     * Наполняет перечисление примененных фильтров.
+     * Перечисляет примененные фильтры.
      *
-     * @param {Object} filterElement - node полученный по событию.
+     * @param {Object} filterElement - измененный фильтр.
      * @param {Object} filtersMap - перечисление примененных фильтров
      */
-    var createFilterMap = function (filterElement, filtersMap) {
+    var updateFiltersMap = function (filterElement, filtersMap) {
       var filterName = filterElement.id;
       var value = filterElement.value;
       if (value === 'any' || filterElement.checked === false) {
@@ -108,71 +244,23 @@
     /**
      * Фильтрует массив предложений.
      *
-     * @param {Array} dataArray - массив с предложениями.
-     * @param {Object} changedFilterElement - тип предложения
+     * @param {Array} dataOffers - массив с предложениями.
      * @param {Object} filtersMap - перечисление примененных фильтров
+     * @param {Object} filters - перечисление всех фильтров
+     * @param {Object} priceFilterValue - перечисление значений цены с диапазоном цены.
      * @return {Array} отфильтрованный массив
      */
-    var filteringData = function (dataArray, changedFilterElement, filtersMap) {
+    var filteringData = function (dataOffers, filtersMap, filters, priceFilterValue) {
       var filterNames = Object.keys(filtersMap);
       if (filterNames.length === 0) {
-        return dataArray;
+        return dataOffers;
       } else {
-        var newData = dataArray.slice();
-        filterNames.forEach(function (filter) {
-          switch (filter) {
-            case 'housing-type':
-              newData = newData.filter(function (currentOffer) {
-                return currentOffer.offer.type === filtersMap[filter];
-              });
-              break;
-
-            case 'housing-rooms':
-              newData = newData.filter(function (currentOffer) {
-                return currentOffer.offer.rooms === +filtersMap[filter];
-              });
-              break;
-
-            case 'housing-price':
-              switch (filtersMap[filter]) {
-                case 'low':
-                  newData = newData.filter(function (currentOffer) {
-                    return currentOffer.offer.price < 10000;
-                  });
-                  break;
-                case 'middle':
-                  newData = newData.filter(function (currentOffer) {
-                    return currentOffer.offer.price >= 10000 && currentOffer.offer.price < 50000;
-                  });
-                  break;
-                case 'high':
-                  newData = newData.filter(function (currentOffer) {
-                    return currentOffer.offer.price > 50000;
-                  });
-                  break;
-              }
-              break;
-
-            case 'housing-guests':
-              newData = newData.filter(function (currentOffer) {
-                if (currentOffer.offer.guests === 0) {
-                  return currentOffer.offer.guests === +filtersMap[filter];
-                } else {
-                  return currentOffer.offer.guests >= +filtersMap[filter] && +filtersMap[filter] !== 0;
-                }
-
-              });
-              break;
-            case 'filter-' + filter.slice(7):
-              newData = newData.filter(function (currentOffer) {
-                var indexOfFilter = currentOffer.offer.features.indexOf(filter.slice(7));
-                return currentOffer.offer.features[indexOfFilter] === filtersMap[filter];
-              });
-              break;
-          }
+        var newDataOffers = dataOffers.slice();
+        filterNames.forEach(function (filterName) {
+          newDataOffers = filters[filterName.toUpperCase()].employ(newDataOffers, filterName, filtersMap, priceFilterValue);
         });
       }
-      return newData;
+      return newDataOffers;
     };
 
     /**
@@ -181,25 +269,26 @@
      * @param {Object} evt - DOM объект собыитя.
      */
     var onPinClick = function (evt) {
-      if (dataForCard[evt.target.id.slice(3)]) {
+      if (evt.target.tagName === 'BUTTON') {
+        var clickedPin = evt.target;
+      } else if (evt.target.parentElement.tagName === 'BUTTON') {
+        clickedPin = evt.target.parentElement;
+      }
+      if (!clickedPin.classList.contains('map__pin--main')) {
         card.close();
-        card.render(utils.nodesTemplate, dataForCard[evt.target.id.slice(3)], Type);
-        var renderedCardElement = utils.nodeMap.querySelector('.map__card');
-        var cardCloseElement = renderedCardElement.querySelector('.popup__close');
-        cardCloseElement.addEventListener('click', card.close);
-        renderedCardElement.addEventListener('keydown', card.pressEsc);
+        clickedPin.classList.add('map__pin--active');
+        var dataForCard = loadedData.filter(function (offer) {
+          return (offer.index + '') === clickedPin.id;
+        });
+        card.render(utils.nodesTemplate, dataForCard[0], Type);
       }
     };
+    utils.nodeMapPins.addEventListener('click', onPinClick);
 
-    utils.nodePinList.addEventListener('click', onPinClick);
-
-    formResetElement.addEventListener('click', function (evt) {
-      evt.preventDefault();
-      resetPin();
-      form.reset();
+    utils.nodeFormAd.addEventListener('reset', function () {
+      clearMap();
     });
   };
-
 
   /**
    * Удаляет метки из DOM дерева.
@@ -207,9 +296,8 @@
    */
   var removePins = function () {
     var similarPinElements = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    var pins = Array.from(similarPinElements);
-    pins.forEach(function (pin) {
-      utils.nodePinList.removeChild(pin);
+    similarPinElements.forEach(function (pin) {
+      utils.nodeMapPins.removeChild(pin);
     });
   };
 
@@ -225,25 +313,18 @@
   /**
    * Возвращает страницу в исходное состояние.
    */
-  var clearPage = function () {
+  var clearMap = function () {
     resetPin();
     main.mapDisabled = true;
     removePins();
     card.close();
-    form.reset();
     utils.nodeFormMapFilters.reset();
     main.disable();
-    Object.keys(FiltersMap).forEach(function (key) {
-      delete FiltersMap[key];
-    });
-    var successElement = utils.nodesTemplate.SUCCESS.cloneNode(true);
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(successElement);
-    utils.nodeMain.appendChild(fragment);
+    FiltersMap = {};
   };
 
   // Взаимодействие с меткой
-  utils.nodeMainPin.addEventListener('mousedown', function (evt) {
+  var onMainPinActivate = function (evt) {
     evt.preventDefault();
     if (main.mapDisabled) {
       main.activate(renderPins, utils.error, 'GET');
@@ -283,10 +364,10 @@
       utils.nodeMainPin.style.left = utils.nodeMainPin.offsetLeft - shift.x + 'px';
 
       var Limits = {
-        MIN_X: data.coordinate.MIN_X,
-        MAX_X: data.coordinate.MAX_X - form.sizePin.WIDTH,
-        MIN_Y: data.coordinate.MIN_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT,
-        MAX_Y: data.coordinate.MAX_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT
+        MIN_X: CoordinateMaps.MIN_X,
+        MAX_X: CoordinateMaps.MAX_X - form.sizePin.WIDTH,
+        MIN_Y: CoordinateMaps.MIN_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT,
+        MAX_Y: CoordinateMaps.MAX_Y - form.sizePin.HEIGHT / 2 - form.sizePin.POINTER_HEIGHT
       };
 
       if (parseInt(utils.nodeMainPin.style.top, 10) < Limits.MIN_Y) {
@@ -323,14 +404,26 @@
       };
       form.address(PinCoords, form.sizePin, main.mapDisabled);
     };
-
+    utils.nodeMainPin.removeEventListener('keydown', onEnterPress);
     utils.nodeMap.addEventListener('mousemove', onMouseMove);
     utils.nodeMap.addEventListener('mouseup', onMouseUp);
-  });
+  };
+
+  /**
+   * Обработчик нажатия клаваиши ENTER.
+   *
+   * @param {Object} evt - объект события DOM
+   */
+  var onEnterPress = function (evt) {
+    if (evt.keyCode === utils.key.ENTER) {
+      onMainPinActivate(evt);
+    }
+  };
+
+  utils.nodeMainPin.addEventListener('mousedown', onMainPinActivate);
+  utils.nodeMainPin.addEventListener('keydown', onEnterPress);
 
   window.pin = {
-    remove: removePins,
-    clear: clearPage,
-    filters: FiltersMap
+    clear: clearMap
   };
 })();

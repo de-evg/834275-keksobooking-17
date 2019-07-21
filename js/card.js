@@ -2,61 +2,144 @@
 
 (function () {
   var utils = window.utils;
-  var ESC_CODE = 27;
 
   /**
-   * Генерирует DOM элемент карточки с предложением.
+   * Заполняет склонированный HTML элемент данными выбранного предложения.
    *
+   * @param {Object} cardElement - склонированный HTML элемент
    * @param {Object} template - объект с данными для генерации новой карточки.
-   * @param {Object} dataForCard - номер объекта с данными конкретной метки
+   * @param {Object} dataForCard - объекта с данными выбранного предложения
    * @param {Object} types - словарь типа меток (eng: рус).
    * @return {Object} cardElement - DOM элемент карточки с предложением
    */
-  var generateCard = function (template, dataForCard, types) {
-    var cardElement = template.CARD.cloneNode(true);
-    cardElement.querySelector('img').src = dataForCard.author.avatar;
-    cardElement.querySelector('.popup__title').textContent = dataForCard.offer.title;
-    cardElement.querySelector('.popup__text--address').textContent = dataForCard.offer.address;
-    cardElement.querySelector('.popup__text--price').textContent = dataForCard.offer.price + '₽/ночь';
-
-    // вставка типа жилья на русском языке
-    var offerType = Object.keys(types).filter(function (key) {
-      return key.toLowerCase() === dataForCard.offer.type;
-    });
-    cardElement.querySelector('.popup__type').textContent = types[offerType];
-
-    cardElement.querySelector('.popup__text--capacity').textContent = dataForCard.offer.rooms + ' комнаты для ' + dataForCard.offer.guests;
-    cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + dataForCard.offer.checkin + ', выезд до ' + dataForCard.offer.checkout;
-
-    // удаление из шаблона списка особенностей
-    var featuresElement = cardElement.querySelector('.popup__features');
-    while (featuresElement.querySelector('.popup__feature')) {
-      featuresElement.removeChild(featuresElement.querySelector('.popup__feature'));
+  var generateCardElement = function (cardElement, template, dataForCard, types) {
+    // вставка аватара
+    try {
+      var userAvatar = cardElement.querySelector('.popup__avatar');
+      if (!dataForCard.author.avatar) {
+        throw new SyntaxError('Данные некорректны');
+      }
+      userAvatar.src = dataForCard.author.avatar;
+    } catch (err) {
+      userAvatar.style.display = 'none';
     }
 
-    // вставка актуальных особенностей
-    dataForCard.offer.features.forEach(function (feature) {
-      var listItemElement = document.createElement('li');
-      listItemElement.classList.add('popup__feature', 'popup__feature--' + feature);
-      featuresElement.appendChild(listItemElement);
-    });
+    // вставка заголовка
+    try {
+      var offerTitle = cardElement.querySelector('.popup__title');
+      if (!dataForCard.offer.title) {
+        throw new SyntaxError('Данные некорректны');
+      }
+      offerTitle.textContent = dataForCard.offer.title;
+    } catch (err) {
+      offerTitle.style.display = 'none';
+    }
+
+    // вставка адреса
+    try {
+      var offerAddress = cardElement.querySelector('.popup__text--address');
+      if (!dataForCard.offer.address) {
+        throw new SyntaxError('Данные некорректны');
+      }
+      offerAddress.textContent = dataForCard.offer.address;
+    } catch (err) {
+      offerAddress.style.display = 'none';
+    }
+
+    // вставка цены
+    try {
+      var offerPrice = cardElement.querySelector('.popup__text--price');
+      if (!dataForCard.offer.price) {
+        throw new SyntaxError('Данные некорректны');
+      }
+      offerPrice.textContent = dataForCard.offer.price + '₽/ночь';
+    } catch (err) {
+      offerPrice.style.display = 'none';
+    }
+
+    // вставка типа жилья на русском языке
+    try {
+      var typeHousing = cardElement.querySelector('.popup__type');
+      if (!dataForCard.offer.type) {
+        throw new SyntaxError('Данные некорректны');
+      }
+      var offerType = Object.keys(types).filter(function (key) {
+        return key.toLowerCase() === dataForCard.offer.type;
+      });
+      typeHousing.textContent = types[offerType];
+    } catch (err) {
+      typeHousing.style.display = 'none';
+    }
+
+    // вставка строки с количеством комнат и количеством гостей
+    try {
+      var offerCapacity = cardElement.querySelector('.popup__text--capacity');
+      if (!dataForCard.offer.rooms || !dataForCard.offer.guests) {
+        throw new SyntaxError('Данные некорректны');
+      }
+      offerCapacity.textContent = dataForCard.offer.rooms + ' комнаты для ' + dataForCard.offer.guests;
+    } catch (err) {
+      offerCapacity.style.display = 'none';
+    }
+
+    try {
+      var offerTime = cardElement.querySelector('.popup__text--time');
+      if (!dataForCard.offer.checkin || !dataForCard.offer.checkout) {
+        throw new SyntaxError('Данные некорректны');
+      }
+      offerTime.textContent = 'Заезд после ' + dataForCard.offer.checkin + ', выезд до ' + dataForCard.offer.checkout;
+    } catch (err) {
+      offerTime.style.display = 'none';
+    }
+
+    // вставка особенностей
+    try {
+      var featuresElement = cardElement.querySelector('.popup__features');
+      if (dataForCard.offer.features.length === 0 || !dataForCard.offer.features) {
+        throw new SyntaxError('Данные некорректны');
+      }
+      // удаление из шаблона списка особенностей
+      while (featuresElement.querySelector('.popup__feature')) {
+        featuresElement.removeChild(featuresElement.querySelector('.popup__feature'));
+      }
+
+      // вставка актуальных особенностей
+      dataForCard.offer.features.forEach(function (feature) {
+        var listItemElement = document.createElement('li');
+        listItemElement.classList.add('popup__feature', 'popup__feature--' + feature);
+        featuresElement.appendChild(listItemElement);
+      });
+    } catch (err) {
+      featuresElement.style.display = 'none';
+    }
 
     // вставка описания
-    cardElement.querySelector('.popup__description').textContent = dataForCard.offer.description;
+    try {
+      var offerDescription = cardElement.querySelector('.popup__description');
+      if (!dataForCard.offer.description) {
+        throw new SyntaxError('Данные некорректны');
+      }
+      offerDescription.textContent = dataForCard.offer.description;
+    } catch (err) {
+      offerDescription.style.display = 'none';
+    }
 
     // вставка фотографий
-    var photosElement = cardElement.querySelector('.popup__photos');
-    var imgElement = photosElement.querySelector('img');
-
-    dataForCard.offer.photos.forEach(function (addressPhoto) {
-      var newImg = imgElement.cloneNode();
-      newImg.src = addressPhoto;
-      photosElement.appendChild(newImg);
-    });
-    photosElement.removeChild(imgElement);
-
-    // вставка аватара
-    cardElement.querySelector('.popup__avatar').src = dataForCard.author.avatar;
+    try {
+      var photosElement = cardElement.querySelector('.popup__photos');
+      var imgElement = photosElement.querySelector('img');
+      if (dataForCard.offer.photos.length === 0 || !dataForCard.offer.photos.length) {
+        throw new SyntaxError('Данные некорректны');
+      }
+      dataForCard.offer.photos.forEach(function (addressPhoto) {
+        var newImg = imgElement.cloneNode();
+        newImg.src = addressPhoto;
+        photosElement.appendChild(newImg);
+      });
+      photosElement.removeChild(imgElement);
+    } catch (err) {
+      photosElement.style.display = 'none';
+    }
 
     return cardElement;
   };
@@ -65,46 +148,53 @@
    * Добавляет в DOM карту с предложением.
    *
    * @param {Object} template - объект с данными для генерации новой карточки.
-   * @param {Object} dataForCard - номер объекта с данными конкретной метки
+   * @param {Object} dataForCard - объект с данными конкретной метки
    * @param {Object} types - словарь типа меток (eng: рус).
    */
   var renderCard = function (template, dataForCard, types) {
+    var cardElement = template.CARD.cloneNode(true);
+    var generatedCardElement = generateCardElement(cardElement, template, dataForCard, types);
     var fragment = document.createDocumentFragment();
-    fragment.appendChild(generateCard(template, dataForCard, types));
+    fragment.appendChild(generatedCardElement);
     utils.nodeFiltersContainer.before(fragment);
+
+    var cardCloseElement = utils.nodeMap.querySelector('.map__card .popup__close');
+    cardCloseElement.addEventListener('click', onButtonCloseClick);
+    window.addEventListener('keydown', onCardEscPress);
   };
 
-  /**
-   * Закрывает карту.
-   *
-   */
   var closeCard = function () {
     if (utils.nodeMap.querySelector('.map__card')) {
-      var renderedCardElement = utils.nodeMap.querySelector('.map__card');
-      var cardCloseElement = renderedCardElement.querySelector('.popup__close');
-      cardCloseElement.removeEventListener('click', closeCard);
-      renderedCardElement.removeEventListener('click', onCardEscPress);
-
+      var activatedPin = utils.nodeMapPins.querySelector('.map__pin--active');
+      if (activatedPin) {
+        activatedPin.classList.remove('map__pin--active');
+      }
       var currentCard = utils.nodeMap.querySelector('.map__card');
       utils.nodeMap.removeChild(currentCard);
+      window.removeEventListener('keydown', onCardEscPress);
     }
   };
 
   /**
-   * Закрывает карту при нажатии наа ESC.
+   * Обработчик нажатия на кнопку закрытия карточки.
+   *
+   */
+  var onButtonCloseClick = function () {
+    closeCard();
+  };
+
+  /**
+   * Обработчик нажатия на калвишу ESC при открытой карточке.
    * @param {Object} evt - DOM объект события
    */
   var onCardEscPress = function (evt) {
-    if (evt.keyCode === ESC_CODE) {
+    if (evt.keyCode === utils.key.ESC) {
       closeCard();
     }
   };
 
   window.card = {
-    getCard: generateCard,
     render: renderCard,
-    close: closeCard,
-    pressEsc: onCardEscPress,
-    escCode: ESC_CODE
+    close: onButtonCloseClick,
   };
 })();
