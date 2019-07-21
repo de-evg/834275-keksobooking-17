@@ -26,8 +26,54 @@
     SUCCESS: document.querySelector('#success').content.querySelector('.success')
   };
 
+  /**
+   * Показывает окно с ошибкой при ошибке загрузки данных меток с сервера.
+   */
+  var onRequestErrorShowPopup = function () {
+    var error = Template.ERROR.cloneNode(true);
+    mainElement.appendChild(error);
+    var errorMessage = mainElement.querySelector('.error');
+    var btnCloseError = errorMessage.querySelector('.error__button');
+
+    /**
+     * Обработчик клика по popup.
+     *
+     * @param {Object} evt - объект события DOM
+     */
+    var onErrorPopupClick = function (evt) {
+      if (evt.target === btnCloseError || evt.target === errorMessage) {
+        closeErrorPopup();
+      }
+    };
+
+    /**
+     * Обработчик нажатия клаваиши ESC.
+     *
+     * @param {Object} evt - объект события DOM
+     */
+    var onEscPress = function (evt) {
+      if (evt.keyCode === KeyCode.ESC) {
+        closeErrorPopup();
+      }
+    };
+
+    /**
+     * Удаляет popup из DOM.
+     *
+     */
+    var closeErrorPopup = function () {
+      mainElement.removeChild(errorMessage);
+      window.removeEventListener('keydown', onEscPress);
+      window.removeEventListener('click', onErrorPopupClick);
+    };
+
+    window.addEventListener('click', onErrorPopupClick);
+    window.addEventListener('keydown', onEscPress);
+  };
+
   window.utils = {
     key: KeyCode,
+    error: onRequestErrorShowPopup,
     nodeMain: mainElement,
     nodeMap: mapElement,
     nodeMapPins: mapPinsElement,

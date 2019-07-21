@@ -69,7 +69,7 @@
     var formData = new FormData(utils.nodeFormAd);
     if (utils.nodeFormAd.checkValidity()) {
       evt.preventDefault();
-      backend.publish(URL, formData, resetPage, pin.error);
+      backend.publish(URL, formData, resetPage, utils.error);
     }
   });
 })();

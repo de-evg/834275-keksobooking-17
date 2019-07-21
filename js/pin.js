@@ -327,7 +327,7 @@
   var onMainPinActivate = function (evt) {
     evt.preventDefault();
     if (main.mapDisabled) {
-      main.activate(renderPins, onRequestErrorShowPopup, 'GET');
+      main.activate(renderPins, utils.error, 'GET');
     }
     main.mapDisabled = false;
 
@@ -423,53 +423,7 @@
   utils.nodeMainPin.addEventListener('mousedown', onMainPinActivate);
   utils.nodeMainPin.addEventListener('keydown', onEnterPress);
 
-  /**
-   * Показывает окно с ошибкой при ошибке загрузки данных меток с сервера.
-   */
-  var onRequestErrorShowPopup = function () {
-    var error = utils.nodesTemplate.ERROR.cloneNode(true);
-    utils.nodeMain.appendChild(error);
-    var errorMessage = utils.nodeMain.querySelector('.error');
-    var btnCloseError = error.querySelector('.error .error__button');
-
-    /**
-     * Обработчик клика по popup.
-     *
-     * @param {Object} evt - объект события DOM
-     */
-    var onErrorPopupClick = function (evt) {
-      if (evt.target === btnCloseError || evt.target === errorMessage) {
-        closeErrorPopup();
-      }
-    };
-
-    /**
-     * Обработчик нажатия клаваиши ESC.
-     *
-     * @param {Object} evt - объект события DOM
-     */
-    var onEscPress = function (evt) {
-      if (evt.keyCode === utils.key.ESC) {
-        closeErrorPopup();
-      }
-    };
-
-    /**
-     * Удаляет popup из DOM.
-     *
-     */
-    var closeErrorPopup = function () {
-      utils.nodeMain.removeChild(errorMessage);
-      window.removeEventListener('keydown', onEscPress);
-      window.removeEventListener('click', onErrorPopupClick);
-    };
-
-    window.addEventListener('click', onErrorPopupClick);
-    window.addEventListener('keydown', onEscPress);
-  };
-
   window.pin = {
-    error: onRequestErrorShowPopup,
     clear: clearMap
   };
 })();
